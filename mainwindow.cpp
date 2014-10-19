@@ -1,6 +1,6 @@
 /***************************************************
-** Author: Dmitry Kukovinets (d1021976@gmail.com)
-****************************************************/
+** Author: Dmitry Kukovinets (d1021976@gmail.com) **
+***************************************************/
 
 #include "mainwindow.h"
 
@@ -62,11 +62,13 @@ MainWindow::MainWindow(QWidget *parent):
 	// wnd.setLayout(layout);
 	
 	
-	QSplitter *mainSplit = new QSplitter;
-	mainSplit->addWidget(new QTextEdit);
-	mainSplit->addWidget(new QTextEdit);
-	mainSplit->addWidget(new QTextEdit);
-	QMainWindow::setCentralWidget(mainSplit);
+	// QSplitter *mainSplit = new QSplitter;
+	// mainSplit->addWidget(new QTextEdit);
+	// mainSplit->addWidget(new QTextEdit);
+	// mainSplit->addWidget(new QTextEdit);
+	// QMainWindow::setCentralWidget(mainSplit);
+	
+	QMainWindow::setCentralWidget(new Task("Some widget"));
 }
 
 MainWindow::~MainWindow()
