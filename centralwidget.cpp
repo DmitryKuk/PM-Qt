@@ -1,5 +1,3 @@
-/***************************************************
-** Author: Dmitry Kukovinets (d1021976@gmail.com) **
-***************************************************/
+// Author: Dmitry Kukovinets (d1021976@gmail.com)
 
 #include "centralwidget.h"

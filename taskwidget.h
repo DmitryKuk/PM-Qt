@@ -1,43 +1,54 @@
-/***************************************************
-** Author: Dmitry Kukovinets (d1021976@gmail.com) **
-***************************************************/
+// Author: Dmitry Kukovinets (d1021976@gmail.com)
 
 #ifndef TASKWIDGET_H
 #define TASKWIDGET_H
 
 #include <QtWidgets>
 
+#include "taskbutton.h"
 
-#define TASKWIDGET_SIZE_MIN_H			100
-#define TASKWIDGET_SIZE_MIN_V			10
-#define TASKWIDGET_SIZE_MAX_H			500
-#define TASKWIDGET_SIZE_MAX_V			150
-#define TASKWIDGET_LABEL_ALIGNMENT		Qt::AlignTop | Qt::AlignLeft
-#define TASKWIDGET_FRAME_STYLE			QFrame::Box
-#define TASKWIDGET_SIZE_POLICY_H		QSizePolicy::Expanding
-#define TASKWIDGET_SIZE_POLICY_V		QSizePolicy::MinimumExpanding
-
-
-class Task: public QFrame
+class TaskWidget: public QFrame
 {
+	Q_OBJECT
+	
 public:
-	Task(const QString &name_, QWidget *parent_ = nullptr);
+	// Size
+	static const QSize
+		SizeMin,
+		SizeMax;
+	static const QSizePolicy
+		SizePolicy;
+	
+	// Progress
+	static const std::pair<int, int>	// (Min, Max)
+		ProgressRange;
+	
+	// Other
+	static const Qt::Alignment
+		LabelAlignment;
+	static const int
+		FrameStyle;
+	
+	
+	TaskWidget(const QString &label, QWidget *parent = nullptr);
 	
 	virtual QString label() const;
+	
+	virtual int progress() const;
+	virtual void setProgress(int value);
 private:
 	QVBoxLayout *mainLayout_;
 	QHBoxLayout *progressLayout_;
 	QLabel *label_;
-	QWidget *progressContainer_;
 	QProgressBar *progressBar_;
-	QPushButton *startPauseButton_, *cancelButton_;
+	TaskButton *actionButton_, *cancelButton_;
 };
 
 // this (mainLayout)
 // 		-> label
 // 		-> progressContainer (progressLayout)
 // 			-> progressBar
-// 			-> startPauseButton
+// 			-> actionButton
 // 			-> cancelButton
 
 #endif	// TASKWIDGET_H

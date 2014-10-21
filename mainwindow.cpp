@@ -1,10 +1,8 @@
-/***************************************************
-** Author: Dmitry Kukovinets (d1021976@gmail.com) **
-***************************************************/
+// Author: Dmitry Kukovinets (d1021976@gmail.com)
 
 #include "mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent):
+MainWindow::MainWindow(const QString &title, QWidget *parent):
 	QMainWindow(parent)
 {
 	// Test window
@@ -68,7 +66,31 @@ MainWindow::MainWindow(QWidget *parent):
 	// mainSplit->addWidget(new QTextEdit);
 	// QMainWindow::setCentralWidget(mainSplit);
 	
-	QMainWindow::setCentralWidget(new Task("Some widget"));
+	// TaskWidget
+	auto *widget = new QWidget(this);
+	QVBoxLayout *layout = new QVBoxLayout(widget);
+	widget->setLayout(layout);
+	
+	auto *widget1 = new TaskWidget("Some task1", widget);
+	auto *widget2 = new TaskWidget("Some task2", widget);
+	auto *widget3 = new TaskWidget("Some task3", widget);
+	
+	layout->addWidget(widget1);
+	layout->addWidget(widget2);
+	layout->addWidget(widget3);
+	
+	widget1->setProgress(50);
+	widget2->setProgress(30);
+	widget3->setProgress(75);
+	
+	
+	// TaskListWidget
+	//auto *widget = new TaskListWidget("Operations", this);
+	// widget->addTask("First task");
+	// widget->addTask("Second task");
+	
+	this->setWindowTitle(title);
+	QMainWindow::setCentralWidget(widget);
 }
 
 MainWindow::~MainWindow()

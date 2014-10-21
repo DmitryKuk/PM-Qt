@@ -1,40 +1,73 @@
-/***************************************************
-** Author: Dmitry Kukovinets (d1021976@gmail.com) **
-***************************************************/
+// Author: Dmitry Kukovinets (d1021976@gmail.com)
 
 #include "taskwidget.h"
 
-Task::Task(const QString &name_, QWidget *parent_):
-	QFrame(parent_),
+// Size
+const QSize
+	TaskWidget::SizeMin(100, 70),
+	TaskWidget::SizeMax(500, 150);
+
+const QSizePolicy
+	TaskWidget::SizePolicy(QSizePolicy::Expanding, QSizePolicy::MinimumExpanding);
+
+// Progress
+const std::pair<int, int>
+	TaskWidget::ProgressRange(0, 100);
+
+// Other
+const Qt::Alignment
+	TaskWidget::LabelAlignment = Qt::AlignTop | Qt::AlignLeft;
+const int
+	TaskWidget::FrameStyle = QFrame::Box;
+
+
+TaskWidget::TaskWidget(const QString &label, QWidget *parent):
+	QFrame(parent),
 	mainLayout_(new QVBoxLayout(this)),
 	progressLayout_(new QHBoxLayout(this)),
 	label_(new QLabel(this)),
-	progressContainer_(new QWidget(this)),
-	progressBar_(new QProgressBar(progressContainer_)),
-	startPauseButton_(new QPushButton("Start/Pause", progressContainer_)),
-	cancelButton_(new QPushButton("Cancel", progressContainer_))
+	progressBar_(new QProgressBar(this)),
+	actionButton_(new TaskButton("Action", this)),
+	cancelButton_(new TaskButton("Cancel", this))
 {
 	// Label setting...
-	this->label_->setText(name_);
-	this->label_->setAlignment(TASKWIDGET_LABEL_ALIGNMENT);
+	this->label_->setText(label);
+	this->label_->setAlignment(TaskWidget::LabelAlignment);
 	this->mainLayout_->addWidget(this->label_);
 	
 	// Progress setting...
+	this->progressBar_->setRange(TaskWidget::ProgressRange.first,
+								 TaskWidget::ProgressRange.second);
+	this->progressBar_->setValue(TaskWidget::ProgressRange.first);
 	this->progressLayout_->addWidget(this->progressBar_);
-	this->progressLayout_->addWidget(this->startPauseButton_);
+	this->progressLayout_->addWidget(this->actionButton_);
 	this->progressLayout_->addWidget(this->cancelButton_);
-	this->progressContainer_->setLayout(this->progressLayout_);
-	this->mainLayout_->addWidget(this->progressContainer_);
+	this->mainLayout_->addLayout(this->progressLayout_);
 	
 	// Main setting...
 	this->setLayout(this->mainLayout_);
-	this->setFrameStyle(TASKWIDGET_FRAME_STYLE);
-	this->setMinimumSize(TASKWIDGET_SIZE_MIN_H, TASKWIDGET_SIZE_MIN_V);
-	this->setMaximumSize(TASKWIDGET_SIZE_MAX_H, TASKWIDGET_SIZE_MAX_V);
-	this->setSizePolicy(TASKWIDGET_SIZE_POLICY_H, TASKWIDGET_SIZE_POLICY_V);
+	this->setFrameStyle(TaskWidget::FrameStyle);
+	this->setMinimumSize(TaskWidget::SizeMin);
+	this->setMaximumSize(TaskWidget::SizeMax);
+	this->setSizePolicy(TaskWidget::SizePolicy);
 }
 
-QString Task::label() const
+
+QString TaskWidget::label() const
 {
 	return this->label_->text();
+}
+
+
+int TaskWidget::progress() const
+{
+	return this->progressBar_->value();
+}
+
+
+void TaskWidget::setProgress(int value)
+{
+	if (value >= TaskWidget::ProgressRange.first
+		&& value <= TaskWidget::ProgressRange.second)
+		this->progressBar_->setValue(value);
 }

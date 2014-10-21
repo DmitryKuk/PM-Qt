@@ -1,6 +1,4 @@
-/***************************************************
-** Author: Dmitry Kukovinets (d1021976@gmail.com) **
-***************************************************/
+// Author: Dmitry Kukovinets (d1021976@gmail.com)
 
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
@@ -18,7 +16,7 @@ class MainWindow:
 	Q_OBJECT
 	
 public:
-	MainWindow(QWidget *parent = nullptr);
+	MainWindow(const QString &title = tr("PM"), QWidget *parent = nullptr);
 	~MainWindow();
 };
 
