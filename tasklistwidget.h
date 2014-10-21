@@ -16,6 +16,8 @@ class TaskListWidget:
 	Q_OBJECT
 	
 public:
+	typedef std::list<TaskWidget *> Container;
+	
 	// Size
 	static const QSizePolicy
 		SizePolicy;
@@ -29,11 +31,13 @@ public:
 	
 	TaskListWidget(const QString &label, QWidget *parent = nullptr);
 	
-	//virtual std::list<TaskWidget *>::iterator addTask(const QString &label);
+	virtual Container::const_iterator addTask(const QString &label);
+	
+	Container::const_iterator begin() const;
+	Container::const_iterator end() const;
 private:
 	QLabel *label_;
-	QListWidget *listWidget_;
-	QVBoxLayout *mainLayout_;
+	QVBoxLayout *mainLayout_, *listLayout_;
 };
 
 #endif	// TASKLISTWIDGET_H
