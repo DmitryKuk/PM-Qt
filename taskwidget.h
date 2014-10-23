@@ -3,6 +3,8 @@
 #ifndef TASKWIDGET_H
 #define TASKWIDGET_H
 
+#include <algorithm>
+
 #include <QtWidgets>
 
 #include "taskbutton.h"
@@ -12,24 +14,6 @@ class TaskWidget: public QFrame
 	Q_OBJECT
 	
 public:
-	// Size
-	static const QSize
-		SizeMin,
-		SizeMax;
-	static const QSizePolicy
-		SizePolicy;
-	
-	// Progress
-	static const std::pair<int, int>	// (Min, Max)
-		ProgressRange;
-	
-	// Other
-	static const Qt::Alignment
-		LabelAlignment;
-	static const int
-		FrameStyle;
-	
-	
 	TaskWidget(const QString &label, QWidget *parent = nullptr);
 	
 	virtual QString label() const;

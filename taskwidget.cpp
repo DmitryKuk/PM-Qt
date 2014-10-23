@@ -2,25 +2,6 @@
 
 #include "taskwidget.h"
 
-// Size
-const QSize
-	TaskWidget::SizeMin(100, 70),
-	TaskWidget::SizeMax(500, 150);
-
-const QSizePolicy
-	TaskWidget::SizePolicy(QSizePolicy::Expanding, QSizePolicy::MinimumExpanding);
-
-// Progress
-const std::pair<int, int>
-	TaskWidget::ProgressRange(0, 100);
-
-// Other
-const Qt::Alignment
-	TaskWidget::LabelAlignment = Qt::AlignTop | Qt::AlignLeft;
-const int
-	TaskWidget::FrameStyle = QFrame::Box;
-
-
 TaskWidget::TaskWidget(const QString &label, QWidget *parent):
 	QFrame(parent),
 	mainLayout_(new QVBoxLayout(this)),
@@ -32,13 +13,14 @@ TaskWidget::TaskWidget(const QString &label, QWidget *parent):
 {
 	// Label setting...
 	this->label_->setText(label);
-	this->label_->setAlignment(TaskWidget::LabelAlignment);
+	this->label_->setAlignment(Qt::AlignLeft);
+	this->label_->setSizePolicy(QSizePolicy::Expanding,
+								QSizePolicy::Fixed);
 	this->mainLayout_->addWidget(this->label_);
 	
 	// Progress setting...
-	this->progressBar_->setRange(TaskWidget::ProgressRange.first,
-								 TaskWidget::ProgressRange.second);
-	this->progressBar_->setValue(TaskWidget::ProgressRange.first);
+	this->progressBar_->setSizePolicy(QSizePolicy::Expanding,
+									  QSizePolicy::Fixed);
 	this->progressLayout_->addWidget(this->progressBar_);
 	this->progressLayout_->addWidget(this->actionButton_);
 	this->progressLayout_->addWidget(this->cancelButton_);
@@ -46,10 +28,28 @@ TaskWidget::TaskWidget(const QString &label, QWidget *parent):
 	
 	// Main setting...
 	this->setLayout(this->mainLayout_);
-	this->setFrameStyle(TaskWidget::FrameStyle);
-	this->setMinimumSize(TaskWidget::SizeMin);
-	this->setMaximumSize(TaskWidget::SizeMax);
-	this->setSizePolicy(TaskWidget::SizePolicy);
+	this->setFrameStyle(QFrame::Box);
+	
+	// Minimum sizes of widgets
+	QSize
+		labelMinSize = this->label_->minimumSize(),
+		progressBarMinSize = this->progressBar_->minimumSize(),
+		actionButtonMinSize = this->actionButton_->minimumSize(),
+		cancelButtonMinSize = this->cancelButton_->minimumSize();
+	
+	// Total minimum size
+	QSize minSize(
+			std::max(labelMinSize.width(),
+					 progressBarMinSize.width()
+					 + actionButtonMinSize.width()
+					 + cancelButtonMinSize.width()),
+			labelMinSize.height()
+			+ std::max(progressBarMinSize.height(),
+					   std::max(actionButtonMinSize.height(),
+					   			cancelButtonMinSize.height())));
+	
+	this->setMinimumSize(minSize);
+	this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 }
 
 
@@ -67,7 +67,6 @@ int TaskWidget::progress() const
 
 void TaskWidget::setProgress(int value)
 {
-	if (value >= TaskWidget::ProgressRange.first
-		&& value <= TaskWidget::ProgressRange.second)
+	if (value >= 0 && value <= 100)
 		this->progressBar_->setValue(value);
 }

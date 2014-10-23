@@ -85,9 +85,21 @@ MainWindow::MainWindow(const QString &title, QWidget *parent):
 	
 	
 	// TaskListWidget
-	auto *widget = new TaskListWidget("Operations", this);
-	widget->addTask("First task");
-	widget->addTask("Second task");
+	// auto *widget = new TaskListWidget("Tasks", this);
+	// widget->addTask("First task");
+	// widget->addTask("Second task");
+	
+	// Left panel widget
+	auto *widget = new LeftPanelWidget(this);
+	auto *taskListWidget = widget->taskListWidget();
+	
+	auto it1 = taskListWidget->addTask("Some task 1");
+	auto it2 = taskListWidget->addTask("Some task 2");
+	auto it3 = taskListWidget->addTask("Some task 3");
+	
+	(*it1)->setProgress(50);
+	(*it2)->setProgress(30);
+	(*it3)->setProgress(75);
 	
 	this->setWindowTitle(title);
 	QMainWindow::setCentralWidget(widget);

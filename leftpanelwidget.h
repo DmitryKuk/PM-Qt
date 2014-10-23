@@ -5,8 +5,16 @@
 
 #include <QtWidgets>
 
+#include "grouplistwidget.h"
 #include "tasklistwidget.h"
 
-
+class LeftPanelWidget: public QSplitter
+{
+public:
+	LeftPanelWidget(QWidget *parent = nullptr);
+	
+	GroupListWidget * groupListWidget();
+	TaskListWidget * taskListWidget();
+};
 
 #endif	// LEFTPANELWIDGET_H

@@ -18,17 +18,6 @@ class TaskListWidget:
 public:
 	typedef std::list<TaskWidget *> Container;
 	
-	// Size
-	static const QSizePolicy
-		SizePolicy;
-	
-	// Other
-	static const Qt::Alignment
-		LabelAlignment;
-	static const int
-		FrameStyle;
-	
-	
 	TaskListWidget(const QString &label, QWidget *parent = nullptr);
 	
 	virtual Container::const_iterator addTask(const QString &label);
@@ -37,6 +26,7 @@ public:
 	Container::const_iterator end() const;
 private:
 	QLabel *label_;
+	QScrollArea *scrollArea_;
 	QVBoxLayout *mainLayout_, *listLayout_;
 };
 

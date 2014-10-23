@@ -2,35 +2,32 @@
 
 #include "tasklistwidget.h"
 
-// Size
-const QSizePolicy
-	TaskListWidget::SizePolicy(QSizePolicy::MinimumExpanding,
-							   QSizePolicy::MinimumExpanding);
-
-// Other
-const Qt::Alignment
-	TaskListWidget::LabelAlignment = Qt::AlignTop | Qt::AlignHCenter;
-const int
-	TaskListWidget::FrameStyle = QFrame::Box;
-
-
 TaskListWidget::TaskListWidget(const QString &label, QWidget *parent):
 	QFrame(parent),
 	label_(new QLabel(this)),
+	scrollArea_(new QScrollArea(this)),
 	mainLayout_(new QVBoxLayout(this)),
-	listLayout_(new QVBoxLayout(this))
+	listLayout_(new QVBoxLayout(scrollArea_))
 {
 	// Label setting...
 	this->label_->setText(label);
+	this->label_->setAlignment(Qt::AlignHCenter);
+	this->label_->setSizePolicy(QSizePolicy::Expanding,
+								QSizePolicy::Fixed);
 	this->mainLayout_->addWidget(this->label_);
 	
-	// List layout setting...
-	this->mainLayout_->addLayout(this->listLayout_);
+	// List setting...
+	this->listLayout_->setContentsMargins(0, 0, 0, 0);	// Left, Top, Right, Bottom
+	this->scrollArea_->setLayout(listLayout_);
+	this->scrollArea_->setContentsMargins(0, 0, 0, 0);	// Left, Top, Right, Bottom
+	this->mainLayout_->addWidget(this->scrollArea_);
 	
 	// Main setting...
+	this->mainLayout_->setContentsMargins(0, 0, 0, 0);	// Left, Top, Right, Bottom
+	this->setMinimumSize(this->label_->minimumSize());
 	this->setLayout(this->mainLayout_);
-	this->setFrameStyle(TaskListWidget::FrameStyle);
-	this->setSizePolicy(TaskListWidget::SizePolicy);
+	this->setFrameStyle(QFrame::Box);
+	this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::MinimumExpanding);
 }
 
 
