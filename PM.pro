@@ -19,13 +19,17 @@ SOURCES += main.cpp\
 		taskwidget.cpp\
 		tasklistwidget.cpp\
 		leftpanelwidget.cpp\
-		centralwidget.cpp\
-		grouplistwidget.cpp
+		mainwidget.cpp\
+		grouplistwidget.cpp\
+		passwordlistwidget.cpp\
+		passwordcontentwidget.cpp
 
 HEADERS +=\
 		mainwindow.h\
 		taskwidget.h\
 		tasklistwidget.h\
 		leftpanelwidget.h\
-		centralwidget.h\
-		grouplistwidget.h
+		mainwidget.h\
+		grouplistwidget.h\
+		passwordlistwidget.h\
+		passwordcontentwidget.h

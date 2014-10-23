@@ -3,20 +3,28 @@
 #include "leftpanelwidget.h"
 
 LeftPanelWidget::LeftPanelWidget(QWidget *parent):
-	QSplitter(Qt::Vertical, parent)
+	QSplitter(Qt::Vertical, parent),
+	groupListWidget_(new GroupListWidget(tr("Groups"), this)),
+	taskListWidget_(new TaskListWidget(tr("Tasks"), this))
 {
-	this->addWidget(new GroupListWidget(tr("Groups"), this));
-	this->addWidget(new TaskListWidget(tr("Tasks"), this));
+	// Grop list setting...
+	this->addWidget(this->groupListWidget_);
+	
+	// Task list setting...
+	this->addWidget(this->taskListWidget_);
+	
+	// Main setting...
+	this->setOrientation(Qt::Vertical);
 }
 
 
 GroupListWidget * LeftPanelWidget::groupListWidget()
 {
-	return dynamic_cast<GroupListWidget *>(this->widget(0));
+	return this->groupListWidget_;
 }
 
 
 TaskListWidget * LeftPanelWidget::taskListWidget()
 {
-	return dynamic_cast<TaskListWidget *>(this->widget(1));
+	return this->taskListWidget_;
 }

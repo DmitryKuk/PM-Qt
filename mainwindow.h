@@ -8,16 +8,21 @@
 #include <QtCore>
 
 #include "leftpanelwidget.h"
-#include "centralwidget.h"
+#include "mainwidget.h"
 
-class MainWindow:
-	public QMainWindow
+class MainWindow: public QMainWindow
 {
 	Q_OBJECT
 	
 public:
 	MainWindow(const QString &title = tr("PM"), QWidget *parent = nullptr);
-	~MainWindow();
+	
+	virtual LeftPanelWidget * leftPanelWidget();
+	virtual MainWidget * mainWidget();
+private:
+	QSplitter *mainSplit_;
+	LeftPanelWidget *leftPanelWidget_;
+	MainWidget *mainWidget_;
 };
 
 #endif	// MAINWINDOW_H
