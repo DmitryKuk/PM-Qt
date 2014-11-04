@@ -18,6 +18,25 @@ LeftPanelWidget::LeftPanelWidget(QWidget *parent):
 }
 
 
+void LeftPanelWidget::readSettings(QSettings &settings, const QString &prefix)
+{
+	QString current_prefix = prefix + "/groupListWidget";
+	
+	// This widget
+	this->restoreGeometry(settings.value(current_prefix + "/geometry").toByteArray());
+	this->restoreState(settings.value(current_prefix + "/state").toByteArray());
+}
+
+void LeftPanelWidget::writeSettings(QSettings &settings, const QString &prefix) const
+{
+	QString current_prefix = prefix + "/groupListWidget";
+	
+	// This widget
+	settings.setValue(current_prefix + "/geometry", this->saveGeometry());
+	settings.setValue(current_prefix + "/state", this->saveState());
+}
+
+
 GroupListWidget * LeftPanelWidget::groupListWidget()
 {
 	return this->groupListWidget_;

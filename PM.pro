@@ -10,7 +10,7 @@ QMAKE_CXXFLAGS += -std=c++0x
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = PM
+TARGET = ../PM
 TEMPLATE = app
 
 
@@ -22,7 +22,8 @@ SOURCES += main.cpp\
 		mainwidget.cpp\
 		grouplistwidget.cpp\
 		passwordlistwidget.cpp\
-		passwordcontentwidget.cpp
+		passwordcontentwidget.cpp\
+		settingssaver.cpp
 
 HEADERS +=\
 		mainwindow.h\
@@ -32,4 +33,5 @@ HEADERS +=\
 		mainwidget.h\
 		grouplistwidget.h\
 		passwordlistwidget.h\
-		passwordcontentwidget.h
+		passwordcontentwidget.h\
+		settingssaver.h

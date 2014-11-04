@@ -75,6 +75,8 @@ void *TaskListWidget::qt_metacast(const char *_clname)
     if (!_clname) return 0;
     if (!strcmp(_clname, qt_meta_stringdata_TaskListWidget.stringdata))
         return static_cast<void*>(const_cast< TaskListWidget*>(this));
+    if (!strcmp(_clname, "SettingsSaver"))
+        return static_cast< SettingsSaver*>(const_cast< TaskListWidget*>(this));
     return QFrame::qt_metacast(_clname);
 }
 

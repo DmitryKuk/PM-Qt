@@ -8,10 +8,12 @@
 #include <QtWidgets>
 
 #include "taskwidget.h"
+#include "settingssaver.h"
 
 class TaskListWidget:
 	public QFrame,
-	private std::list<TaskWidget *>
+	private std::list<TaskWidget *>,
+	public SettingsSaver
 {
 	Q_OBJECT
 	
@@ -19,6 +21,9 @@ public:
 	typedef std::list<TaskWidget *> Container;
 	
 	TaskListWidget(const QString &label, QWidget *parent = nullptr);
+	
+	void readSettings(QSettings &settings, const QString &prefix = "");
+	void writeSettings(QSettings &settings, const QString &prefix = "") const;
 	
 	virtual Container::const_iterator addTask(const QString &label);
 	

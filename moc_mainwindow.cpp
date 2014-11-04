@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_MainWindow_t {
-    QByteArrayData data[1];
-    char stringdata[11];
+    QByteArrayData data[2];
+    char stringdata[24];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -29,9 +29,10 @@ struct qt_meta_stringdata_MainWindow_t {
     )
 static const qt_meta_stringdata_MainWindow_t qt_meta_stringdata_MainWindow = {
     {
-QT_MOC_LITERAL(0, 0, 10)
+QT_MOC_LITERAL(0, 0, 10),
+QT_MOC_LITERAL(1, 11, 12)
     },
-    "MainWindow"
+    "MainWindow\0saveSettings"
 };
 #undef QT_MOC_LITERAL
 
@@ -42,11 +43,14 @@ static const uint qt_meta_data_MainWindow[] = {
        0,       // classname
        0,    0, // classinfo
        0,    0, // methods
-       0,    0, // properties
+       1,   14, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
        0,       // signalCount
+
+ // properties: name, type, flags
+       1, QMetaType::Bool, 0x00190103,
 
        0        // eod
 };
@@ -75,6 +79,8 @@ void *MainWindow::qt_metacast(const char *_clname)
     if (!_clname) return 0;
     if (!strcmp(_clname, qt_meta_stringdata_MainWindow.stringdata))
         return static_cast<void*>(const_cast< MainWindow*>(this));
+    if (!strcmp(_clname, "SettingsSaver"))
+        return static_cast< SettingsSaver*>(const_cast< MainWindow*>(this));
     return QMainWindow::qt_metacast(_clname);
 }
 
@@ -83,6 +89,40 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     _id = QMainWindow::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
+    
+#ifndef QT_NO_PROPERTIES
+     if (_c == QMetaObject::ReadProperty) {
+        void *_v = _a[0];
+        switch (_id) {
+        case 0: *reinterpret_cast< bool*>(_v) = needSaveSettings(); break;
+        default: break;
+        }
+        _id -= 1;
+    } else if (_c == QMetaObject::WriteProperty) {
+        void *_v = _a[0];
+        switch (_id) {
+        case 0: setSaveSettings(*reinterpret_cast< bool*>(_v)); break;
+        default: break;
+        }
+        _id -= 1;
+    } else if (_c == QMetaObject::ResetProperty) {
+        _id -= 1;
+    } else if (_c == QMetaObject::QueryPropertyDesignable) {
+        _id -= 1;
+    } else if (_c == QMetaObject::QueryPropertyScriptable) {
+        _id -= 1;
+    } else if (_c == QMetaObject::QueryPropertyStored) {
+        _id -= 1;
+    } else if (_c == QMetaObject::QueryPropertyEditable) {
+        _id -= 1;
+    } else if (_c == QMetaObject::QueryPropertyUser) {
+        _id -= 1;
+    } else if (_c == QMetaObject::RegisterPropertyMetaType) {
+        if (_id < 1)
+            *reinterpret_cast<int*>(_a[0]) = -1;
+        _id -= 1;
+    }
+#endif // QT_NO_PROPERTIES
     return _id;
 }
 QT_END_MOC_NAMESPACE

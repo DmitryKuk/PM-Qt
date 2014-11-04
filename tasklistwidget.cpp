@@ -31,6 +31,23 @@ TaskListWidget::TaskListWidget(const QString &label, QWidget *parent):
 }
 
 
+void TaskListWidget::readSettings(QSettings &settings, const QString &prefix)
+{
+	QString current_prefix = prefix + "/taskListWidget";
+	
+	// This widget
+	this->restoreGeometry(settings.value(current_prefix + "/geometry").toByteArray());
+}
+
+void TaskListWidget::writeSettings(QSettings &settings, const QString &prefix) const
+{
+	QString current_prefix = prefix + "/taskListWidget";
+	
+	// This widget
+	settings.setValue(current_prefix + "/geometry", this->saveGeometry());
+}
+
+
 TaskListWidget::Container::const_iterator TaskListWidget::addTask(const QString &label)
 {
 	auto *taskWidget = new TaskWidget(label, this);
@@ -44,7 +61,6 @@ TaskListWidget::Container::const_iterator TaskListWidget::begin() const
 {
 	return TaskListWidget::Container::begin();
 }
-
 
 TaskListWidget::Container::const_iterator TaskListWidget::end() const
 {

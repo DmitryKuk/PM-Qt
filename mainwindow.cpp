@@ -2,11 +2,15 @@
 
 #include "mainwindow.h"
 
-MainWindow::MainWindow(const QString &title, QWidget *parent):
+MainWindow::MainWindow(const QString &title,
+					   bool autoLoadSettings,
+					   bool autoSaveSettings,
+					   QWidget *parent):
 	QMainWindow(parent),
 	mainSplit_(new QSplitter(this)),
 	leftPanelWidget_(new LeftPanelWidget(mainSplit_)),
-	mainWidget_(new MainWidget(mainSplit_))
+	mainWidget_(new MainWidget(mainSplit_)),
+	saveSettings_(autoSaveSettings? true: false)
 {
 	// TaskWidgets
 	// auto *widget = new QWidget(this);
@@ -44,6 +48,10 @@ MainWindow::MainWindow(const QString &title, QWidget *parent):
 	// (*it2)->setProgress(30);
 	// (*it3)->setProgress(75);
 	
+	if (autoLoadSettings) {
+		QSettings settings;
+		this->readSettings(settings);
+	}
 	
 	// Main splitter setting...
 	this->mainSplit_->setOrientation(Qt::Horizontal);
@@ -56,6 +64,50 @@ MainWindow::MainWindow(const QString &title, QWidget *parent):
 }
 
 
+void MainWindow::readSettings(QSettings &settings, const QString &prefix)
+{
+	QString current_prefix = prefix + "/mainWindow";
+	
+	// This widget
+	this->restoreGeometry(settings.value(current_prefix + "/geometry").toByteArray());
+	this->restoreState(settings.value(current_prefix + "/state").toByteArray());
+	
+	// Child widgets
+	this->mainSplit_->restoreGeometry(settings.value(current_prefix + "/mainSplit/geometry").toByteArray());
+	this->mainSplit_->restoreState(settings.value(current_prefix + "/mainSplit/state").toByteArray());
+	
+	this->leftPanelWidget_->readSettings(settings, current_prefix);
+	this->mainWidget_->readSettings(settings, current_prefix);
+}
+
+void MainWindow::writeSettings(QSettings &settings, const QString &prefix) const
+{
+	QString current_prefix = prefix + "/mainWindow";
+	
+	// This widget
+	settings.setValue(current_prefix + "/geometry", this->saveGeometry());
+	settings.setValue(current_prefix + "/state", this->saveState());
+	
+	// Child widgets
+	settings.setValue(current_prefix + "/mainSplit/geometry", this->mainSplit_->saveGeometry());
+	settings.setValue(current_prefix + "/mainSplit/state", this->mainSplit_->saveState());
+	
+	this->leftPanelWidget_->writeSettings(settings, current_prefix);
+	this->mainWidget_->writeSettings(settings, current_prefix);
+}
+
+
+bool MainWindow::needSaveSettings() const
+{
+	return this->saveSettings_;
+}
+
+void MainWindow::setSaveSettings(bool enable)
+{
+	this->saveSettings_ = enable;
+}
+
+
 LeftPanelWidget * MainWindow::leftPanelWidget()
 {
 	return this->leftPanelWidget_;
@@ -65,4 +117,14 @@ LeftPanelWidget * MainWindow::leftPanelWidget()
 MainWidget * MainWindow::mainWidget()
 {
 	return this->mainWidget_;
+}
+
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+	if (this->needSaveSettings()) {
+		QSettings settings;
+		this->writeSettings(settings);
+	}
+	this->QMainWindow::closeEvent(event);
 }

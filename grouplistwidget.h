@@ -5,10 +5,15 @@
 
 #include <QtWidgets>
 
-class GroupListWidget: public QFrame
+#include "settingssaver.h"
+
+class GroupListWidget: public QFrame, public SettingsSaver
 {
 public:
 	GroupListWidget(const QString &label, QWidget *parent = nullptr);
+	
+	void readSettings(QSettings &settings, const QString &prefix = "");
+	void writeSettings(QSettings &settings, const QString &prefix = "") const;
 private:
 	QLabel *label_;
 };

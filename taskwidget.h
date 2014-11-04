@@ -13,6 +13,18 @@ class TaskWidget: public QFrame
 {
 	Q_OBJECT
 	
+	// Properties
+	Q_PROPERTY(int progress
+			   READ progress
+			   WRITE setProgress
+			   DESIGNABLE false
+			   SCRIPTABLE false
+			   USER false);
+	Q_PROPERTY(QString label
+			   READ label
+			   DESIGNABLE false
+			   SCRIPTABLE false
+			   USER false);
 public:
 	TaskWidget(const QString &label, QWidget *parent = nullptr);
 	
@@ -30,7 +42,7 @@ private:
 
 // this (mainLayout)
 // 		-> label
-// 		-> progressContainer (progressLayout)
+// 		-> (progressLayout)
 // 			-> progressBar
 // 			-> actionButton
 // 			-> cancelButton

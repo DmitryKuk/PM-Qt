@@ -10,7 +10,7 @@ if (( $# != 0 && $# != 1 )); then
 fi
 
 if [ "X$1X" == "XrunX" ]; then
-	qmake && make && open PM.app/
+	qmake -Wall && make && open ../PM.app/
 else
-	qmake && make
+	qmake -Wall && make
 fi
