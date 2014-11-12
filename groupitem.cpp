@@ -2,10 +2,24 @@
 
 #include "groupitem.h"
 
-GroupItem::GroupItem(const id_t &id, QTreeWidget *parent):
+GroupItem::GroupItem(const id_t &id,
+					 const QString &group_name,
+					 QTreeWidget *parent):
 	QTreeWidgetItem(parent, QTreeWidgetItem::UserType),
 	id_(id)
-{}
+{
+	this->setName(group_name);
+}
+
+
+GroupItem::GroupItem(const id_t &id,
+					 const QString &group_name,
+					 QTreeWidgetItem *parent):
+	QTreeWidgetItem(parent, QTreeWidgetItem::UserType),
+	id_(id)
+{
+	this->setName(group_name);
+}
 
 
 const id_t & GroupItem::id() const
