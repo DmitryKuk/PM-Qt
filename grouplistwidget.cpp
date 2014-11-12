@@ -3,12 +3,10 @@
 #include "grouplistwidget.h"
 
 GroupListWidget::GroupListWidget(const QString &label, QWidget *parent):
-	QTreeWidget(parent),
-	label_(new QLabel(this))
+	QTreeWidget(parent)
 {
-	this->label_->setText(label);
 	this->setColumnCount(1);
-	this->setHeaderLabel(tr("Groups"));
+	this->setHeaderLabel(label);
 }
 
 

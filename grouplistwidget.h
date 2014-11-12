@@ -18,7 +18,6 @@ public:
 	void readSettings(QSettings &settings, const QString &prefix = "");
 	void writeSettings(QSettings &settings, const QString &prefix = "") const;
 private:
-	QLabel *label_;
 };
 
 #endif	// GROUPLISTWIDGET_H

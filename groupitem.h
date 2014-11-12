@@ -9,22 +9,6 @@
 
 class GroupItem: public QTreeWidgetItem
 {
-	// TODO: Fix 7 errors in moc-file when uncomment these. :|
-	
-	Q_OBJECT
-	
-	// Properties
-	Q_PROPERTY(id_t id
-			   READ id
-			   DESIGNABLE false
-			   SCRIPTABLE false
-			   USER false);
-	Q_PROPERTY(QString name
-			   READ name
-			   WRITE setName
-			   DESIGNABLE false
-			   SCRIPTABLE false
-			   USER true);
 public:
 	GroupItem(const id_t &id, QTreeWidget *parent = nullptr);
 	
