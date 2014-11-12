@@ -7,8 +7,11 @@
 
 #include "settingssaver.h"
 
-class GroupListWidget: public QFrame, public SettingsSaver
+class GroupListWidget:
+	public QTreeWidget,
+	public SettingsSaver
 {
+	Q_OBJECT
 public:
 	GroupListWidget(const QString &label, QWidget *parent = nullptr);
 	

@@ -23,9 +23,10 @@ SOURCES += main.cpp\
 		grouplistwidget.cpp\
 		passwordlistwidget.cpp\
 		passwordcontentwidget.cpp\
-		settingssaver.cpp
+		settingssaver.cpp\
+		groupitem.cpp
 
-HEADERS +=\
+HEADERS += types.h\
 		mainwindow.h\
 		taskwidget.h\
 		tasklistwidget.h\
@@ -34,4 +35,5 @@ HEADERS +=\
 		grouplistwidget.h\
 		passwordlistwidget.h\
 		passwordcontentwidget.h\
-		settingssaver.h
+		settingssaver.h\
+		groupitem.h

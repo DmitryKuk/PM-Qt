@@ -7,7 +7,9 @@
 
 #include "settingssaver.h"
 
-class PasswordListWidget: public QFrame, public SettingsSaver
+class PasswordListWidget:
+	public QFrame,
+	public SettingsSaver
 {
 public:
 	PasswordListWidget(const QString &label, QWidget *parent = nullptr);

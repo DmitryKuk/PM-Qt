@@ -7,8 +7,11 @@
 
 #include "settingssaver.h"
 
-class PasswordContentWidget: public QGroupBox, public SettingsSaver
+class PasswordContentWidget:
+	public QGroupBox,
+	public SettingsSaver
 {
+	Q_OBJECT
 public:
 	PasswordContentWidget(const QString &label, QWidget *parent = nullptr);
 	

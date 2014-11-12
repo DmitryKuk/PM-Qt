@@ -12,7 +12,9 @@
 #include "leftpanelwidget.h"
 #include "mainwidget.h"
 
-class MainWindow: public QMainWindow, public SettingsSaver
+class MainWindow:
+	public QMainWindow,
+	public SettingsSaver
 {
 	Q_OBJECT
 	

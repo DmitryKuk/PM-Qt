@@ -9,7 +9,9 @@
 #include "tasklistwidget.h"
 #include "settingssaver.h"
 
-class LeftPanelWidget: public QSplitter
+class LeftPanelWidget:
+	public QSplitter,
+	public SettingsSaver
 {
 	Q_OBJECT
 	
