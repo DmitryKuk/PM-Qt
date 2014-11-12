@@ -2,15 +2,10 @@
 
 # Author: Dmitry Kukovinets (d1021976@gmail.com)
 
-# Simple script to run all
+# Simple script to push all changes to github
 
-if (( $# != 0 && $# != 1 )); then
-	echo -e "Usage:\n\t$0 [run]"
-	exit 1
-fi
-
-if [ "X$1X" == "XrunX" ]; then
-	qmake -Wall && make && open ../PM.app/
+if [ "X$1" != "X" ]; then
+	make clean && git add *.h *.cpp *.sh *.pro && git commit -m "$1" && git push
 else
-	qmake -Wall && make
+	echo -e "Error! Usage:\n\t./update.sh MESSAGE"
 fi
