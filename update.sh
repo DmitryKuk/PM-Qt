@@ -18,6 +18,7 @@ if [ "X$1" == "X" ]; then
 else
 	# Adding message to commit
 	GIT_COMMIT_MSG="$( echo -en $GIT_COMMIT_MSG \'$1\' )"
+	echo -e "\"$GIT_COMMIT_MSG\""
 fi
 
 
