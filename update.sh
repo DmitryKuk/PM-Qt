@@ -12,12 +12,11 @@ GIT_ADD='git add'
 GIT_COMMIT_MSG='git commit -m'
 GIT_PUSH='git push'
 
+# Checking message
 if [ "X$1" == "X" ]; then
 	echo -e "Error! Usage:\n\t./update.sh MESSAGE"
 	exit 1
 else
-	# Adding message to commit
-	# GIT_COMMIT_MSG="$( echo -en $GIT_COMMIT_MSG \'$1\' )"
 	MESSAGE="$1"
 fi
 
@@ -35,8 +34,7 @@ done
 
 if [ "X$FILES_TO_UPDATE" != "X" ]; then
 	# Now use git to add all of them, commit with given messsage and push
-	$GIT_ADD $FILES_TO_UPDATE && $GIT_COMMIT_MSG "$MESSAGE" && $GIT_PUSH
-	
-	echo "$GIT_COMMAND"
-	$GIT_COMMAND
+	$GIT_ADD $FILES_TO_UPDATE && $GIT_COMMIT_MSG "$MESSAGE" && $GIT_PUSH && echo 'Done.' || echo 'Error.'
+else
+	echo 'No files selected.'
 fi
