@@ -17,8 +17,8 @@ if [ "X$1" == "X" ]; then
 	exit 1
 else
 	# Adding message to commit
-	GIT_COMMIT_MSG="$( echo -en $GIT_COMMIT_MSG \'$1\' )"
-	echo -e "\"$GIT_COMMIT_MSG\""
+	# GIT_COMMIT_MSG="$( echo -en $GIT_COMMIT_MSG \'$1\' )"
+	MESSAGE="$1"
 fi
 
 
@@ -33,7 +33,10 @@ for I in $( $LS -1 | $GREP -v '[[:graph:]]*\.\(o\|so\|pro\.user\|app\)\|moc_[[:g
 	fi
 done
 
-echo $FILES_TO_UPDATE
-
-# Now use git to add all of them, commit with given messsage and push
-echo "$GIT_ADD $FILES_TO_UPDATE && $GIT_COMMIT_MSG && $GIT_PUSH"
+if [ "X$FILES_TO_UPDATE" != "X" ]; then
+	# Now use git to add all of them, commit with given messsage and push
+	GIT_COMMAND="$GIT_ADD $FILES_TO_UPDATE && $GIT_COMMIT_MSG '$MESSAGE' && $GIT_PUSH"
+	
+	echo $GIT_COMMAND
+	$GIT_COMMAND
+fi
