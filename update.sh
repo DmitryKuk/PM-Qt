@@ -35,8 +35,8 @@ done
 
 if [ "X$FILES_TO_UPDATE" != "X" ]; then
 	# Now use git to add all of them, commit with given messsage and push
-	GIT_COMMAND="$GIT_ADD $FILES_TO_UPDATE && $GIT_COMMIT_MSG '$MESSAGE' && $GIT_PUSH"
+	$GIT_ADD $FILES_TO_UPDATE && $GIT_COMMIT_MSG "$MESSAGE" && $GIT_PUSH
 	
-	echo $GIT_COMMAND
+	echo "$GIT_COMMAND"
 	$GIT_COMMAND
 fi
