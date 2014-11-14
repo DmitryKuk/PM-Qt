@@ -2,6 +2,8 @@
 
 #include "taskwidget.h"
 
+#include <algorithm>
+
 TaskWidget::TaskWidget(const QString &label, QWidget *parent):
 	QFrame(parent),
 	mainLayout_(new QVBoxLayout(this)),

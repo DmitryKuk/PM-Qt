@@ -3,8 +3,6 @@
 #ifndef TASKWIDGET_H
 #define TASKWIDGET_H
 
-#include <algorithm>
-
 #include <QtWidgets>
 
 #include "taskbutton.h"
