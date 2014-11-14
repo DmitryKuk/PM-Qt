@@ -20,7 +20,7 @@ class TaskListWidget:
 public:
 	typedef std::list<TaskWidget *> Container;
 	
-	TaskListWidget(const QString &label, QWidget *parent = nullptr);
+	TaskListWidget(QWidget *parent = nullptr);
 	
 	void readSettings(QSettings &settings, const QString &prefix = "");
 	void writeSettings(QSettings &settings, const QString &prefix = "") const;

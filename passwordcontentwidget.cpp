@@ -2,12 +2,10 @@
 
 #include "passwordcontentwidget.h"
 
-PasswordContentWidget::PasswordContentWidget(const QString &label, QWidget *parent):
+PasswordContentWidget::PasswordContentWidget(QWidget *parent):
 	QGroupBox(parent),
-	label_(new QLabel(this))
-{
-	this->label_->setText(label);
-}
+	label_(new QLabel(tr("Password content"), this))
+{}
 
 
 void PasswordContentWidget::readSettings(QSettings &settings, const QString &prefix)

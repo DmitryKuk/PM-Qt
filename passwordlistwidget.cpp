@@ -2,11 +2,19 @@
 
 #include "passwordlistwidget.h"
 
-PasswordListWidget::PasswordListWidget(const QString &label, QWidget *parent):
-	QFrame(parent),
-	label_(new QLabel(this))
+#include <initializer_list>
+
+// TODO: Remove this test (some groups)
+#include "passworditem.h"
+
+PasswordListWidget::PasswordListWidget(QWidget *parent):
+	QTreeWidget(parent)
 {
-	this->label_->setText(label);
+	this->setHeaderLabels({ tr("Name"), tr("Group"), tr("Modified"), tr("Created") });
+	
+	new PasswordItem(3, { "Linux"  , "Example passwords", "02.01.2100", "01.01.2100" }, this);
+	new PasswordItem(4, { "Windows", "Example passwords", "02.01.2100", "01.01.2100" }, this);
+	new PasswordItem(5, { "Etc"    , "Example passwords", "02.01.2100", "01.01.2100" }, this);
 }
 
 

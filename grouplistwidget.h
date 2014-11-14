@@ -13,11 +13,10 @@ class GroupListWidget:
 {
 	Q_OBJECT
 public:
-	GroupListWidget(const QString &label, QWidget *parent = nullptr);
+	GroupListWidget(QWidget *parent = nullptr);
 	
 	void readSettings(QSettings &settings, const QString &prefix = "");
 	void writeSettings(QSettings &settings, const QString &prefix = "") const;
-private:
 };
 
 #endif	// GROUPLISTWIDGET_H

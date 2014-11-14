@@ -5,11 +5,11 @@
 // TODO: Remove this test (some groups)
 #include "groupitem.h"
 
-GroupListWidget::GroupListWidget(const QString &label, QWidget *parent):
+GroupListWidget::GroupListWidget(QWidget *parent):
 	QTreeWidget(parent)
 {
 	this->setColumnCount(1);
-	this->setHeaderLabel(label);
+	this->setHeaderLabel(tr("Groups"));
 	
 	GroupItem *p = new GroupItem(1, "Home", this);
 	p = new GroupItem(2, "Copmuter passwords", p);

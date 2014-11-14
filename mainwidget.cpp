@@ -4,8 +4,8 @@
 
 MainWidget::MainWidget(QWidget *parent):
 	QSplitter(parent),
-	passwordListWidget_(new PasswordListWidget(tr("Passwords"), this)),
-	passwordContentWidget_(new PasswordContentWidget(tr("Password content"), this))
+	passwordListWidget_(new PasswordListWidget(this)),
+	passwordContentWidget_(new PasswordContentWidget(this))
 {
 	// Password list widget setting...
 	this->addWidget(this->passwordListWidget_);

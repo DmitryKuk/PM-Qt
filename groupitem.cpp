@@ -3,22 +3,22 @@
 #include "groupitem.h"
 
 GroupItem::GroupItem(const id_t &id,
-					 const QString &group_name,
+					 const QString &groupName,
 					 QTreeWidget *parent):
 	QTreeWidgetItem(parent, QTreeWidgetItem::UserType),
 	id_(id)
 {
-	this->setName(group_name);
+	this->setName(groupName);
 }
 
 
 GroupItem::GroupItem(const id_t &id,
-					 const QString &group_name,
+					 const QString &groupName,
 					 QTreeWidgetItem *parent):
 	QTreeWidgetItem(parent, QTreeWidgetItem::UserType),
 	id_(id)
 {
-	this->setName(group_name);
+	this->setName(groupName);
 }
 
 
@@ -33,7 +33,7 @@ QString GroupItem::name() const
 	return this->text(0);
 }
 
-void GroupItem::setName(const QString &new_name)
+void GroupItem::setName(const QString &groupName)
 {
-	this->setText(0, new_name);
+	this->setText(0, groupName);
 }

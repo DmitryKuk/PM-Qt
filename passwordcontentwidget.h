@@ -13,7 +13,7 @@ class PasswordContentWidget:
 {
 	Q_OBJECT
 public:
-	PasswordContentWidget(const QString &label, QWidget *parent = nullptr);
+	PasswordContentWidget(QWidget *parent = nullptr);
 	
 	void readSettings(QSettings &settings, const QString &prefix = "");
 	void writeSettings(QSettings &settings, const QString &prefix = "") const;

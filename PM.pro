@@ -6,7 +6,8 @@
 
 QT += core gui
 QMAKE_MAC_SDK = macosx10.9
-QMAKE_CXXFLAGS += -std=c++0x
+QMAKE_CXXFLAGS += -std=c++11 -Wall
+CONFIG += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -24,7 +25,8 @@ SOURCES += main.cpp\
 		passwordlistwidget.cpp\
 		passwordcontentwidget.cpp\
 		settingssaver.cpp\
-		groupitem.cpp
+		groupitem.cpp\
+		passworditem.cpp
 
 HEADERS += types.h\
 		mainwindow.h\
@@ -36,4 +38,5 @@ HEADERS += types.h\
 		passwordlistwidget.h\
 		passwordcontentwidget.h\
 		settingssaver.h\
-		groupitem.h
+		groupitem.h\
+		passworditem.h

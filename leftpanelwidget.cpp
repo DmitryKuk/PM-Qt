@@ -4,8 +4,8 @@
 
 LeftPanelWidget::LeftPanelWidget(QWidget *parent):
 	QSplitter(Qt::Vertical, parent),
-	groupListWidget_(new GroupListWidget(tr("Groups"), this)),
-	taskListWidget_(new TaskListWidget(tr("Tasks"), this))
+	groupListWidget_(new GroupListWidget(this)),
+	taskListWidget_(new TaskListWidget(this))
 {
 	// Grop list setting...
 	this->addWidget(this->groupListWidget_);

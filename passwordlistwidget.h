@@ -8,16 +8,14 @@
 #include "settingssaver.h"
 
 class PasswordListWidget:
-	public QFrame,
+	public QTreeWidget,
 	public SettingsSaver
 {
 public:
-	PasswordListWidget(const QString &label, QWidget *parent = nullptr);
+	PasswordListWidget(QWidget *parent = nullptr);
 	
 	void readSettings(QSettings &settings, const QString &prefix = "");
 	void writeSettings(QSettings &settings, const QString &prefix = "") const;
-private:
-	QLabel *label_;
 };
 
 #endif // PASSWORDLISTWIDGET_H

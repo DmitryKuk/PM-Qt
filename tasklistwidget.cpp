@@ -2,15 +2,14 @@
 
 #include "tasklistwidget.h"
 
-TaskListWidget::TaskListWidget(const QString &label, QWidget *parent):
+TaskListWidget::TaskListWidget(QWidget *parent):
 	QFrame(parent),
-	label_(new QLabel(this)),
+	label_(new QLabel(tr("Tasks"), this)),
 	scrollArea_(new QScrollArea(this)),
 	mainLayout_(new QVBoxLayout(this)),
 	listLayout_(new QVBoxLayout(scrollArea_))
 {
 	// Label setting...
-	this->label_->setText(label);
 	this->label_->setAlignment(Qt::AlignHCenter);
 	this->label_->setSizePolicy(QSizePolicy::Expanding,
 								QSizePolicy::Fixed);

@@ -33,7 +33,7 @@ for I in $( $LS -1 | $GREP -v '[[:graph:]]*\.\(o\|so\|pro\.user\|app\)\|moc_[[:g
 done
 
 if [ "X$FILES_TO_UPDATE" != "X" ]; then
-	# Now use git to add all of them, commit with given messsage and push
+	# Now use git to add all of files, commit with given messsage and push
 	$GIT_ADD $FILES_TO_UPDATE && $GIT_COMMIT_MSG "$MESSAGE" && $GIT_PUSH && echo 'Done.' || echo 'Error.'
 else
 	echo 'No files selected.'
