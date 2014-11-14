@@ -17,7 +17,7 @@ if [ "X$1" == "X" ]; then
 	exit 1
 else
 	# Adding message to commit
-	GIT_COMMIT_MSG="$GIT_COMMIT_MSG '$1'"
+	GIT_COMMIT_MSG="$( echo -en $GIT_COMMIT_MSG \'$1\' )"
 fi
 
 
