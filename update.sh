@@ -36,4 +36,4 @@ done
 echo $FILES_TO_UPDATE
 
 # Now use git to add all of them, commit with given messsage and push
-$GIT_ADD $FILES_TO_UPDATE && $GIT_COMMIT_MSG && $GIT_PUSH
+echo "$GIT_ADD $FILES_TO_UPDATE && $GIT_COMMIT_MSG && $GIT_PUSH"
