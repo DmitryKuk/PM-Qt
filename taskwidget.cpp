@@ -2,7 +2,7 @@
 
 #include "taskwidget.h"
 
-#include <algorithm>
+#include <algorithm>	// For std::min & std::max only!
 
 TaskWidget::TaskWidget(const QString &label, QWidget *parent):
 	QFrame(parent),
@@ -34,10 +34,10 @@ TaskWidget::TaskWidget(const QString &label, QWidget *parent):
 	
 	// Minimum sizes of widgets
 	QSize
-		labelMinSize = this->label_->minimumSize(),
-		progressBarMinSize = this->progressBar_->minimumSize(),
-		actionButtonMinSize = this->actionButton_->minimumSize(),
-		cancelButtonMinSize = this->cancelButton_->minimumSize();
+		labelMinSize		= this->label_		 ->minimumSize(),
+		progressBarMinSize	= this->progressBar_ ->minimumSize(),
+		actionButtonMinSize	= this->actionButton_->minimumSize(),
+		cancelButtonMinSize	= this->cancelButton_->minimumSize();
 	
 	// Total minimum size
 	QSize minSize(

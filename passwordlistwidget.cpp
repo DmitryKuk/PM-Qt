@@ -10,11 +10,11 @@
 PasswordListWidget::PasswordListWidget(QWidget *parent):
 	QTreeWidget(parent)
 {
-	this->setHeaderLabels({ tr("Name"), tr("Group"), tr("Modified"), tr("Created") });
+	this->setHeaderLabels({ tr("Name"), tr("Group"), tr("Type"), tr("Modified"), tr("Created") });
 	
-	new PasswordItem(3, { "Linux"  , "Example passwords", "02.01.2100", "01.01.2100" }, this);
-	new PasswordItem(4, { "Windows", "Example passwords", "02.01.2100", "01.01.2100" }, this);
-	new PasswordItem(5, { "Etc"    , "Example passwords", "02.01.2100", "01.01.2100" }, this);
+	new PasswordItem(3, { "Linux"  , "Example passwords", "Password", "02.01.2100", "01.01.2100" }, this);
+	new PasswordItem(4, { "Windows", "Example passwords", "Password", "02.01.2100", "01.01.2100" }, this);
+	new PasswordItem(5, { "Etc"    , "Example passwords", "Password", "02.01.2100", "01.01.2100" }, this);
 }
 
 

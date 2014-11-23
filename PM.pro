@@ -26,7 +26,10 @@ SOURCES += main.cpp\
 		passwordcontentwidget.cpp\
 		settingssaver.cpp\
 		groupitem.cpp\
-		passworditem.cpp
+		passworditem.cpp\
+		passwordtree.cpp\
+		password.cpp\
+		cryptokernelagent.cpp
 
 HEADERS += types.h\
 		mainwindow.h\
@@ -39,4 +42,7 @@ HEADERS += types.h\
 		passwordcontentwidget.h\
 		settingssaver.h\
 		groupitem.h\
-		passworditem.h
+		passworditem.h\
+		passwordtree.h passwordtree.hpp\
+		password.h\
+		cryptokernelagent.h

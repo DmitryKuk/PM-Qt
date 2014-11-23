@@ -3,9 +3,9 @@
 #ifndef TASKLISTWIDGET_H
 #define TASKLISTWIDGET_H
 
-#include <list>
-
 #include <QtWidgets>
+
+#include <list>
 
 #include "taskwidget.h"
 #include "settingssaver.h"
