@@ -3,19 +3,21 @@
 #ifndef PASSWORDITEM_H
 #define PASSWORDITEM_H
 
-#include <QtWidgets>
-#include <QStringList>
+#include <QString>
+#include <QList>
+#include <QPair>
 
 #include "types.h"
+#include "abstractitem.h"
+#include "groupitem.h"
 
-class PasswordItem: public QTreeWidgetItem
+class PasswordItem: public AbstractItem
 {
 public:
-	PasswordItem(const id_t &id, const QStringList &passwordProperties, QTreeWidget *parent = nullptr);
-	
-	virtual const id_t & id() const;
+	PasswordItem(id_t id, const QString &passwordName, GroupItem *parent = nullptr);
+	PasswordItem(id_t id, const QString &passwordName, QWidget *parent = nullptr);
 private:
-	id_t id_;
+	QList<QPair<field_id_t, QString>> fields_;	// Fields list: (FIELD_ID, FIELD_STRING)
 };
 
 #endif // PASSWORDITEM_H

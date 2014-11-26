@@ -3,22 +3,16 @@
 #ifndef GROUPITEM_H
 #define GROUPITEM_H
 
-#include <QtWidgets>
+#include <QString>
 
 #include "types.h"
+#include "abstractitem.h"
 
-class GroupItem: public QTreeWidgetItem
+class GroupItem: public AbstractItem
 {
 public:
-	GroupItem(const id_t &id, const QString &groupName, QTreeWidget *parent = nullptr);
-	GroupItem(const id_t &id, const QString &groupName, QTreeWidgetItem *parent = nullptr);
-	
-	virtual const id_t & id() const;
-	
-	virtual QString name() const;
-	virtual void setName(const QString &groupName);
-private:
-	id_t id_;
+	GroupItem(id_t id, const QString &groupName, AbstractItem *parent = nullptr);
+	GroupItem(id_t id, const QString &groupName, QWidget *parent = nullptr);
 };
 
 #endif // GROUPITEM_H

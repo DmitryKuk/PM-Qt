@@ -2,14 +2,14 @@
 
 #include "passworditem.h"
 
-PasswordItem::PasswordItem(const id_t &id,
-						   const QStringList &passwordProperties,
-						   QTreeWidget *parent):
-	QTreeWidgetItem(parent, passwordProperties, QTreeWidgetItem::UserType),
-	id_(id)
+PasswordItem::PasswordItem(id_t id,
+						   const QString &passwordName,
+						   GroupItem *parent):
+	AbstractItem(id, passwordName, parent)
 {}
 
-const id_t & PasswordItem::id() const
-{
-	return this->id_;
-}
+PasswordItem::PasswordItem(id_t id,
+						   const QString &passwordName,
+						   QWidget *parent):
+	AbstractItem(id, passwordName, parent)
+{}

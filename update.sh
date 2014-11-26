@@ -14,10 +14,16 @@ GIT_PUSH='git push'
 
 # Checking message
 if [ "X$1" == "X" ]; then
-	echo -e "Error! Usage:\n\t./update.sh MESSAGE"
+	echo -e "Error! Usage:\n\t./update.sh MESSAGE [nopush]"
 	exit 1
 else
 	MESSAGE="$1"
+fi
+
+# Checking for "nopush" command
+NOPUSH=0
+if [ "X$2" != "X" ]; then
+	NOPUSH=1
 fi
 
 
@@ -34,7 +40,34 @@ done
 
 if [ "X$FILES_TO_UPDATE" != "X" ]; then
 	# Now use git to add all of files, commit with given messsage and push
-	$GIT_ADD $FILES_TO_UPDATE && $GIT_COMMIT_MSG "$MESSAGE" && $GIT_PUSH && echo 'Done.' || echo 'Error.'
+	$GIT_ADD $FILES_TO_UPDATE
+	if (( $? == 0 )); then
+		echo 'Files added.'
+	else
+		echo 'Addind error.'
+		exit 2
+	fi
+	
+	$GIT_COMMIT_MSG "$MESSAGE"
+	if (( $? == 0 )); then
+		echo 'Changes commited.'
+	else
+		echo 'Commiting error.'
+		exit 3
+	fi
+	
+	if (( $NOPUSH == 0 )); then
+		$GIT_PUSH
+		if (( $? == 0 )); then
+			echo 'Commits pushed.'
+		else
+			echo 'Pushing error.'
+			exit 4
+		fi
+	fi
+	
+	echo 'Done.'
 else
 	echo 'No files selected.'
+	exit 0
 fi
