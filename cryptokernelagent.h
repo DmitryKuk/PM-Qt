@@ -1,25 +1,55 @@
 // Author: Dmitry Kukovinets (d1021976@gmail.com)
 
+// This file contains cryptokernel agent. Agent must use Kernel for all kinds
+// of cryptography tasks: generate new ids, encode or decode data...
+// Agent is interface for GUI to do all cryptography actions.
+
+// Example: [     GUI      ] <-> [          Agent          ] <-> [    Kernel    ]
+//          (Qt/ncurses/...)     (depends on GUI and Kernel)     (lib/daemon/...)
+// This version of program uses Qt GUI, so Agent has Qt API too. Agent has own
+// cache for some data. Some data caches in PasswordItem or GroupItem objects.
+
 #ifndef CRYPTOKERNELAGENT_H
 #define CRYPTOKERNELAGENT_H
 
-#include <string>
-#include <map>
+#include <QString>
+
+#include <vector>
+#include <unordered_map>
 
 #include "types.h"
-#include "passwordtree.h"
 
 class CryptoKernelAgent
 {
 public:
-	typedef std::unordered_map<id_t, id_t> map;
+	CryptoKernelAgent();
+	~CryptoKernelAgent();
 	
-	CryptoKernelAgent(const std::string filename);
+	// Type management (every type has own set of fields)
+	std::vector<type_id_t> types() const;			// Returns all types ids
+	QString type(type_id_t tid) const;				// Returns type id if it exists or empty string
+	type_id_t addType(const QString &typeName);		// Generates new type id and adds it with name
 	
-	map groups() const;
-	map items() const;
+	// Field management (field ids are unique for same type)
+	std::vector<field_id_t> fields(type_id_t tid) const;			// Returns all fields ids for type or empty vector
+	QString field(type_id_t tid, field_id_t fid) const;				// Returns field id if it exists or empty string
+	field_id_t addField(type_id_t tid, const QString &fieldName);	// Generates new field id and adds it with name
+private:
+	struct Type
+	{
+		QString name;
+		std::unordered_map<field_id_t, QString> fields;
+	};
 	
-	std::string data(const id_t &id) const;
+	std::unordered_map<type_id_t, Type> types_;	// Types with their names and fields (id + name)
+	
+	
+	// Deprecated constructor and operator=()
+	[[deprecated("Don't copy the agent!")]]
+	CryptoKernelAgent(const CryptoKernelAgent &other);
+	
+	[[deprecated("Don't copy the agent!")]]
+	CryptoKernelAgent & operator=(const CryptoKernelAgent &other);
 };
 
 #endif // CRYPTOKERNELAGENT_H

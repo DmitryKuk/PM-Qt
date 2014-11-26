@@ -4,12 +4,12 @@
 
 GroupItem::GroupItem(id_t id,
 					 const QString &groupName,
-					 AbstractItem *parent):
+					 GroupItem *parent):
 	AbstractItem(id, groupName, parent)
 {}
 
 GroupItem::GroupItem(id_t id,
 					 const QString &groupName,
-					 QWidget *parent):
+					 QTreeWidget *parent):
 	AbstractItem(id, groupName, parent)
 {}

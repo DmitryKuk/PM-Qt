@@ -3,7 +3,9 @@
 #ifndef ABSTRACTITEM_H
 #define ABSTRACTITEM_H
 
-#include <QtWidgets>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
+
 #include <QString>
 
 #include "types.h"
@@ -12,7 +14,7 @@ class AbstractItem: public QTreeWidgetItem
 {
 public:
 	AbstractItem(id_t id, const QString &itemName, AbstractItem *parent = nullptr);
-	AbstractItem(id_t id, const QString &itemName, QWidget *parent = nullptr);
+	AbstractItem(id_t id, const QString &itemName, QTreeWidget *parent = nullptr);
 	virtual ~AbstractItem() = 0;
 	
 	inline id_t id() const;

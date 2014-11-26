@@ -10,6 +10,6 @@ PasswordItem::PasswordItem(id_t id,
 
 PasswordItem::PasswordItem(id_t id,
 						   const QString &passwordName,
-						   QWidget *parent):
+						   QTreeWidget *parent):
 	AbstractItem(id, passwordName, parent)
 {}

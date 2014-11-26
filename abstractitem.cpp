@@ -13,7 +13,7 @@ AbstractItem::AbstractItem(id_t id,
 
 AbstractItem::AbstractItem(id_t id,
 						   const QString &itemName,
-						   QWidget *parent):
+						   QTreeWidget *parent):
 	QTreeWidgetItem(parent),
 	id_(id)
 {
