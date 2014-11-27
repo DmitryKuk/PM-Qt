@@ -16,7 +16,7 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-		types.cpp\
+		cryptokernel/types.cpp\
 		mainwindow.cpp\
 		taskwidget.cpp\
 		tasklistwidget.cpp\
@@ -29,9 +29,10 @@ SOURCES += main.cpp\
 		abstractitem.cpp\
 		groupitem.cpp\
 		passworditem.cpp\
-		cryptokernelagent.cpp
+		cryptokernelagent.cpp\
+		cryptokernel/cryptokernel.cpp
 
-HEADERS += types.h\
+HEADERS += cryptokernel/types.h types.h\
 		mainwindow.h\
 		taskwidget.h\
 		tasklistwidget.h\
@@ -44,4 +45,5 @@ HEADERS += types.h\
 		abstractitem.h\
 		groupitem.h\
 		passworditem.h\
-		cryptokernelagent.h
+		cryptokernelagent.h\
+		cryptokernel/cryptokernel.h

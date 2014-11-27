@@ -41,9 +41,6 @@ public:
 	field_id_t setField(type_id_t tid, field_id_t fid, const QString &fieldName);	// Sets new name for existing
 																					// field of existing type or
 																					// returns invalid_field_id
-protected:
-	type_id_t addRandomTypeId();	// Adds a new type with empty name and fields or returns invalid_type_id
-	field_id_t addRandomFieldId(type_id_t tid);	// Adds a new field for existing type or returns invalid_field_id
 private:
 	struct Type
 	{
