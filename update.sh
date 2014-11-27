@@ -13,9 +13,13 @@ GIT_ADD='git add'
 GIT_COMMIT_MSG='git commit -m'
 GIT_PUSH='git push'
 
+COLOR_OK='\033[32m'
+COLOR_ERROR='\033[31m'
+COLOR_RESET='\033[0m'
+
 # Checking message
 if [ "X$1" == "X" ]; then
-	echo -e "Error! Usage:\n\t./update.sh MESSAGE [nopush]"
+	echo -e "${COLOR_ERROR}Error!$COLOR_RESET Usage:\n\t./update.sh MESSAGE [nopush]"
 	exit 1
 else
 	MESSAGE="$1"
@@ -53,9 +57,9 @@ function update_all() {
 		# Now use git to add all of files
 		$GIT_ADD $FILES_TO_UPDATE
 		if (( $? == 0 )); then
-			echo "Files from \"$CURRENT_DIR/\" added."
+			echo "${COLOR_OK}Files from \"$CURRENT_DIR/\" added.$COLOR_RESET"
 		else
-			echo "Error adding files from \"$CURRENT_DIR\"."
+			echo "${COLOR_ERROR}Error adding files from \"$CURRENT_DIR\".$COLOR_RESET"
 			exit 2
 		fi
 	fi
@@ -65,18 +69,18 @@ update_all '.'
 
 $GIT_COMMIT_MSG "$MESSAGE"
 if (( $? == 0 )); then
-	echo "Changes commited with message \"$MESSAGE\"."
+	echo "${COLOR_OK}Changes commited with message \"$MESSAGE\".$COLOR_RESET"
 else
-	echo 'Commiting error.'
+	echo "${COLOR_ERROR}Commiting error.$COLOR_RESET"
 	exit 3
 fi
 
 if (( $NOPUSH == 0 )); then
 	$GIT_PUSH
 	if (( $? == 0 )); then
-		echo 'Commits pushed.'
+		echo "${COLOR_OK}Commits pushed.$COLOR_RESET"
 	else
-		echo 'Pushing error.'
+		echo "${COLOR_ERROR}Pushing error.$COLOR_RESET"
 		exit 4
 	fi
 fi
