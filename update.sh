@@ -37,10 +37,10 @@ function update_all() {
 		$1='.'
 	fi
 	
-	FILES_TO_UPDATE=''
+	local FILES_TO_UPDATE=''
 	for I in $( "$LS" "$1" -1 | "$GREP" -v '[[:graph:]]*\.\(o\|so\|pro\.user\|app\)\|moc_[[:graph:]]*\|Makefile' ); do
-		FILE="$1/$I"
-		TYPE="$( $STAT -f '%HT' $FILE )"
+		local FILE="$1/$I"
+		local TYPE="$( $STAT -f '%HT' $FILE )"
 		if [ "X$TYPE" == "XRegular File" ]; then
 			FILES_TO_UPDATE="$FILES_TO_UPDATE $FILE"
 		elif [ "X$TYPE" == "XDirectory" ]; then
