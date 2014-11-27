@@ -38,18 +38,18 @@ function update_all() {
 	fi
 	
 	FILES_TO_UPDATE=''
-	for I in $( $LS $1 -1 | $GREP -v '[[:graph:]]*\.\(o\|so\|pro\.user\|app\)\|moc_[[:graph:]]*\|Makefile' ); do
+	for I in $( "$LS" "$1" -1 | "$GREP" -v '[[:graph:]]*\.\(o\|so\|pro\.user\|app\)\|moc_[[:graph:]]*\|Makefile' ); do
 		FILE="$1/$I"
 		TYPE="$( $STAT -f '%HT' $FILE )"
 		if [ "X$TYPE" == "XRegular File" ]; then
-			FILES_TO_UPDATE="$FILES_TO_UPDATE $1/$I"
+			FILES_TO_UPDATE="$FILES_TO_UPDATE $FILE"
 		elif [ "X$TYPE" == "XDirectory" ]; then
 			update_all "$FILE"
 		fi
 	done
 	
 	if [ "X$FILES_TO_UPDATE" != "X" ]; then
-		# Now use git to add all of files, commit with given messsage and push
+		# Now use git to add all of files
 		$GIT_ADD $FILES_TO_UPDATE
 		if (( $? == 0 )); then
 			echo 'Files added.'
