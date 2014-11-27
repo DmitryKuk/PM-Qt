@@ -7,6 +7,7 @@
 # Programs used to work
 LS='/bin/ls'
 GREP='grep'
+STAT='stat'
 
 GIT_ADD='git add'
 GIT_COMMIT_MSG='git commit -m'
@@ -31,43 +32,51 @@ fi
 # Then select only regular files (not directories, links and others!) and collect
 # their names in FILES_TO_UPDATE in format 'file1 file1 ...'
 
-FILES_TO_UPDATE=''
-for I in $( $LS -1 | $GREP -v '[[:graph:]]*\.\(o\|so\|pro\.user\|app\)\|moc_[[:graph:]]*\|Makefile' ); do
-	if [ "X$( stat -f '%HT' $I )" == "XRegular File" ]; then
-		FILES_TO_UPDATE="$FILES_TO_UPDATE $I"
-	fi
-done
-
-if [ "X$FILES_TO_UPDATE" != "X" ]; then
-	# Now use git to add all of files, commit with given messsage and push
-	$GIT_ADD $FILES_TO_UPDATE
-	if (( $? == 0 )); then
-		echo 'Files added.'
-	else
-		echo 'Addind error.'
-		exit 2
+function update_all() {
+	if [ "X$1" == "X" ]; then	# $1 is current directory
+		$1='.'
 	fi
 	
-	$GIT_COMMIT_MSG "$MESSAGE"
-	if (( $? == 0 )); then
-		echo 'Changes commited.'
-	else
-		echo 'Commiting error.'
-		exit 3
-	fi
+	FILES_TO_UPDATE=''
+	for I in $( $LS "$1" -1 | $GREP -v '[[:graph:]]*\.\(o\|so\|pro\.user\|app\)\|moc_[[:graph:]]*\|Makefile' ); do
+		TYPE="$( $STAT -f '%HT' '$1/$I' )"
+		if [ "X$TYPE" == "XRegular File" ]; then
+			FILES_TO_UPDATE="$FILES_TO_UPDATE '$1/$I'"
+		elif [ "X$TYPE" == "XDirectory" ]; then
+			update_all "$1/$I"
+		fi
+	done
 	
-	if (( $NOPUSH == 0 )); then
-		$GIT_PUSH
+	if [ "X$FILES_TO_UPDATE" != "X" ]; then
+		# Now use git to add all of files, commit with given messsage and push
+		$GIT_ADD $FILES_TO_UPDATE
 		if (( $? == 0 )); then
-			echo 'Commits pushed.'
+			echo 'Files added.'
 		else
-			echo 'Pushing error.'
-			exit 4
+			echo 'Addind error.'
+			exit 2
 		fi
 	fi
-	
-	echo 'Done.'
+}
+
+update_all '.'
+
+$GIT_COMMIT_MSG "$MESSAGE"
+if (( $? == 0 )); then
+	echo 'Changes commited.'
 else
-	echo 'No files selected.'
-	exit 0
+	echo 'Commiting error.'
+	exit 3
 fi
+
+if (( $NOPUSH == 0 )); then
+	$GIT_PUSH
+	if (( $? == 0 )); then
+		echo 'Commits pushed.'
+	else
+		echo 'Pushing error.'
+		exit 4
+	fi
+fi
+
+echo 'Done.'

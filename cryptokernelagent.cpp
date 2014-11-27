@@ -27,7 +27,25 @@ QString CryptoKernelAgent::type(type_id_t tid) const
 
 type_id_t CryptoKernelAgent::addType(const QString &typeName)
 {
-	return 0;
+	if (typeName.isEmpty()) return invalid_type_id;
+	
+	type_id_t new_type_id = this->kernel_.add_type(const std::string &type_name);
+	if (new_type_id == invalid_type_id) return invalid_type_id;
+	
+	this->types_[new_type_id] = Type();
+	return new_type_id;
+}
+
+type_id_t setType(type_id_t tid, const QString &typeName)
+{
+	if (typeName.isEmpty()) return invalid_type_id;
+	
+	auto it = this->types_.find(tid);
+	if (it == this->types_.end()) return invalid_type_id;
+	
+	// Ask CryptoKernel!!!
+	it->second.name = typeName;
+	return tid;
 }
 
 
@@ -56,5 +74,28 @@ QString CryptoKernelAgent::field(type_id_t tid, field_id_t fid) const
 
 field_id_t CryptoKernelAgent::addField(type_id_t tid, const QString &fieldName)
 {
-	return 0;
+	if (typeName.isEmpty()) return invalid_type_id;
+	
+	auto it = this->types_.find(tid);
+	if (it == this->types_.end()) return invalid_type_id;
+	
+	// Ask CryptoKernel!!!
+	it->second.name = typeName;
+	return tid;
+}
+
+field_id_t setField(type_id_t tid, field_id_t fid, const QString &fieldName)
+{
+	
+}
+
+
+type_id_t CryptoKernelAgent::addRandomTypeId()
+{
+	
+}
+
+field_id_t CryptoKernelAgent::addRandomFieldId(type_id_t tid)
+{
+	
 }

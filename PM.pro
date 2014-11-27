@@ -16,6 +16,7 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
+		types.cpp\
 		mainwindow.cpp\
 		taskwidget.cpp\
 		tasklistwidget.cpp\
