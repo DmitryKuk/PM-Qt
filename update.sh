@@ -13,9 +13,9 @@ GIT_ADD='git add'
 GIT_COMMIT_MSG='git commit -m'
 GIT_PUSH='git push'
 
-COLOR_OK='\033[32m'
-COLOR_ERROR='\033[31m'
-COLOR_RESET='\033[0m'
+COLOR_OK="\033[32m"
+COLOR_ERROR="\033[31m"
+COLOR_RESET="\033[0m"
 
 # Checking message
 if [ "X$1" == "X" ]; then
