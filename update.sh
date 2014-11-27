@@ -85,4 +85,4 @@ if (( $NOPUSH == 0 )); then
 	fi
 fi
 
-echo 'Done.'
+echo -e "${COLOR_OK}Done.$COLOR_RESET"
