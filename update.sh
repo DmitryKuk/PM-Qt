@@ -39,7 +39,7 @@ function update_all() {
 	fi
 	
 	local FILES_TO_UPDATE=''
-	for I in $( "$LS" "$CURRENT_DIR" -1 | "$GREP" -v '[[:graph:]]*\.\(o\|so\|pro\.user\|app\)\|moc_[[:graph:]]*\|Makefile' ); do
+	for I in $( "$LS" -1 "$CURRENT_DIR" | "$GREP" -v '[[:graph:]]*\.\(o\|so\|pro\.user\|app\)\|moc_[[:graph:]]*\|Makefile' ); do
 		local FILE="$CURRENT_DIR/$I"
 		local TYPE="$( $STAT -f '%HT' $FILE )"
 		if [ "X$TYPE" == "XRegular File" ]; then
