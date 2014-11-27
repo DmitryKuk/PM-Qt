@@ -38,12 +38,13 @@ function update_all() {
 	fi
 	
 	FILES_TO_UPDATE=''
-	for I in $( $LS "$1" -1 | $GREP -v '[[:graph:]]*\.\(o\|so\|pro\.user\|app\)\|moc_[[:graph:]]*\|Makefile' ); do
-		TYPE="$( $STAT -f '%HT' '$1/$I' )"
+	for I in $( $LS $1 -1 | $GREP -v '[[:graph:]]*\.\(o\|so\|pro\.user\|app\)\|moc_[[:graph:]]*\|Makefile' ); do
+		FILE="$1/$I"
+		TYPE="$( $STAT -f '%HT' $FILE )"
 		if [ "X$TYPE" == "XRegular File" ]; then
-			FILES_TO_UPDATE="$FILES_TO_UPDATE '$1/$I'"
+			FILES_TO_UPDATE="$FILES_TO_UPDATE $1/$I"
 		elif [ "X$TYPE" == "XDirectory" ]; then
-			update_all "$1/$I"
+			update_all $1/$I
 		fi
 	done
 	
