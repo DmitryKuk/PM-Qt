@@ -33,13 +33,14 @@ fi
 # their names in FILES_TO_UPDATE in format 'file1 file1 ...'
 
 function update_all() {
-	if [ "X$1" == "X" ]; then	# $1 is current directory
-		$1='.'
+	local CURRENT_DIR='.'
+	if [ "X$1" != "X" ]; then	# $1 is current directory
+		CURRENT_DIR="$1"
 	fi
 	
 	local FILES_TO_UPDATE=''
-	for I in $( "$LS" "$1" -1 | "$GREP" -v '[[:graph:]]*\.\(o\|so\|pro\.user\|app\)\|moc_[[:graph:]]*\|Makefile' ); do
-		local FILE="$1/$I"
+	for I in $( "$LS" "$CURRENT_DIR" -1 | "$GREP" -v '[[:graph:]]*\.\(o\|so\|pro\.user\|app\)\|moc_[[:graph:]]*\|Makefile' ); do
+		local FILE="$CURRENT_DIR/$I"
 		local TYPE="$( $STAT -f '%HT' $FILE )"
 		if [ "X$TYPE" == "XRegular File" ]; then
 			FILES_TO_UPDATE="$FILES_TO_UPDATE $FILE"
