@@ -47,7 +47,7 @@ function update_all() {
 	for I in $( "$LS" -1 "$CURRENT_DIR" | "$GREP" -v '[[:graph:]]*\.\(o\|so\|pro\.user\|app\)\|moc_[[:graph:]]*\|Makefile' ); do
 		local FILE="$CURRENT_DIR/$I"
 		local TYPE="$( $STAT -f '%HT' $FILE )"
-		if [ "X$TYPE" == "XRegular File" ]; then
+		if [ "X$TYPE" == "XRegular File" ] || [ "X$TYPE" == "XSymbolic Link" ]; then
 			FILES_TO_UPDATE="$FILES_TO_UPDATE $FILE"
 		elif [ "X$TYPE" == "XDirectory" ]; then
 			update_all "$FILE"
