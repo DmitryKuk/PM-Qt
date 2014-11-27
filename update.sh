@@ -44,7 +44,7 @@ function update_all() {
 		if [ "X$TYPE" == "XRegular File" ]; then
 			FILES_TO_UPDATE="$FILES_TO_UPDATE $1/$I"
 		elif [ "X$TYPE" == "XDirectory" ]; then
-			update_all $1/$I
+			update_all "$FILE"
 		fi
 	done
 	
