@@ -53,9 +53,9 @@ function update_all() {
 		# Now use git to add all of files
 		$GIT_ADD $FILES_TO_UPDATE
 		if (( $? == 0 )); then
-			echo 'Files added.'
+			echo "Files from \"$CURRENT_DIR/\" added."
 		else
-			echo 'Addind error.'
+			echo "Error adding files from \"$CURRENT_DIR\"."
 			exit 2
 		fi
 	fi
@@ -65,7 +65,7 @@ update_all '.'
 
 $GIT_COMMIT_MSG "$MESSAGE"
 if (( $? == 0 )); then
-	echo 'Changes commited.'
+	echo "Changes commited with message \"$MESSAGE\"."
 else
 	echo 'Commiting error.'
 	exit 3
