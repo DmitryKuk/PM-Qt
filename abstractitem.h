@@ -25,4 +25,5 @@ private:
 	id_t id_;
 };
 
+#include "abstractitem.hpp"
 #endif // ABSTRACTITEM_H

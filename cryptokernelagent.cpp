@@ -84,18 +84,7 @@ field_id_t CryptoKernelAgent::addField(type_id_t tid, const QString &fieldName)
 	return tid;
 }
 
-field_id_t setField(type_id_t tid, field_id_t fid, const QString &fieldName)
-{
-	
-}
-
-
-type_id_t CryptoKernelAgent::addRandomTypeId()
-{
-	
-}
-
-field_id_t CryptoKernelAgent::addRandomFieldId(type_id_t tid)
+field_id_t CryptoKernelAgent::setField(type_id_t tid, field_id_t fid, const QString &fieldName)
 {
 	
 }
