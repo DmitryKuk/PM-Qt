@@ -46,4 +46,5 @@ HEADERS += cryptokernel/types.h types.h\
 		groupitem.h\
 		passworditem.h\
 		cryptokernelagent.h\
-		cryptokernel/cryptokernel.h
+		cryptokernel/cryptokernel.h\
+		cryptokernel/interval_set.h cryptokernel/interval_set.hpp
