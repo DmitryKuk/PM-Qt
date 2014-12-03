@@ -24,18 +24,12 @@ class interval_set: private std::map<T, T, Compare, Alloc>
 {
 public:
 	typedef std::map<T, T, Compare, Alloc> parent_container;
-	typedef std::pair<interval_set<T, Compare, Alloc>::iterator, bool> iter_bool_pair;
+	typedef typename parent_container::iterator iterator;
+	typedef typename parent_container::const_iterator const_iterator;
+	typedef std::pair<typename interval_set<T, Compare, Alloc>::iterator, bool> iter_bool_pair;
 	
 	// Iterators
-	class iterator: public parent_container::iterator
-	{};
-	
-	class const_iterator: public parent_container::const_iterator
-	{};
-	
-	inline iterator begin();
 	inline const_iterator begin() const;
-	inline iterator end();
 	inline const_iterator end() const;
 	
 	// Constructors and operator=()
@@ -62,13 +56,17 @@ protected:
 	// 2) element does not exist, but left interval exists: (iterator to left interval, false)
 	// 3) element does not exist and no correct interval exists: (this->end(), false)
 	// TIME: O(log N)
-	interval_set<T, Compare, Alloc>::iter_bool_pair interval_set::find_interval(const T &element);
+	iter_bool_pair find_interval(const T &element);
 	
 	// Tries to merge 3 intervals: it and its both left and right neighbours.
 	// If merging was successfully, return iterator to the new interval and true.
 	// Otherwise, returns given iterator and false.
 	// TIME: O(1) (amortized)
-	inline iter_bool_pair interval_set<T, Compare, Alloc>::merge(interval_set<T, Compare, Alloc>::iterator it);
+	inline iter_bool_pair merge(iterator it);
+	
+	// Iterators
+	inline iterator begin();
+	inline iterator end();
 };
 
 #include "interval_set.hpp"

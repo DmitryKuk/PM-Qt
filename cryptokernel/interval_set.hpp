@@ -2,25 +2,13 @@
 
 // Iterators
 template<class T, class Compare, class Alloc>
-inline interval_set<T, Compare, Alloc>::iterator interval_set<T, Compare, Alloc>::begin()
+inline typename interval_set<T, Compare, Alloc>::const_iterator interval_set<T, Compare, Alloc>::begin() const
 {
 	return this->parent_container::begin();
 }
 
 template<class T, class Compare, class Alloc>
-inline interval_set<T, Compare, Alloc>::const_iterator interval_set<T, Compare, Alloc>::begin() const
-{
-	return this->parent_container::begin();
-}
-
-template<class T, class Compare, class Alloc>
-inline interval_set<T, Compare, Alloc>::iterator interval_set<T, Compare, Alloc>::end()
-{
-	return this->parent_container::end();
-}
-
-template<class T, class Compare, class Alloc>
-inline interval_set<T, Compare, Alloc>::const_iterator interval_set<T, Compare, Alloc>::end() const
+inline typename interval_set<T, Compare, Alloc>::const_iterator interval_set<T, Compare, Alloc>::end() const
 {
 	return this->parent_container::end();
 }
@@ -107,19 +95,19 @@ interval_set<T, Compare, Alloc>::erase(const T &element)
 	if (!p.second) return;	// element does not exist
 	
 	// Forking interval: [left, right) => [left, element), [element + 1, right)
-	if (are_equal(element, it->first)) {	// [left = element, right) => [element + 1, right)
-		auto interval = std::move(*it); ++interval.first;	// left => element + 1
-		it = this->parent_container::erase(it);	// Now it points to next interval
+	if (are_equal(element, p.first->first)) {	// [left = element, right) => [element + 1, right)
+		std::pair<T, T> interval = std::move(*p.first); ++interval.first;	// left => element + 1
+		p.first = this->parent_container::erase(p.first);	// Now p.first points to next interval
 		if (cmp(interval.first, interval.second))	// Check: interval is correct (non-zero size)
-			this->parent_container::insert(it, std::move(interval));
+			this->parent_container::insert(p.first, std::move(interval));
 	} else {
 		T element1 = element; ++element1;
-		if (are_equal(element1, it->second))	// [left, right) => [left, right - 1)
-			it->second = element;
+		if (are_equal(element1, p.first->second))	// [left, right) => [left, right - 1)
+			p.first->second = element;
 		else {	// [left, right) => [left, element), [element + 1, right)
-			auto it1 = it; ++it1;
-			this->parent_container::emplace_hint(it1, std::move(element1), std::move(it->second));
-			it->second = element;
+			auto it1 = p.first; ++it1;
+			this->parent_container::emplace_hint(it1, std::move(element1), std::move(p.first->second));
+			p.first->second = element;
 		}
 	}
 }
@@ -145,7 +133,7 @@ interval_set<T, Compare, Alloc>::find(const T &element) const
 // 3) element does not exist and no correct interval exists: (this->end(), false)
 // TIME: O(log N)
 template<class T, class Compare, class Alloc>
-interval_set<T, Compare, Alloc>::iter_bool_pair
+typename interval_set<T, Compare, Alloc>::iter_bool_pair
 interval_set<T, Compare, Alloc>::find_interval(const T &element)
 {
 	Compare cmp = this->key_comp();	// Comparator
@@ -166,7 +154,7 @@ interval_set<T, Compare, Alloc>::find_interval(const T &element)
 // TIME: O(1) (amortized)
 template<class T, class Compare, class Alloc>
 inline
-interval_set<T, Compare, Alloc>::iter_bool_pair
+typename interval_set<T, Compare, Alloc>::iter_bool_pair
 interval_set<T, Compare, Alloc>::merge(interval_set<T, Compare, Alloc>::iterator it)
 {
 	// Helper lambda-function. Merges 2 intervals into one. If it is possible,
@@ -220,4 +208,18 @@ interval_set<T, Compare, Alloc>::merge(interval_set<T, Compare, Alloc>::iterator
 		}
 	}
 	return res;
+}
+
+
+// Iterators
+template<class T, class Compare, class Alloc>
+inline typename interval_set<T, Compare, Alloc>::iterator interval_set<T, Compare, Alloc>::begin()
+{
+	return this->parent_container::begin();
+}
+
+template<class T, class Compare, class Alloc>
+inline typename interval_set<T, Compare, Alloc>::iterator interval_set<T, Compare, Alloc>::end()
+{
+	return this->parent_container::end();
 }
