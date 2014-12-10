@@ -16,6 +16,10 @@
 class crypto_kernel
 {
 public:
+  // Static functions
+	
+  // End of static functions
+	
 	crypto_kernel();
 	~crypto_kernel();
 	
