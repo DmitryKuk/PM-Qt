@@ -8,6 +8,7 @@
 
 #include <vector>
 #include <cstddef>
+#include <atomic>
 
 namespace generator {
 
@@ -38,7 +39,7 @@ protected:
 	// Sets new status. Call this function on every generation
 	inline void set_status(enum status new_status) const { this->status_ = new_status; }
 private:
-	mutable enum status status_;
+	mutable std::atomic<enum status> status_;
 };
 
 
