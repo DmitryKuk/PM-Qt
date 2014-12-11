@@ -4,6 +4,7 @@
 // The default device is DEV_RANDOM.
 // All these class are final, do NOT write subclasses overriding their generate()
 // functions. All 3 classes are thread-sefety and async-safety.
+// NOTE: all dev_random generators use single stream assotiated with DEV_RANDOM!
 
 #ifndef DEV_RANDOM_H
 #define DEV_RANDOM_H
@@ -22,12 +23,18 @@ class raw_dev_random:
 	virtual public raw
 {
 public:
-	raw_dev_random(const std::string &dev_name = DEV_RANDOM);
+	// Constructors and operator=()
+	raw_dev_random();												// Default
+	inline raw_dev_random(const raw_dev_random &other);				// Copy
+	inline raw_dev_random(raw_dev_random &&other);					// Move
+	
+	inline raw_dev_random & operator=(const raw_dev_random &other);	// Copy
+	inline raw_dev_random & operator=(raw_dev_random &&other);		// Move
 	
 	virtual void generate(void *data, size_t n) const override final;
 private:
-	mutable std::ifstream stream_;
-	mutable std::mutex mutex_;
+	static std::ifstream stream_;
+	static std::mutex mutex_;
 };
 
 
@@ -36,7 +43,13 @@ class universal_dev_random:
 	virtual private raw_dev_random
 {
 public:
-	universal_dev_random(const std::string &dev_name = DEV_RANDOM);
+	// Constructors and operator=()
+	inline universal_dev_random();												// Default
+	inline universal_dev_random(const universal_dev_random &other);				// Copy
+	inline universal_dev_random(universal_dev_random &&other);					// Move
+	
+	inline universal_dev_random & operator=(const universal_dev_random &other);	// Copy
+	inline universal_dev_random & operator=(universal_dev_random &&other);		// Move
 	
 	template<class Num>
 	Num generate() const;	// override final
@@ -51,7 +64,13 @@ class dev_random:
 	virtual private raw_dev_random
 {
 public:
-	dev_random(const std::string &dev_name = DEV_RANDOM);
+	// Constructors and operator=()
+	inline dev_random();									// Default
+	inline dev_random(const dev_random<Num> &other);		// Copy
+	inline dev_random(dev_random<Num> &&other);				// Move
+	
+	inline dev_random & operator=(const dev_random &other);	// Copy
+	inline dev_random & operator=(dev_random &&other);		// Move
 	
 	virtual Num generate() const override final;
 private:
@@ -66,5 +85,4 @@ inline const generator::universal_dev_random & operator>>(const generator::unive
 
 
 #include "dev_random.hpp"
-#undef DEV_RANDOM
 #endif // DEV_RANDOM_H

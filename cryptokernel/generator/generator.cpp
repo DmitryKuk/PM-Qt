@@ -2,17 +2,16 @@
 
 #include "generator.h"
 
-generator::base::base():
-	status_(status::unknown_error)
-{}
-
+// Base
 generator::base::~base()
 {}
 
 
+// Raw
 generator::raw::~raw()
 {}
 
 
+// Universal
 generator::universal::~universal()
 {}

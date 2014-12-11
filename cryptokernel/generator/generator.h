@@ -25,8 +25,14 @@ enum class status {
 class base
 {
 public:
-	base();
+	// Constructors, destructor and operator=()
+	inline base();					// Default
+	inline base(const base &other);	// Copy
+	inline base(base &&other);		// Move
 	virtual ~base() = 0;
+	
+	inline generator::base & operator=(const generator::base &other);	// Copy
+	inline generator::base & operator=(generator::base &&other);		// Move
 	
 	// Returns status of last generation
 	inline enum status status() const { return this->status_; }
@@ -47,7 +53,14 @@ private:
 class raw: virtual public base
 {
 public:
+	// Constructors, destructor and operator=()
+	inline raw();					// Default
+	inline raw(const raw &other);	// Copy
+	inline raw(raw &&other);		// Move
 	virtual ~raw() = 0;
+	
+	inline generator::raw & operator=(const generator::raw &other);	// Copy
+	inline generator::raw & operator=(generator::raw &&other);		// Move
 	
 	virtual void generate(void *data, size_t n) const = 0;
 };
@@ -57,7 +70,14 @@ public:
 class universal: virtual public base
 {
 public:
+	// Constructors, destructor and operator=()
+	inline universal();							// Default
+	inline universal(const universal &other);	// Copy
+	inline universal(universal &&other);		// Move
 	virtual ~universal() = 0;
+	
+	inline generator::universal & operator=(const generator::universal &other);	// Copy
+	inline generator::universal & operator=(generator::universal &&other);		// Move
 	
 	template<class Num>
 	Num generate() const;
@@ -69,7 +89,14 @@ template<class Num>
 class simple: virtual public base
 {
 public:
+	// Constructors, destructor and operator=()
+	inline simple();					// Default
+	inline simple(const simple &other);	// Copy
+	inline simple(simple &&other);		// Move
 	virtual ~simple() = 0;
+	
+	inline generator::simple<Num> & operator=(const generator::simple<Num> &other);	// Copy
+	inline generator::simple<Num> & operator=(generator::simple<Num> &&other);		// Move
 	
 	virtual Num generate() const = 0;
 };
