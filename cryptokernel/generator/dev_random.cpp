@@ -9,7 +9,7 @@ std::mutex generator::raw_dev_random::mutex_;
 
 // Default constructor
 generator::raw_dev_random::raw_dev_random():	// Default
-	generator::raw()
+	generator::base()
 {
 	generator::raw_dev_random::mutex_.lock();	// Guarantee async-safety
 	bool b = generator::raw_dev_random::stream_.good();

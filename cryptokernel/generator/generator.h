@@ -14,8 +14,8 @@ namespace generator {
 
 // Generation status
 enum class status {
-	success,			// Operation was successful
 	not_initialized,	// Generator was not be initialized correctly
+	success,			// Operation was successful
 	not_enough_entropy,	// Operation was incorrect because of entropy pool is empty
 	unknown_error		// Another error occured
 };
@@ -50,34 +50,20 @@ private:
 
 
 // Generates some data (n unsigned chars) writing them into array pointed by "data".
-class raw: virtual public base
+class raw
 {
 public:
-	// Constructors, destructor and operator=()
-	inline raw();					// Default
-	inline raw(const raw &other);	// Copy
-	inline raw(raw &&other);		// Move
 	virtual ~raw() = 0;
-	
-	inline generator::raw & operator=(const generator::raw &other);	// Copy
-	inline generator::raw & operator=(generator::raw &&other);		// Move
 	
 	virtual void generate(void *data, size_t n) const = 0;
 };
 
 
 // Generates random data of any type.
-class universal: virtual public base
+class universal
 {
 public:
-	// Constructors, destructor and operator=()
-	inline universal();							// Default
-	inline universal(const universal &other);	// Copy
-	inline universal(universal &&other);		// Move
 	virtual ~universal() = 0;
-	
-	inline generator::universal & operator=(const generator::universal &other);	// Copy
-	inline generator::universal & operator=(generator::universal &&other);		// Move
 	
 	template<class Num>
 	Num generate() const;
@@ -86,17 +72,10 @@ public:
 
 // Generates random data of type Num.
 template<class Num>
-class simple: virtual public base
+class simple
 {
 public:
-	// Constructors, destructor and operator=()
-	inline simple();					// Default
-	inline simple(const simple &other);	// Copy
-	inline simple(simple &&other);		// Move
 	virtual ~simple() = 0;
-	
-	inline generator::simple<Num> & operator=(const generator::simple<Num> &other);	// Copy
-	inline generator::simple<Num> & operator=(generator::simple<Num> &&other);		// Move
 	
 	virtual Num generate() const = 0;
 };

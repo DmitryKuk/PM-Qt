@@ -4,19 +4,19 @@
 // Constructors and operator=()
 inline
 generator::raw_dev_random::raw_dev_random(const generator::raw_dev_random &other):	// Copy
-	generator::raw(other)
+	generator::base(other)
 {}
 
 inline
 generator::raw_dev_random::raw_dev_random(generator::raw_dev_random &&other):		// Move
-	generator::raw(other)
+	generator::base(std::move(other))
 {}
 
 inline
 generator::raw_dev_random &
 generator::raw_dev_random::operator=(const generator::raw_dev_random &other)		// Copy
 {
-	this->generator::raw::operator=(other);
+	this->generator::base::operator=(other);
 	return *this;
 }
 
@@ -24,7 +24,7 @@ inline
 generator::raw_dev_random &
 generator::raw_dev_random::operator=(generator::raw_dev_random &&other)				// Move
 {
-	this->generator::raw::operator=(other);
+	this->generator::base::operator=(std::move(other));
 	return *this;
 }
 
@@ -32,7 +32,7 @@ generator::raw_dev_random::operator=(generator::raw_dev_random &&other)				// Mo
 // Universal
 // Constructors and operator=()
 inline
-generator::universal_dev_random::universal_dev_random():									// Default
+generator::universal_dev_random::universal_dev_random():												// Default
 	generator::raw_dev_random()
 {}
 
@@ -42,8 +42,8 @@ generator::universal_dev_random::universal_dev_random(const generator::universal
 {}
 
 inline
-generator::universal_dev_random::universal_dev_random(generator::universal_dev_random &&other):		// Move
-	generator::raw_dev_random(other)
+generator::universal_dev_random::universal_dev_random(generator::universal_dev_random &&other):			// Move
+	generator::raw_dev_random(std::move(other))
 {}
 
 inline
@@ -56,9 +56,9 @@ generator::universal_dev_random::operator=(const generator::universal_dev_random
 
 inline
 generator::universal_dev_random &
-generator::universal_dev_random::operator=(generator::universal_dev_random &&other)					// Move
+generator::universal_dev_random::operator=(generator::universal_dev_random &&other)						// Move
 {
-	this->generator::raw_dev_random::operator=(other);
+	this->generator::raw_dev_random::operator=(std::move(other));
 	return *this;
 }
 
@@ -92,13 +92,13 @@ generator::dev_random<Num>::dev_random(const generator::dev_random<Num> &other):
 template<class Num>
 inline
 generator::dev_random<Num>::dev_random(generator::dev_random<Num> &&other):			// Move
-	generator::raw_dev_random(other)
+	generator::raw_dev_random(std::move(other))
 {}
 
 template<class Num>
 inline
 generator::dev_random<Num> &
-generator::dev_random<Num>::operator=(const generator::dev_random<Num> &other)	// Copy
+generator::dev_random<Num>::operator=(const generator::dev_random<Num> &other)		// Copy
 {
 	this->generator::raw_dev_random::operator=(other);
 	return *this;
@@ -107,9 +107,9 @@ generator::dev_random<Num>::operator=(const generator::dev_random<Num> &other)	/
 template<class Num>
 inline
 generator::dev_random<Num> &
-generator::dev_random<Num>::operator=(generator::dev_random<Num> &&other)		// Move
+generator::dev_random<Num>::operator=(generator::dev_random<Num> &&other)			// Move
 {
-	this->generator::raw_dev_random::operator=(other);
+	this->generator::raw_dev_random::operator=(std::move(other));
 	return *this;
 }
 

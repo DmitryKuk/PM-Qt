@@ -8,16 +8,18 @@
 
 int main()
 {
-	std::cin.get();
-	random_map<int, int, generator::dev_random<int>> m;
-	std::cout << (m.generator().status() == generator::status::not_initialized? "Generator is not initialized!": "Generator ok.") << std::endl;
+	// std::cin.get();
+	random_map<unsigned short, unsigned short, generator::dev_random<unsigned short>> m;
+	std::cout << (m.generator().status() == generator::status::not_initialized? "Generator is not initialized!": "Generator is ok.") << std::endl;
 	
-	INSERT(m, 10);
-	INSERT(m, 15);
-	INSERT(m, 20);
+	for (unsigned short i = 0; i < 1000; ++i)
+		INSERT(m, i);
+	// INSERT(m, 10);
+	// INSERT(m, 15);
+	// INSERT(m, 20);
 	PRINT(m);
 	
 	std::cout << m.size() << std::endl;
-	std::cin.get();
+	// std::cin.get();
 	return 0;
 }

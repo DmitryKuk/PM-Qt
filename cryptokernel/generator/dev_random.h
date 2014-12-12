@@ -20,7 +20,8 @@
 namespace generator {
 
 class raw_dev_random:
-	virtual public raw
+	public base,
+	public raw
 {
 public:
 	// Constructors and operator=()
@@ -39,8 +40,8 @@ private:
 
 
 class universal_dev_random:
-	virtual public universal,
-	virtual private raw_dev_random
+	public raw_dev_random,
+	public universal
 {
 public:
 	// Constructors and operator=()
@@ -60,8 +61,8 @@ private:
 
 template<class Num>
 class dev_random:
-	virtual public simple<Num>,
-	virtual private raw_dev_random
+	public raw_dev_random,
+	public simple<Num>
 {
 public:
 	// Constructors and operator=()

@@ -26,9 +26,10 @@ public:
 	using Container::erase;
 	
 	// Constructors and operator=()
-	random_map(const Generator &g = Generator());							// Default
-	random_map(const random_map<Key, Value, Generator, Container> &other);	// Copy
-	random_map(random_map<Key, Value, Generator, Container> &&other);		// Move
+	inline random_map(const Generator &g = Generator());							// Default
+	inline random_map(Generator &&g);												// By moving generator
+	inline random_map(const random_map<Key, Value, Generator, Container> &other);	// Copy
+	inline random_map(random_map<Key, Value, Generator, Container> &&other);		// Move
 	
 	random_map<Key, Value, Generator, Container> & operator=(const random_map<Key, Value, Generator, Container> &other);	// Copy
 	random_map<Key, Value, Generator, Container> & operator=(random_map<Key, Value, Generator, Container> &&other);			// Move

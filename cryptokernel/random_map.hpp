@@ -7,6 +7,12 @@ random_map<Key, Value, Generator, Container>::random_map(const Generator &g):
 	generator_(g)
 {}
 
+// By moving generator
+template<class Key, class Value, class Generator, class Container>
+random_map<Key, Value, Generator, Container>::random_map(Generator &&g):
+	generator_(std::move(g))
+{}
+
 // Copy
 template<class Key, class Value, class Generator, class Container>
 random_map<Key, Value, Generator, Container>::random_map(const random_map<Key, Value, Generator, Container> &other):
@@ -37,8 +43,8 @@ template<class Key, class Value, class Generator, class Container>
 random_map<Key, Value, Generator, Container> &
 random_map<Key, Value, Generator, Container>::operator=(random_map<Key, Value, Generator, Container> &&other)
 {
-	this->Container::operator=(other);
-	this->generator_ = std::move(other.generator_);
+	this->Container::operator=(std::move(other));
+	this->generator_ = std::move(std::move(other.generator_));
 	return *this;
 }
 
@@ -54,7 +60,7 @@ random_map<Key, Value, Generator, Container>::insert(const Value &val)
 	iterator end = this->end();
 	while (true) {
 		Key k = this->generator_.generate();
-		if (this->generator_->bad())
+		if (this->generator_.bad())
 			return std::make_pair(end, false);
 		iterator it = this->find(k);
 		if (it == end) {
