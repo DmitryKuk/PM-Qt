@@ -10,9 +10,9 @@ GREP_CMD='grep'
 STAT_CMD='stat'
 FILE_CMD='file'
 
-GIT_ADD='git add'
-GIT_COMMIT_MSG='git commit -m'
-GIT_PUSH='git push'
+GIT_ADD_CMD='git add'
+GIT_COMMIT_MSG_CMD='git commit -m'
+GIT_PUSH_CMD='git push'
 
 # Colors to display messages
 COLOR_OK='\033[32m'
@@ -63,7 +63,7 @@ function update_all() {
 	
 	if [ "X$FILES_TO_UPDATE" != "X" ]; then
 		# Now use git to add all of files
-		$GIT_ADD $FILES_TO_UPDATE
+		$GIT_ADD_CMD $FILES_TO_UPDATE
 		if (( $? == 0 )); then
 			echo -e "${COLOR_OK}Files from \"$CURRENT_DIR/\" added.$COLOR_RESET"
 		else
@@ -75,7 +75,7 @@ function update_all() {
 
 update_all '.'
 
-$GIT_COMMIT_MSG "$MESSAGE"
+$GIT_COMMIT_MSG_CMD "$MESSAGE"
 if (( $? == 0 )); then
 	echo -e "${COLOR_OK}Changes commited with message \"$MESSAGE\".$COLOR_RESET"
 else
@@ -84,7 +84,7 @@ else
 fi
 
 if (( $NOPUSH == 0 )); then
-	$GIT_PUSH
+	$GIT_PUSH_CMD
 	if (( $? == 0 )); then
 		echo -e "${COLOR_OK}Commits pushed.$COLOR_RESET"
 	else
