@@ -50,7 +50,7 @@ function update_all() {
 		local FILE="$CURRENT_DIR/$I"
 		local TYPE="$( $STAT_CMD -f '%HT' $FILE )"
 		if [ "X$TYPE" == "XRegular File" ] || [ "X$TYPE" == "XSymbolic Link" ]; then
-			"$FILE_CMD" --mime-type "$FILE" | "$GREP_CMD" "text/"
+			"$FILE_CMD" --mime-type "$FILE" 2>/dev/null | "$GREP_CMD" "text/" &>/dev/null
 			if [ "X$?" != "X0" ]; then
 				echo -e "${COLOR_NOTE}File \"$FILE\" seems like not text. It will not be autocommited.$COLOR_RESET"
 			else
