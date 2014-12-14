@@ -55,7 +55,7 @@ random_map<Key, Value, Generator, Container>::operator=(random_map<Key, Value, G
 // TIME: depends on Container::find() and Container::emplace().
 template<class Key, class Value, class Generator, class Container>
 std::pair<typename random_map<Key, Value, Generator, Container>::iterator, bool>
-random_map<Key, Value, Generator, Container>::insert(const Value &val)
+random_map<Key, Value, Generator, Container>::insert_random(const Value &val)
 {
 	iterator end = this->end();
 	while (true) {
@@ -72,7 +72,7 @@ random_map<Key, Value, Generator, Container>::insert(const Value &val)
 
 template<class Key, class Value, class Generator, class Container>
 std::pair<typename random_map<Key, Value, Generator, Container>::iterator, bool>
-random_map<Key, Value, Generator, Container>::insert(Value &&val)
+random_map<Key, Value, Generator, Container>::insert_random(Value &&val)
 {
 	iterator end = this->end();
 	while (true) {

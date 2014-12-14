@@ -20,9 +20,12 @@ public:
 	using Container::end;
 	
 	// Other functions from Container
-	using Container::find;
 	using Container::at;
 	using Container::size;
+	using Container::find;
+	
+	using Container::insert;
+	using Container::emplace;
 	using Container::erase;
 	
 	// Constructors and operator=()
@@ -38,8 +41,8 @@ public:
 	// Inserts new (key, value) pair, where key is random.
 	// Returns iterator to newly inserted pair.
 	// TIME: depends on Container::find() and Container::emplace().
-	std::pair<typename random_map<Key, Value, Generator, Container>::iterator, bool> insert(const Value &val);
-	std::pair<typename random_map<Key, Value, Generator, Container>::iterator, bool> insert(Value &&val);
+	std::pair<typename random_map<Key, Value, Generator, Container>::iterator, bool> insert_random(const Value &val);
+	std::pair<typename random_map<Key, Value, Generator, Container>::iterator, bool> insert_random(Value &&val);
 	
 	inline const Generator & generator() const;
 private:
