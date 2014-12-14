@@ -5,9 +5,10 @@
 # Simple script to push all changes to github
 
 # Programs used to work
-LS='/bin/ls'
-GREP='grep'
-STAT='stat'
+LS_CMD='/bin/ls'
+GREP_CMD='grep'
+STAT_CMD='stat'
+FILE_CMD='file'
 
 GIT_ADD='git add'
 GIT_COMMIT_MSG='git commit -m'
@@ -15,6 +16,7 @@ GIT_PUSH='git push'
 
 # Colors to display messages
 COLOR_OK='\033[32m'
+COLOR_NOTE='\033[34m'
 COLOR_ERROR='\033[31m'
 COLOR_RESET='\033[0m'
 
@@ -44,11 +46,16 @@ function update_all() {
 	fi
 	
 	local FILES_TO_UPDATE=''
-	for I in $( "$LS" -1 "$CURRENT_DIR" | "$GREP" -v '[[:graph:]]*\.\(o\|so\|pro\.user\|app\)\|moc_[[:graph:]]*\|Makefile' ); do
+	for I in $( "$LS_CMD" -1 "$CURRENT_DIR" | "$GREP_CMD" -v '[[:graph:]]*\.\(o\|so\|pro\.user\|app\)\|moc_[[:graph:]]*\|Makefile' ); do
 		local FILE="$CURRENT_DIR/$I"
-		local TYPE="$( $STAT -f '%HT' $FILE )"
+		local TYPE="$( $STAT_CMD -f '%HT' $FILE )"
 		if [ "X$TYPE" == "XRegular File" ] || [ "X$TYPE" == "XSymbolic Link" ]; then
-			FILES_TO_UPDATE="$FILES_TO_UPDATE $FILE"
+			"$FILE_CMD" --mime-type "$FILE" | "$GREP_CMD" "text/"
+			if [ "X$?" != "X0" ]; then
+				echo "${COLOR_NOTE}File \"$FILE\" seems like not text. It will not be autocommited.$COLOR_RESET"
+			else
+				FILES_TO_UPDATE="$FILES_TO_UPDATE $FILE"
+			fi
 		elif [ "X$TYPE" == "XDirectory" ]; then
 			update_all "$FILE"
 		fi
