@@ -19,7 +19,7 @@ template<class Key1,						class Key2,
 		 class Value,
 		 class Hash1 = std::hash<Key1>,		class Hash2 = std::hash<Key2>,
 		 class Pred1 = std::equal_to<Key1>,	class Pred2 = std::equal_to<Key2>>
-class doublemap
+class double_map
 {
 public:
 	// Data container
@@ -52,13 +52,32 @@ public:
 	inline const_iterator begin() const;
 	inline const_iterator end() const;
 	
-	// Constructors
-	inline doublemap();
-	inline doublemap(const doublemap<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2> &other);
-	inline doublemap(doublemap<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2> &&other);
+	// Constructors and operator=()
+	inline double_map();
+	inline double_map(const double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2> &other);
+	inline double_map(double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2> &&other);
+	
+	inline double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2> &
+	operator=(const double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2> &other);
+	
+	inline double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2> &
+	operator=(double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2> &&other);
 	
 	std::pair<const_iterator, bool> insert(const triple<Key1, Key2, Value> &t);
 	std::pair<const_iterator, bool> insert(triple<Key1, Key2, Value> &&t);
+	
+	// Like random_map::insert_random()
+	// Generates Key1 automatically.
+	template<class Generator>
+	std::pair<const_iterator, bool> insert_random1(const Generator &g, const Key2 &k2, const Value &val);
+	
+	// Generates Key2 automatically.
+	template<class Generator>
+	std::pair<const_iterator, bool> insert_random2(const Generator &g, const Key1 &k1, const Value &val);
+	
+	// Generates both keys automatically.
+	template<class Generator>
+	std::pair<const_iterator, bool> insert_random(const Generator &g, const Value &val);
 	
 	void erase(const_iterator it);
 	inline void erase1(const Key1 &k1);
@@ -80,5 +99,5 @@ private:
 	map2_t map2_;
 };
 
-#include "doublemap.hpp"
+#include "double_map.hpp"
 #endif // DOUBLEMAP_H

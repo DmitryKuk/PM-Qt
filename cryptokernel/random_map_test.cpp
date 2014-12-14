@@ -3,7 +3,7 @@
 
 #include "generator/dev_random.h"
 #include "random_map.h"
-#include <map>
+#include <unordered_map>
 
 template<class T1, class T2>
 inline
@@ -46,7 +46,7 @@ void emplace(RM &m, const Key &key, const Val &val)
 int main()
 {
 	// std::cin.get();
-	random_map<unsigned short, unsigned short, generator::dev_random<unsigned short>, std::map<unsigned short, unsigned short>> m;
+	random_map<unsigned short, unsigned short, generator::dev_random<unsigned short>, std::unordered_map> m;
 	std::cout << ((m.generator().status() == generator::status::not_initialized)?
 				 "Generator is not initialized!":
 				 "Generator is ok.") << std::endl;

@@ -3,11 +3,12 @@
 #include <iostream>
 #include <string>
 
-#include "doublemap.h"
+#include "double_map.h"
+#include "generator/dev_random.h"
 
 int main()
 {
-	doublemap<int, std::string, int> m;
+	double_map<int, std::string, int> m;
 	
 	std::cout << "Inserting:" << std::endl;
 	m.insert(make_triple(1, std::string("one"), 1));
@@ -44,6 +45,23 @@ int main()
 	std::cout << "\t5:  ";
 	if (it == m.end()) std::cout << "Not found." << std::endl;
 	else std::cout << it->first << ", " << it->second << ":  " << it->third << std::endl;
+	
+	std::cout << "Inserting random:" << std::endl;
+	generator::dev_random<int> g;
+	m.insert_random1(g, std::string("random50"), 50);
+	m.insert_random1(g, std::string("random70"), 70);
+	for (const auto &x: m)
+		std::cout << '\t' << x.first << ", " << x.second << ":  " << x.third << std::endl;
+	
+	std::cout << "Copying:" << std::endl << "m:" << std::endl;
+	m.insert(make_triple(10, std::string("ten"), 10));
+	m.insert(make_triple(12, std::string("twelwe"), 12));
+	for (const auto &x: m)
+		std::cout << '\t' << x.first << ", " << x.second << ":  " << x.third << std::endl;
+	std::cout << "m_copy:" << std::endl;
+	auto m_copy = m;
+	for (const auto &x: m_copy)
+		std::cout << '\t' << x.first << ", " << x.second << ":  " << x.third << std::endl;
 	
 	return 0;
 }
