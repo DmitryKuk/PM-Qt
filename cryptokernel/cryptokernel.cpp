@@ -13,12 +13,16 @@ crypto_kernel::~crypto_kernel()
 // Reads all data from given stream. If any error occured, don't erase old data
 int
 CryptoKernel::read(std::istream &s)
-{}
+{
+	std::cerr << "cryptokernel::read not implemented yet!" << std::endl;
+}
 
 // Writes all data to given stream
 int
 CryptoKernel::write(std::ostream &s) const
-{}
+{
+	std::cerr << "cryptokernel::read not implemented yet!" << std::endl;
+}
 // End of input/output functions
 
 
@@ -52,28 +56,27 @@ crypto_kernel::add_type(const std::string &type_name)
 	if (type_name.empty()) return invalid_type_id;
 	
 	// Searching for existing type name
-	{
-		auto it = this->types_.begin();
-		for (auto end = this->types_.end(); it != end; ++it)
-			if (it->second.name == type_name)
-				return invalid_type_id;
-	}
+	for (const auto &x: this->types_)
+		if (x.second.name == type_name)
+			return invalid_type_id;
 	
-	// Generating new correct type id removing it from vacant_types_
-	auto tid_pair = this->add_new_type_id();
-	
-	// Insert data into types_ or remove from vacant_types_
-	if (this->types_.insert(std::make_pair(new_tid, type_name)).second) {
-		
-		return new_tid;
-	} else
-		return "";
+	// Inserting data into types_
+	auto p = this->types_.insert_random(std::move({ .name = type_name }));
+	if (p.second) return p.first->first;
+	else return invalid_type_id;
 }
 
 // Sets new name for existing type or returns invalid_type_id
 type_id_t
 crypto_kernel::set_type(type_id_t tid, const std::string &type_name)
-{}
+{
+	if (type_name.empty()) return invalid_type_id;
+	
+	auto it = this->types_.find(tid);
+	if (it == this->types_.end())
+		return invalid_type_id;
+	it->second = type_name;
+}
 // End of type management
 
 

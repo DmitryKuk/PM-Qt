@@ -1,6 +1,11 @@
 // Author: Dmitry Kukovinets (d1021976@gmail.com)
 
 // This is the kernel of this program. No frameworks here! Only STL.
+// crypto_kernel class uses random_map and generator::dev_random<T>
+// for managing types and their fields.
+
+// NOTE: type and field ids are NOT const, sometimes cryptokernel
+// changes them: on every program start or more often.
 
 #ifndef CRYPTOKERNEL_H
 #define CRYPTOKERNEL_H
@@ -9,9 +14,10 @@
 #include <string>
 #include <vector>
 #include <list>
-#include <unordered_map>
 
 #include "types.h"
+#include "random_map.h"
+#include "generator/dev_random.h"
 
 class crypto_kernel
 {
@@ -25,10 +31,10 @@ public:
 	
   // Input/output functions
 	// Reads all data from given stream. If any error occured, don't erase old data
-	int read(std::istream &s);
+	int read(std::istream &s);	// NOT IMPLEMENTED YET
 	
 	// Writes all data to given stream
-	int write(std::ostream &s) const;
+	int write(std::ostream &s) const;	// NOT IMPLEMENTED YET
   // End of input/output functions
 	
   // Type management (every type has own set of fields)
@@ -59,26 +65,15 @@ public:
 	// Sets new name for existing field of existing type or returns invalid_field_id
 	field_id_t set_field(type_id_t tid, field_id_t fid, const std::string &field_name);
   // End of field management
-protected:
-  // Type management
-	// Generates new correct type id
-	type_id_t generate_type_id() const;
-	
-	// Inserts new type id into index, does NOT insert it into types_
-	type_id_t add_type_id(type_id_t new_tid);
-  // End of type management
 private:
 	struct type
 	{
 		std::string name;
-		std::unordered_map<field_id_t, std::string> fields;
+		random_map<field_id_t, std::string, generator::dev_random<field_id_t>> fields;
 	};
 	
-	// Types with their names and fields (id + name)
-	std::unordered_map<type_id_t, type> types_;
-	
-	// List of intervals of not-in-use type ids: [min, max)
-	std::list<std::pair<type_id_t, type_id_t>> vacant_types_;
+	// Types map
+	random_map<type_id_t, type, generator::dev_random<type_id_t>> types_;
 	
 	// Deprecated constructor and operator=()
 	[[deprecated("Don't copy the kernel!")]]
