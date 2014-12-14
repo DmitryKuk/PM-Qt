@@ -52,7 +52,7 @@ function update_all() {
 		if [ "X$TYPE" == "XRegular File" ] || [ "X$TYPE" == "XSymbolic Link" ]; then
 			"$FILE_CMD" --mime-type "$FILE" | "$GREP_CMD" "text/"
 			if [ "X$?" != "X0" ]; then
-				echo "${COLOR_NOTE}File \"$FILE\" seems like not text. It will not be autocommited.$COLOR_RESET"
+				echo -e "${COLOR_NOTE}File \"$FILE\" seems like not text. It will not be autocommited.$COLOR_RESET"
 			else
 				FILES_TO_UPDATE="$FILES_TO_UPDATE $FILE"
 			fi
