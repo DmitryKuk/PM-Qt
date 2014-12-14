@@ -9,24 +9,12 @@ template<class Key,					// Key type
 		 class Value,				// Value Type
 		 class Generator,			// Generator, that provides random data of type Key
 		 class Container = std::unordered_map<Key, Value>>	// Assotiative container<Key, Value, ContainerArgs>
-class random_map: private Container
+class random_map: public Container
 {
 public:
 	// Iterators
 	using typename Container::iterator;
 	using typename Container::const_iterator;
-	
-	using Container::begin;
-	using Container::end;
-	
-	// Other functions from Container
-	using Container::at;
-	using Container::size;
-	using Container::find;
-	
-	using Container::insert;
-	using Container::emplace;
-	using Container::erase;
 	
 	// Constructors and operator=()
 	inline random_map(const Generator &g = Generator());							// Default
