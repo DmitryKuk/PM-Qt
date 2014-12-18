@@ -46,11 +46,11 @@ function update_all() {
 	fi
 	
 	local FILES_TO_UPDATE=''
-	for I in $( "$LS_CMD" -1 "$CURRENT_DIR" | "$GREP_CMD" -v '[[:graph:]]*\.\(o\|so\|pro\.user\|app\)\|moc_[[:graph:]]*\|Makefile' ); do
+	for I in $( "$LS_CMD" -1 "$CURRENT_DIR" | "$GREP_CMD" -v '[[:print:]]*\.\(o\|so\|pro\user\|app\)\|moc_[[:print:]]*\|Makefile' ); do
 		local FILE="$CURRENT_DIR/$I"
 		local TYPE="$( $STAT_CMD -f '%HT' $FILE )"
 		if [ "X$TYPE" == "XRegular File" ] || [ "X$TYPE" == "XSymbolic Link" ]; then
-			"$FILE_CMD" --mime-type "$FILE" 2>/dev/null | "$GREP_CMD" "text/" &>/dev/null
+			"$FILE_CMD" --no-dereference --mime-type "$FILE" 2>/dev/null | "$GREP_CMD" "[[:print:]]*\(text/[[:print:]]*\|application/x-symlink\)" &>/dev/null
 			if [ "X$?" != "X0" ]; then
 				echo -e "${COLOR_NOTE}File \"$FILE\" seems like not text. It will not be autocommited.$COLOR_RESET"
 			else
