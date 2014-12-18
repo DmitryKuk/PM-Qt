@@ -52,7 +52,7 @@ function update_all() {
 		if [ "X$TYPE" == "XRegular File" ] || [ "X$TYPE" == "XSymbolic Link" ]; then
 			"$FILE_CMD" --no-dereference --mime-type "$FILE" 2>/dev/null | "$GREP_CMD" "[[:print:]]*\(text/[[:print:]]*\|application/x-symlink\)" &>/dev/null
 			if [ "X$?" != "X0" ]; then
-				echo -e "${COLOR_NOTE}File \"$FILE\" seems like not text. It will not be autocommited.$COLOR_RESET"
+				echo -e "${COLOR_NOTE}File \"$FILE\" seems like not text or symlink. It will not be autocommited.$COLOR_RESET"
 			else
 				FILES_TO_UPDATE="$FILES_TO_UPDATE $FILE"
 			fi
@@ -65,9 +65,9 @@ function update_all() {
 		# Now use git to add all of files
 		$GIT_ADD_CMD $FILES_TO_UPDATE
 		if (( $? == 0 )); then
-			echo -e "${COLOR_OK}Files from \"$CURRENT_DIR/\" added.$COLOR_RESET"
+			echo -e "${COLOR_OK}Added files from: \"$CURRENT_DIR/\"$COLOR_RESET"
 		else
-			echo -e "${COLOR_ERROR}Error adding files from \"$CURRENT_DIR\".$COLOR_RESET"
+			echo -e "${COLOR_ERROR}Error adding files from: \"$CURRENT_DIR\".$COLOR_RESET"
 			exit 2
 		fi
 	fi
@@ -77,7 +77,7 @@ update_all '.'
 
 $GIT_COMMIT_MSG_CMD "$MESSAGE"
 if (( $? == 0 )); then
-	echo -e "${COLOR_OK}Changes commited with message \"$MESSAGE\".$COLOR_RESET"
+	echo -e "${COLOR_OK}Changes commited with message: \"$MESSAGE\".$COLOR_RESET"
 else
 	echo -e "${COLOR_ERROR}Commiting error.$COLOR_RESET"
 	exit 3
