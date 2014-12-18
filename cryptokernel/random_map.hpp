@@ -80,7 +80,7 @@ random_map<Key, Value, Generator, Container, ContainerArgs...>::insert_random(co
 {
 	iterator end = this->end();
 	while (true) {
-		Key k = this->generator_.generate();
+		Key k = this->generator_();
 		if (this->generator_.bad())
 			return std::make_pair(end, false);
 		iterator it = this->find(k);
@@ -100,7 +100,7 @@ random_map<Key, Value, Generator, Container, ContainerArgs...>::insert_random(Va
 {
 	iterator end = this->end();
 	while (true) {
-		Key k = this->generator_.generate();
+		Key k = this->generator_();
 		if (this->generator_.bad())
 			return std::make_pair(end, false);
 		iterator it = this->find(k);

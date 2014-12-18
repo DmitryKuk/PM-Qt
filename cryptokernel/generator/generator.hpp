@@ -46,6 +46,6 @@ inline
 const generator::simple<Num> &
 operator>>(const generator::simple<Num> &g, Num &n)
 {
-	n = g.generate();
+	n = g();
 	return g;
 }

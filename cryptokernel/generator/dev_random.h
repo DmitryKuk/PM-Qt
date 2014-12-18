@@ -1,9 +1,9 @@
 // Author: Dmitry Kukovinets (d1021976@gmail.com)
 
 // This file contains classes getting random data from /dev/random-device.
-// The default device is DEV_RANDOM.
-// All these class are final, do NOT write subclasses overriding their generate()
-// functions. All 3 classes are thread-sefety and async-safety.
+// The default device is DEV_RANDOM_DEVICE.
+// All these class are final, do NOT write subclasses overriding their operator()'s.
+// All 3 classes are thread-sefety and async-safety.
 // NOTE: all dev_random generators use single stream assotiated with DEV_RANDOM!
 
 #ifndef DEV_RANDOM_H
@@ -15,7 +15,7 @@
 
 #include "generator.h"
 
-#define DEV_RANDOM "/dev/random"
+#define DEV_RANDOM_DEVICE "/dev/random"
 
 namespace generator {
 
@@ -32,7 +32,7 @@ public:
 	inline raw_dev_random & operator=(const raw_dev_random &other);	// Copy
 	inline raw_dev_random & operator=(raw_dev_random &&other);		// Move
 	
-	virtual void generate(void *data, size_t n) const override final;
+	virtual void operator()(void *data, size_t n) const override final;
 private:
 	static std::ifstream stream_;
 	static std::mutex mutex_;
@@ -55,7 +55,7 @@ public:
 	template<class Num>
 	Num generate() const;	// override final
 private:
-	using raw_dev_random::generate;
+	using raw_dev_random::operator();
 };
 
 
@@ -73,9 +73,9 @@ public:
 	inline dev_random & operator=(const dev_random &other);	// Copy
 	inline dev_random & operator=(dev_random &&other);		// Move
 	
-	virtual Num generate() const override final;
+	virtual Num operator()() const override final;
 private:
-	using raw_dev_random::generate;
+	using raw_dev_random::operator();
 };
 
 }; // namespace generator

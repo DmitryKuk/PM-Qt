@@ -34,7 +34,7 @@ inline
 typename double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::const_iterator
 double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::begin() const
 {
-	return this->data_.begin();
+	return this->list_.begin();
 }
 
 template<class Key1, class Key2, class Value, class Hash1, class Hash2, class Pred1, class Pred2>
@@ -42,7 +42,7 @@ inline
 typename double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::const_iterator
 double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::end() const
 {
-	return this->data_.end();
+	return this->list_.end();
 }
 
 
@@ -55,11 +55,11 @@ double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::double_map()									
 template<class Key1, class Key2, class Value, class Hash1, class Hash2, class Pred1, class Pred2>
 inline
 double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::double_map(const double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2> &other):	// Copy
-	data_(other.data_),
+	list_(other.list_),
 	map1_(other.map1_.bucket_count()),
 	map2_(other.map2_.bucket_count())
 {
-	for (auto it = this->data_.begin(), end = this->data_.end(); it != end; ++it) {
+	for (auto it = this->list_.begin(), end = this->list_.end(); it != end; ++it) {
 		this->map1_.insert(std::move(std::make_pair(&it->first, it)));
 		this->map2_.insert(std::move(std::make_pair(&it->second, it)));
 	}
@@ -68,7 +68,7 @@ double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::double_map(const doub
 template<class Key1, class Key2, class Value, class Hash1, class Hash2, class Pred1, class Pred2>
 inline
 double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::double_map(double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2> &&other):		// Move
-	data_(std::move(other.data_)),
+	list_(std::move(other.list_)),
 	map1_(std::move(other.map1_)),
 	map2_(std::move(other.map2_))
 {}
@@ -82,8 +82,8 @@ double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::operator=(const doubl
 	if (this == &other) return *this;
 	this->map1_.clear();
 	this->map2_.clear();
-	this->data_ = other.data_;
-	for (auto it = this->data_.begin(), end = this->data_.end(); it != end; ++it) {
+	this->list_ = other.list_;
+	for (auto it = this->list_.begin(), end = this->list_.end(); it != end; ++it) {
 		this->map1_.insert(std::move(std::make_pair(&it->first, it)));
 		this->map2_.insert(std::move(std::make_pair(&it->second, it)));
 	}
@@ -95,7 +95,7 @@ inline
 double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2> &
 double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::operator=(double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2> &&other)			// Move
 {
-	this->data_ = std::move(other.data_);
+	this->list_ = std::move(other.list_);
 	this->map1_ = std::move(other.map1_);
 	this->map2_ = std::move(other.map2_);
 	return *this;
@@ -110,8 +110,8 @@ double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::insert(const triple<K
 		|| this->map2_.find(&t.second) != this->map2_.end())
 		return std::move(std::make_pair(std::move(this->end()), false));
 	
-	this->data_.push_back(t);
-	auto it = --(this->data_.end());
+	this->list_.push_back(t);
+	auto it = --(this->list_.end());
 	
 	this->map1_[&it->first] = it;
 	this->map2_[&it->second] = it;
@@ -126,8 +126,8 @@ double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::insert(triple<Key1, K
 		|| this->map2_.find(&t.second) != this->map2_.end())
 		return std::move(std::make_pair(std::move(this->end()), false));
 	
-	this->data_.push_back(std::move(t));
-	auto it = --(this->data_.end());
+	this->list_.push_back(std::move(t));
+	auto it = --(this->list_.end());
 	
 	this->map1_[&it->first] = it;
 	this->map2_[&it->second] = it;
@@ -148,12 +148,12 @@ double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::insert_random1(const 
 	
 	auto end1 = this->map1_.end();
 	while (true) {
-		Key1 k1 = g.generate();
+		Key1 k1 = g();
 		if (g.bad())
 			return std::make_pair(std::move(end), false);
 		auto it1 = this->map1_.find(&k1);
 		if (it1 == end1) {
-			auto it = this->data_.insert(end, std::move(make_triple(k1, k2, val)));
+			auto it = this->list_.insert(end, std::move(make_triple(k1, k2, val)));
 			this->map1_[&it->first] = it;
 			this->map2_[&it->second] = it;
 			return std::make_pair(std::move(it), true);
@@ -173,12 +173,12 @@ double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::insert_random2(const 
 	
 	auto end2 = this->map2_.end();
 	while (true) {
-		Key2 k2 = g.generate();
+		Key2 k2 = g();
 		if (g.bad())
 			return std::make_pair(std::move(end), false);
 		auto it2 = this->map2_.find(&k2);
 		if (it2 == end2) {
-			auto it = this->data_.insert(end, std::move(make_triple(k1, k2, val)));
+			auto it = this->list_.insert(end, std::move(make_triple(k1, k2, val)));
 			this->map1_[&it->first] = it;
 			this->map2_[&it->second] = it;
 			return std::make_pair(std::move(it), true);
@@ -196,7 +196,7 @@ double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::insert_random(const G
 	auto end1 = this->map1_.end(), it1 = end1;
 	Key1 k1;
 	do {
-		k1 = g.generate();
+		k1 = g();
 		it1 = this->map1_.find(&k1);
 	} while (it1 != end1);
 	
@@ -204,11 +204,11 @@ double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::insert_random(const G
 	auto end2 = this->map2_.end(), it2 = end2;
 	Key2 k2;
 	do {
-		k2 = g.generate();
+		k2 = g();
 		it2 = this->map2_.find(&k2);
 	} while (it2 != end2);
 	
-	auto it = this->data_.insert(this->data_.end(), std::move(make_triple(k1, k2, val)));
+	auto it = this->list_.insert(this->list_.end(), std::move(make_triple(k1, k2, val)));
 	this->map1_[&it->first] = it;
 	this->map2_[&it->second] = it;
 	return std::make_pair(std::move(it), true);
@@ -223,7 +223,7 @@ double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::erase(double_map<Key1
 	
 	this->map1_.erase(&it->first);
 	this->map2_.erase(&it->second);
-	this->data_.erase(it);
+	this->list_.erase(it);
 }
 
 template<class Key1, class Key2, class Value, class Hash1, class Hash2, class Pred1, class Pred2>
@@ -248,7 +248,7 @@ inline
 size_t
 double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::size() const
 {
-	// Not this->data_.size(), because it can be O(n).
+	// Not this->list_.size(), because it can be O(n).
 	return this->map1_.size();
 }
 
@@ -259,7 +259,7 @@ double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::find1(const Key1 &k1)
 {
 	auto it = this->map1_.find(&k1);
 	if (it == this->map1_.end()) return this->end();
-	return std::move(it->second);
+	return it->second;
 }
 
 template<class Key1, class Key2, class Value, class Hash1, class Hash2, class Pred1, class Pred2>
@@ -268,7 +268,7 @@ double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::find2(const Key2 &k2)
 {
 	auto it = this->map2_.find(&k2);
 	if (it == this->map2_.end()) return this->end();
-	return std::move(it->second);
+	return it->second;
 }
 
 
@@ -276,29 +276,21 @@ template<class Key1, class Key2, class Value, class Hash1, class Hash2, class Pr
 inline
 Value &
 double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::at1(const Key1 &k1)
-{
-	return this->map1_.at(&k1)->third;
-}
+{ return this->map1_.at(&k1)->third; }
 
 template<class Key1, class Key2, class Value, class Hash1, class Hash2, class Pred1, class Pred2>
 inline
 const Value &
 double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::at1(const Key1 &k1) const
-{
-	return this->map1_.at(&k1)->third;
-}
+{ return this->map1_.at(&k1)->third; }
 
 
 template<class Key1, class Key2, class Value, class Hash1, class Hash2, class Pred1, class Pred2>
 Value &
 double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::at2(const Key2 &k2)
-{
-	return this->map2_.at(&k2)->third;
-}
+{ return this->map2_.at(&k2)->third; }
 
 template<class Key1, class Key2, class Value, class Hash1, class Hash2, class Pred1, class Pred2>
 const Value &
 double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::at2(const Key2 &k2) const
-{
-	return this->map2_.at(&k2)->third;
-}
+{ return this->map2_.at(&k2)->third; }

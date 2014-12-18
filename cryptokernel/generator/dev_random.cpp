@@ -3,7 +3,7 @@
 #include "dev_random.h"
 
 // Static
-std::ifstream generator::raw_dev_random::stream_(DEV_RANDOM, std::ios::in | std::ios::binary);
+std::ifstream generator::raw_dev_random::stream_(DEV_RANDOM_DEVICE, std::ios::in | std::ios::binary);
 std::mutex generator::raw_dev_random::mutex_;
 
 
@@ -21,7 +21,7 @@ generator::raw_dev_random::raw_dev_random():	// Default
 
 
 void
-generator::raw_dev_random::generate(void *data, size_t n) const
+generator::raw_dev_random::operator()(void *data, size_t n) const
 {
 	generator::raw_dev_random::mutex_.lock();	// Guarantee async-safety
 	if (this->status() == generator::status::not_initialized) return;

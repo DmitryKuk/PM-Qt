@@ -94,7 +94,7 @@ public:
 	inline Value & at2(const Key2 &k2);
 	inline const Value & at2(const Key2 &k2) const;
 private:
-	container_t data_;
+	container_t list_;
 	map1_t map1_;
 	map2_t map2_;
 };

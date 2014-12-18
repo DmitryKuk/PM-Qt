@@ -6,11 +6,11 @@
 
 // Constants
 const type_id_t
-	invalid_type_id		= numeric_limits<type_id_t>::max(),
-	min_type_id			= numeric_limits<type_id_t>::min(),
-	max_type_id			= numeric_limits<type_id_t>::max() - 1;
+	invalid_type_id		= std::numeric_limits<type_id_t>::max(),
+	min_type_id			= std::numeric_limits<type_id_t>::min(),
+	max_type_id			= std::numeric_limits<type_id_t>::max() - 1;
 
 const field_id_t
-	invalid_field_id	= numeric_limits<field_id_t>::max(),
-	min_field_id		= numeric_limits<field_id_t>::min(),
-	max_field_id		= numeric_limits<field_id_t>::max() - 1;
+	invalid_field_id	= std::numeric_limits<field_id_t>::max(),
+	min_field_id		= std::numeric_limits<field_id_t>::min(),
+	max_field_id		= std::numeric_limits<field_id_t>::max() - 1;

@@ -55,7 +55,7 @@ class raw
 public:
 	virtual ~raw() = 0;
 	
-	virtual void generate(void *data, size_t n) const = 0;
+	virtual void operator()(void *data, size_t n) const = 0;
 };
 
 
@@ -77,7 +77,7 @@ class simple
 public:
 	virtual ~simple() = 0;
 	
-	virtual Num generate() const = 0;
+	virtual Num operator()() const = 0;
 };
 
 };	// namespace generator

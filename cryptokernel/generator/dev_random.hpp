@@ -70,7 +70,7 @@ generator::universal_dev_random::generate() const
 	Num n(0);
 	if (this->status() == status::not_initialized) return n;
 	
-	this->generate(static_cast<void *>(&n), sizeof(Num));
+	(*this)(static_cast<void *>(&n), sizeof(Num));
 	return n;
 }
 
@@ -116,12 +116,12 @@ generator::dev_random<Num>::operator=(generator::dev_random<Num> &&other)			// M
 
 template<class Num>
 Num
-generator::dev_random<Num>::generate() const
+generator::dev_random<Num>::operator()() const
 {
 	Num n(0);
 	if (this->status() == status::not_initialized) return n;
 	
-	this->generate(static_cast<void *>(&n), sizeof(Num));
+	(*this)(static_cast<void *>(&n), sizeof(Num));
 	return n;
 }
 
