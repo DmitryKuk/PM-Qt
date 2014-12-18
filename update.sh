@@ -46,7 +46,7 @@ function update_all() {
 	fi
 	
 	local FILES_TO_UPDATE=''
-	for I in $( "$LS_CMD" -1 "$CURRENT_DIR" | "$GREP_CMD" -v '[[:print:]]*\.\(o\|so\|pro\user\|app\)\|moc_[[:print:]]*\|Makefile' ); do
+	for I in $( "$LS_CMD" -1 "$CURRENT_DIR" | "$GREP_CMD" -v '[[:print:]]*\.\(o\|so\|pro\.user\|app\)\|moc_[[:print:]]*\|Makefile' ); do
 		local FILE="$CURRENT_DIR/$I"
 		local TYPE="$( $STAT_CMD -f '%HT' $FILE )"
 		if [ "X$TYPE" == "XRegular File" ] || [ "X$TYPE" == "XSymbolic Link" ]; then
