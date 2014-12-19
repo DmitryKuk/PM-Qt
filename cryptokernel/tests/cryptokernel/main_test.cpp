@@ -26,11 +26,13 @@ int main()
 	std::vector<type_id_t> types;
 	cryptokernel k;
 	
+	// Adding types
 	k.add_type("hello");
 	k.add_type("world");
 	types = k.types();
 	std::cout << "Types: " << types << std::endl;
 	
+	// Addidng fields
 	k.add_field(types[0], "hello field 1");
 	k.add_field(types[0], "hello field 2");
 	
@@ -38,11 +40,29 @@ int main()
 	k.add_field(types[1], "world field 2");
 	k.add_field(types[1], "world field 3");
 	
-	k.set_type(types[0], "new hello");
-	std::cout << ((k.set_type(100500, "new incorrect type") == invalid_type_id)?
-				 "OK":
+	// Type changing
+	std::cout << ((k.set_type(types[0], "new hello") != invalid_type_id)?
+				 "OK: Correct type changed":
+				 "ERROR: Can't set correct type") << std::endl;
+	
+	std::cout << ((k.set_type(0, "new incorrect type") == invalid_type_id)?
+				 "OK: Incorrect type not changed":
 				 "ERROR: Invalid type changed") << std::endl;
 	
+	// Field changing
+	std::cout << ((k.set_field(types[0], k.fields(types[0])[0], "hello new field 1") != invalid_type_id)?
+				 "OK: Correct type, correct field changed":
+				 "ERROR: Can't set correct type, correct field") << std::endl;
+	
+	std::cout << ((k.set_field(types[0], 0, "hello new incorrect field") == invalid_field_id)?
+				 "OK: Correct type, incorrect field not changed":
+				 "ERROR: Changed correct type, incorrect field") << std::endl;
+	
+	std::cout << ((k.set_field(0, 0, "incorrect type new incorrect field") == invalid_field_id)?
+				 "OK: Inorrect type, incorrect field not changed":
+				 "ERROR: Changed incorrect type, incorrect field") << std::endl;
+	
+	// Printing result
 	std::cout << "Types:" << std::endl;
 	for (auto &t: types) {
 		std::cout << IDENT << t << ":  " << k.type(t);
