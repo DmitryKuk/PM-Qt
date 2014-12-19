@@ -74,7 +74,10 @@ cryptokernel::add_type(const std::string &type_name)
 	
 	// Inserting data into types_
 	auto p = this->types_.insert_random1(this->type_generator_, type_name, fields_dmap_t());
-	if (p.second) return p.first->first;
+	if (p.second) {
+		this->types_order_.emplace_back(p.first->first, std::move(fields_order_t()));
+		return p.first->first;
+	}
 	return invalid_type_id;
 }
 
@@ -123,14 +126,22 @@ cryptokernel::field(type_id_t tid, field_id_t fid) const
 
 // Generates new field id and adds it with name
 field_id_t
-cryptokernel::add_field(type_id_t tid, const std::string &field_name)
+cryptokernel::add_field(type_id_t tid, const std::string &field_name, const std::string &field_format)
 {
 	if (field_name.empty()) return invalid_field_id;
 	
 	try {
 		auto &fields = this->types_.at1(tid);
-		auto p = fields.insert_random1(this->field_generator_, field_name, "");
-		if (p.second) return p.first->first;
+		auto p = fields.insert_random1(this->field_generator_, field_name, field_format);
+		if (p.second) {
+			// Updating order
+			for (auto &x: this->types_order_)	// Searching for tid in types_order_
+				if (x.first == tid) {
+					x.second.push_back(p.first->first);	// Adding new field to order
+					break;
+				}
+			return p.first->first;
+		}
 	} catch (...) {
 		return invalid_field_id;
 	}

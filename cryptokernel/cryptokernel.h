@@ -60,7 +60,7 @@ public:
 	std::string field(type_id_t tid, field_id_t fid) const;
 	
 	// Generates new field id and adds it with name
-	field_id_t add_field(type_id_t tid, const std::string &field_name);
+	field_id_t add_field(type_id_t tid, const std::string &field_name, const std::string &field_format = "");
 	
 	// Sets new name for existing field of existing type or returns invalid_field_id
 	field_id_t set_field(type_id_t tid, field_id_t fid, const std::string &field_name);
