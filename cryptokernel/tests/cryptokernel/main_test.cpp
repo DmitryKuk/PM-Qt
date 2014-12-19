@@ -29,6 +29,7 @@ int main()
 	k.add_type("hello");
 	k.add_type("world");
 	types = k.types();
+	std::cout << "Types: " << types << std::endl;
 	
 	k.add_field(types[0], "hello field 1");
 	k.add_field(types[0], "hello field 2");
@@ -37,7 +38,10 @@ int main()
 	k.add_field(types[1], "world field 2");
 	k.add_field(types[1], "world field 3");
 	
-	std::cout << types << std::endl;
+	k.set_type(types[0], "new hello");
+	std::cout << ((k.set_type(100500, "new incorrect type") == invalid_type_id)?
+				 "OK":
+				 "ERROR: Invalid type changed") << std::endl;
 	
 	std::cout << "Types:" << std::endl;
 	for (auto &t: types) {
