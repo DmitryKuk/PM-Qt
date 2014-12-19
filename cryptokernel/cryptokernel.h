@@ -44,8 +44,14 @@ public:
 	// Returns type id if it exists or empty string
 	std::string type(type_id_t tid) const;
 	
+	// Return true if type exists, false otherwise
+	bool test_type(type_id_t tid) const;
+	
 	// Generates new type id and adds it with name
 	type_id_t add_type(const std::string &type_name);
+	
+	// Removes existing type
+	type_id_t remove_type(type_id_t tid);
 	
 	// Sets new name for existing type or returns invalid_type_id
 	type_id_t set_type(type_id_t tid, const std::string &type_name);
@@ -56,8 +62,8 @@ public:
 	// Returns all fields ids for type (ids are ordered by user) or empty vector
 	std::vector<field_id_t> fields(type_id_t tid) const;
 	
-	// Returns field id if it exists or empty string
-	std::string field(type_id_t tid, field_id_t fid) const;
+	// Returns (field name, field format) pair, if field fit exists in type tid or ("", "") pair
+	std::pair<std::string, std::string> field(type_id_t tid, field_id_t fid) const;
 	
 	// Generates new field id and adds it with name
 	field_id_t add_field(type_id_t tid, const std::string &field_name, const std::string &field_format = "");

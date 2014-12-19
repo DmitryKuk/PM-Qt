@@ -21,6 +21,12 @@ std::ostream & operator<<(std::ostream &f, const std::vector<T> &v)
 }
 
 
+template<class T>
+std::ostream & operator<<(std::ostream &f, const std::pair<T, T> &p)
+{
+	return f << '(' << p.first << ", " << p.second << ')';
+}
+
 int main()
 {
 	std::vector<type_id_t> types;
@@ -59,13 +65,22 @@ int main()
 				 "ERROR: Changed correct type, incorrect field") << std::endl;
 	
 	std::cout << ((k.set_field(0, 0, "incorrect type new incorrect field") == invalid_field_id)?
-				 "OK: Inorrect type, incorrect field not changed":
+				 "OK: Incorrect type, incorrect field not changed":
 				 "ERROR: Changed incorrect type, incorrect field") << std::endl;
 	
+	// Removing types
+	std::cout << ((k.remove_type(types[1]) != invalid_type_id)?
+				 "OK: Correct type removed":
+				 "ERROR: Correct type not removed") << std::endl;
+	
+	std::cout << ((k.remove_type(0) == invalid_type_id)?
+				 "OK: Incorrect type not removed":
+				 "ERROR: Incorrect type removed") << std::endl;
+	
 	// Printing result
-	std::cout << "Types:" << std::endl;
-	for (auto &t: types) {
-		std::cout << IDENT << t << ":  " << k.type(t);
+	std::cout << std::endl << "Types:" << std::endl;
+	for (auto &t: k.types()) {
+		std::cout << IDENT << t << ":  " << ((k.test_type(t))? k.type(t): "<NOT EXISTS>");
 		auto fields = k.fields(t);
 		if (fields.empty())
 			std::cout << std::endl;

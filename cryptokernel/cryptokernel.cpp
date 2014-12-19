@@ -66,6 +66,15 @@ cryptokernel::type(type_id_t tid) const
 	return it->second;
 }
 
+// Return true if type exists, false otherwise
+bool
+cryptokernel::test_type(type_id_t tid) const
+{
+	auto it = this->types_.find1(tid);
+	if (it == this->types_.end()) return false;	// Not found
+	return true;
+}
+
 // Generates new type id and adds it with name
 type_id_t
 cryptokernel::add_type(const std::string &type_name)
@@ -79,6 +88,24 @@ cryptokernel::add_type(const std::string &type_name)
 		return p.first->first;
 	}
 	return invalid_type_id;
+}
+
+// Removes existing type
+type_id_t
+cryptokernel::remove_type(type_id_t tid)
+{
+	auto it = this->types_.find1(tid);
+	if (it == this->types_.end())
+		return invalid_type_id;
+	this->types_.erase(it);	// Erasing type with its fields from types_
+	
+	// Erasing type from type order
+	for (auto oit = this->types_order_.begin(), oend = this->types_order_.end(); oit != oend; ++oit)
+		if (oit->first == tid) {
+			this->types_order_.erase(oit);
+			break;
+		}
+	return tid;
 }
 
 // Sets new name for existing type or returns invalid_type_id
@@ -110,18 +137,18 @@ cryptokernel::fields(type_id_t tid) const
 	return std::vector<field_id_t>();
 }
 
-// Returns field id if it exists or empty string
-std::string
+// Returns (field name, field format) pair, if field fit exists in type tid or ("", "") pair
+std::pair<std::string, std::string>
 cryptokernel::field(type_id_t tid, field_id_t fid) const
 {
 	try {
 		const auto &fields = this->types_.at1(tid);
 		auto it = fields.find1(fid);
-		if (it != fields.end()) return it->second;
+		if (it != fields.end()) return std::make_pair(it->second, it->third);
 	} catch (...) {
-		return "";
+		return std::pair<std::string, std::string>();
 	}
-	return "";
+	return std::pair<std::string, std::string>();
 }
 
 // Generates new field id and adds it with name
