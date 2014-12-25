@@ -9,8 +9,14 @@ if (( $# != 0 && $# != 1 )); then
 	exit 1
 fi
 
-if [ "X$1X" == "XrunX" ]; then
-	qmake -Wall && make && open PM.app/
-else
-	qmake -Wall && make
+qmake -Wall && make
+STATUS="$?"
+
+if [ "X${STATUS}X" == "X0X" ] && [ "X$1X" == "XrunX" ]; then
+	TARGET="$( uname )"
+	case "$( uname )" in
+		"Darwin") open PM.app/ ;;
+		"Linux") ./PM ;;
+		*) echo -e "Sorry, I don\'t know how to build it for $TARGET.\nSee \"build.sh\" for more information."
+	esac
 fi
