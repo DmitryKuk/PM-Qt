@@ -1,8 +1,4 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2014-10-05T19:16:09
-#
-#-------------------------------------------------
+# Author: Dmitry Kukovinets (d1021976@gmail.com)
 
 QT += core gui
 QMAKE_MAC_SDK = macosx10.9
@@ -28,9 +24,7 @@ SOURCES += main.cpp\
 		settingssaver.cpp\
 		abstractitem.cpp\
 		groupitem.cpp\
-		passworditem.cpp\
-		cryptokernelagent.cpp\
-		cryptokernel/cryptokernel.cpp
+		passworditem.cpp
 
 HEADERS += cryptokernel/types.h types.h\
 		mainwindow.h\
@@ -44,7 +38,4 @@ HEADERS += cryptokernel/types.h types.h\
 		settingssaver.h\
 		abstractitem.h\
 		groupitem.h\
-		passworditem.h\
-		cryptokernelagent.h\
-		cryptokernel/cryptokernel.h\
-		cryptokernel/interval_set.h cryptokernel/interval_set.hpp
+		passworditem.h

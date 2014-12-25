@@ -3,13 +3,10 @@
 #include <QApplication>
 
 #include "mainwindow.h"
-#include "cryptokernelagent.h"
 
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
-	
-	CryptoKernelAgent agent;
 	
 	MainWindow w;
 	w.show();

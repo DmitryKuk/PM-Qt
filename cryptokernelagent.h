@@ -42,14 +42,6 @@ public:
 																					// field of existing type or
 																					// returns invalid_field_id
 private:
-	struct Type
-	{
-		QString name;
-		std::unordered_map<field_id_t, QString> fields;
-	};
-	
-	std::unordered_map<type_id_t, Type> types_;	// Types with their names and fields (id + name)
-	
 	
 	// Deprecated constructor and operator=()
 	[[deprecated("Don't copy the agent!")]]
