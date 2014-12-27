@@ -4,8 +4,8 @@
 #include <vector>
 #include <list>
 
-#include "project/types.h"
-#include "project/cryptokernel.h"
+#include "types.h"
+#include "cryptokernel.h"
 
 #define IDENT "    "
 

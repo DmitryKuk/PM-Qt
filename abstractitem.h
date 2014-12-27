@@ -19,7 +19,7 @@ public:
 	
 	inline id_t id() const;
 	
-	inline const QString & name() const;
+	inline QString name() const;
 	inline void setName(const QString &newName);
 private:
 	id_t id_;

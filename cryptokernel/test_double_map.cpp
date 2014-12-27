@@ -3,8 +3,8 @@
 #include <iostream>
 #include <string>
 
-#include "project/double_map.h"
-#include "project/generator/dev_random.h"
+#include "double_map.h"
+#include "generator/dev_random.h"
 
 int main()
 {

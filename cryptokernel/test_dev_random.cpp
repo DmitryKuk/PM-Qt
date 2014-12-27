@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "project/generator/dev_random.h"
+#include "generator/dev_random.h"
 
 int main()
 {

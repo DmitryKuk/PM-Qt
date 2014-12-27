@@ -2,8 +2,8 @@
 #include <iomanip>
 #include <unordered_map>
 
-#include "project/generator/dev_random.h"
-#include "project/random_map.h"
+#include "generator/dev_random.h"
+#include "random_map.h"
 
 template<class T1, class T2>
 inline

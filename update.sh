@@ -30,7 +30,7 @@ fi
 
 # Checking for "nopush" command
 NOPUSH=0
-if [ "X$2" != "X" ]; then
+if [ "X$2" != 'X' ]; then
 	NOPUSH=1
 fi
 
@@ -41,12 +41,17 @@ fi
 
 function update_all() {
 	local CURRENT_DIR='.'
-	if [ "X$1" != "X" ]; then	# $1 is current directory
+	if [ "X$1" != 'X' ]; then	# $1 is current directory
 		CURRENT_DIR="$1"
 	fi
 	
 	local FILES_TO_UPDATE=''
-	for I in $( "$LS_CMD" -1 "$CURRENT_DIR" | "$GREP_CMD" -v '[[:print:]]*\.\(o\|so\|pro\.user\|app\)\|moc_[[:print:]]*\|Makefile' ); do
+	for I in $( "$LS_CMD" -1 "$CURRENT_DIR" | "$GREP_CMD" -v '[[:print:]]*\.\(o\|so\|pro\.user\|app\)\|moc_[[:print:]]*' ); do
+		# Ignoring the main Makefile, because qmake generates it
+		if [ "X$I" == 'XMakefile' ] && [ "X$CURRENT_DIR" == 'X.' ]; then
+			continue
+		fi
+		
 		local FILE="$CURRENT_DIR/$I"
 		local TYPE="$( $STAT_CMD -f '%HT' $FILE )"
 		if [ "X$TYPE" == "XRegular File" ] || [ "X$TYPE" == "XSymbolic Link" ]; then

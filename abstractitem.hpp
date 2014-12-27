@@ -5,7 +5,7 @@ inline id_t AbstractItem::id() const
 	return this->id_;
 }
 
-inline const QString & AbstractItem::name() const
+inline QString AbstractItem::name() const
 {
 	return this->text(0);
 }
