@@ -9,28 +9,6 @@ SOURCES_CPP = \
 	generator/generator.cpp \
 	generator/dev_random.cpp
 
-# Compiler
-GPP = g++ -Wall -std=c++11
-
-
-# Objects files
-OBJECTS = $(SOURCES_CPP:.cpp=.o)
-
-
-# Targets
-.PHONY: all clean
-
-all: $(OBJECTS)
-
-clean:
-	rm -f $(OBJECTS)
-
-
-# Objects compilation
-%.o: %.cpp
-	$(GPP) -c -o "$@" "$<"
-
-
 # Tests
 TEST_SOURCES_CPP = \
 	test_dev_random.cpp \
@@ -38,8 +16,28 @@ TEST_SOURCES_CPP = \
 	test_double_map.cpp \
 	test_cryptokernel.cpp
 
+
+# Compiler
+GPP = g++ -Wall -std=c++11
+
+# Objects and target files
+OBJECTS = $(SOURCES_CPP:.cpp=.o)
 TEST_OBJECTS = $(TEST_SOURCES_CPP:.cpp=.o)
 TEST_TARGETS = $(basename $(TEST_SOURCES_CPP))
+
+# Targets
+.PHONY: all clean
+
+all: $(OBJECTS)
+
+clean:
+	rm -f $(OBJECTS) $(TEST_OBJECTS) $(TEST_TARGETS)
+
+
+# Objects compilation
+%.o: %.cpp
+	$(GPP) -c -o "$@" "$<"
+
 
 # Tests targets
 tests: $(TEST_TARGETS)

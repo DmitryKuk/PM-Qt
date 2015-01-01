@@ -243,6 +243,61 @@ double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::erase2(const Key2 &k2
 }
 
 
+// Updates 1st or 2nd key and returns true. If it's impossible (new_k already
+// exists or k1 does not exists), returns false and does NOT change any element.
+template<class Key1, class Key2, class Value, class Hash1, class Hash2, class Pred1, class Pred2>
+bool
+double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::update1(const Key1 &k1, const Key1 &new_k1)
+{
+	auto it = this->map1_.find(&k1);
+	if (it == this->map1_.end()) return false;
+	
+	auto p = this->map1_.insert(std::move(std::make_pair(&new_k1, it->second)));
+	if (p.second) {	// Inserted
+		it->second->first = new_k1;	// Updating element in container
+		this->map1_.erase(it);	// Cleaning old data from map1_
+		return true;
+	}
+	return false;
+}
+
+template<class Key1, class Key2, class Value, class Hash1, class Hash2, class Pred1, class Pred2>
+bool
+double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::update2(const Key2 &k2, const Key2 &new_k2)
+{
+	auto it = this->map2_.find(&k2);
+	if (it == this->map2_.end()) return false;
+	
+	auto p = this->map2_.insert(std::move(std::make_pair(&new_k2, it->second)));
+	if (p.second) {	// Inserted
+		it->second->second = new_k2;	// Updating element in container
+		this->map2_.erase(it);	// Cleaning old data from map1_
+		return true;
+	}
+	return false;
+}
+
+
+// As update1/update2, but use one key to update another.
+template<class Key1, class Key2, class Value, class Hash1, class Hash2, class Pred1, class Pred2>
+bool
+double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::update12(const Key1 &k1, const Key2 &new_k2)
+{
+	auto it = this->find1(k1);
+	if (it == this->end()) return false;
+	return this->update2(it->second, new_k2);
+}
+
+template<class Key1, class Key2, class Value, class Hash1, class Hash2, class Pred1, class Pred2>
+bool
+double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::update21(const Key2 &k2, const Key1 &new_k1)
+{
+	auto it = this->find2(k2);
+	if (it == this->end()) return false;
+	return this->update1(it->first, new_k1);
+}
+
+
 template<class Key1, class Key2, class Value, class Hash1, class Hash2, class Pred1, class Pred2>
 inline
 size_t
@@ -294,3 +349,46 @@ template<class Key1, class Key2, class Value, class Hash1, class Hash2, class Pr
 const Value &
 double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::at2(const Key2 &k2) const
 { return this->map2_.at(&k2)->third; }
+
+
+// Returns true, if key exists, or false otherwise
+template<class Key1, class Key2, class Value, class Hash1, class Hash2, class Pred1, class Pred2>
+bool
+double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::test1(const Key1 &k1) const
+{
+	auto it = this->find1(k1);
+	if (it == this->end()) return false;
+	return true;
+}
+
+template<class Key1, class Key2, class Value, class Hash1, class Hash2, class Pred1, class Pred2>
+bool
+double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::test2(const Key2 &k2) const
+{
+	auto it = this->find2(k2);
+	if (it == this->end()) return false;
+	return true;
+}
+
+
+template<class Key1, class Key2, class Value, class Hash1, class Hash2, class Pred1, class Pred2>
+std::vector<Key1>
+double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::all_keys1() const
+{
+	std::vector<Key1> res;
+	res.reserve(this->size());
+	for (auto &x: *this)
+		res.push_back(x.first);
+	return res;
+}
+
+template<class Key1, class Key2, class Value, class Hash1, class Hash2, class Pred1, class Pred2>
+std::vector<Key2>
+double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::all_keys2() const
+{
+	std::vector<Key2> res;
+	res.reserve(this->size());
+	for (auto &x: *this)
+		res.push_back(x.second);
+	return res;
+}

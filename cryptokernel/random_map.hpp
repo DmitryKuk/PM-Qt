@@ -2,67 +2,55 @@
 
 // Constructors and operator=()
 // Default
-template<class Key, class Value, class Generator,
+template<class Key, class Value,
 		 template<class K, class V, class...>
 		 class Container,
 		 class ...ContainerArgs>
-random_map<Key, Value, Generator, Container, ContainerArgs...>::random_map(const Generator &g):
-	generator_(g)
-{}
-
-// By moving generator
-template<class Key, class Value, class Generator,
-		 template<class K, class V, class...>
-		 class Container,
-		 class ...ContainerArgs>
-random_map<Key, Value, Generator, Container, ContainerArgs...>::random_map(Generator &&g):
-	generator_(std::move(g))
+random_map<Key, Value, Container, ContainerArgs...>::random_map()
 {}
 
 // Copy
-template<class Key, class Value, class Generator,
+template<class Key, class Value,
 		 template<class K, class V, class...>
 		 class Container,
 		 class ...ContainerArgs>
-random_map<Key, Value, Generator, Container, ContainerArgs...>::random_map(const random_map<Key, Value, Generator, Container, ContainerArgs...> &other):
-	Container<Key, Value, ContainerArgs...>(other),
-	generator_(other.generator_)
+random_map<Key, Value, Container, ContainerArgs...>::random_map(const random_map<Key, Value, Container, ContainerArgs...> &other):
+	Container<Key, Value, ContainerArgs...>(other)
 {}
 
 // Move
-template<class Key, class Value, class Generator,
+template<class Key, class Value,
 		 template<class K, class V, class...>
 		 class Container,
 		 class ...ContainerArgs>
-random_map<Key, Value, Generator, Container, ContainerArgs...>::random_map(random_map<Key, Value, Generator, Container, ContainerArgs...> &&other):
-	Container<Key, Value, ContainerArgs...>(other),
-	generator_(std::move(other.generator_))
+random_map<Key, Value, Container, ContainerArgs...>::random_map(random_map<Key, Value, Container, ContainerArgs...> &&other):
+	Container<Key, Value, ContainerArgs...>(other)
 {}
 
 
 // Copy
-template<class Key, class Value, class Generator,
+template<class Key, class Value,
 		 template<class K, class V, class...>
 		 class Container,
 		 class ...ContainerArgs>
-random_map<Key, Value, Generator, Container, ContainerArgs...> &
-random_map<Key, Value, Generator, Container, ContainerArgs...>::operator=(const random_map<Key, Value, Generator, Container, ContainerArgs...> &other)
+inline
+random_map<Key, Value, Container, ContainerArgs...> &
+random_map<Key, Value, Container, ContainerArgs...>::operator=(const random_map<Key, Value, Container, ContainerArgs...> &other)
 {
 	this->Container<Key, Value, ContainerArgs...>::operator=(other);
-	this->generator_ = other.generator_;
 	return *this;
 }
 
 // Move
-template<class Key, class Value, class Generator,
+template<class Key, class Value,
 		 template<class K, class V, class...>
 		 class Container,
 		 class ...ContainerArgs>
-random_map<Key, Value, Generator, Container, ContainerArgs...> &
-random_map<Key, Value, Generator, Container, ContainerArgs...>::operator=(random_map<Key, Value, Generator, Container, ContainerArgs...> &&other)
+inline
+random_map<Key, Value, Container, ContainerArgs...> &
+random_map<Key, Value, Container, ContainerArgs...>::operator=(random_map<Key, Value, Container, ContainerArgs...> &&other)
 {
 	this->Container<Key, Value, ContainerArgs...>::operator=(std::move(other));
-	this->generator_ = std::move(std::move(other.generator_));
 	return *this;
 }
 
@@ -71,17 +59,18 @@ random_map<Key, Value, Generator, Container, ContainerArgs...>::operator=(random
 // Inserts new (key, value) pair, where key is random.
 // Returns iterator to newly inserted pair.
 // TIME: depends on Container::find() and Container::emplace().
-template<class Key, class Value, class Generator,
+template<class Key, class Value,
 		 template<class K, class V, class...>
 		 class Container,
 		 class ...ContainerArgs>
-std::pair<typename random_map<Key, Value, Generator, Container, ContainerArgs...>::iterator, bool>
-random_map<Key, Value, Generator, Container, ContainerArgs...>::insert_random(const Value &val)
+template<class Generator>
+std::pair<typename random_map<Key, Value, Container, ContainerArgs...>::iterator, bool>
+random_map<Key, Value, Container, ContainerArgs...>::insert_random(const Generator &g, const Value &val)
 {
 	iterator end = this->end();
 	while (true) {
-		Key k = this->generator_();
-		if (this->generator_.bad())
+		Key k = g();
+		if (g.bad())
 			return std::make_pair(end, false);
 		iterator it = this->find(k);
 		if (it == end) {
@@ -91,17 +80,18 @@ random_map<Key, Value, Generator, Container, ContainerArgs...>::insert_random(co
 	}
 }
 
-template<class Key, class Value, class Generator,
+template<class Key, class Value,
 		 template<class K, class V, class...>
 		 class Container,
 		 class ...ContainerArgs>
-std::pair<typename random_map<Key, Value, Generator, Container, ContainerArgs...>::iterator, bool>
-random_map<Key, Value, Generator, Container, ContainerArgs...>::insert_random(Value &&val)
+template<class Generator>
+std::pair<typename random_map<Key, Value, Container, ContainerArgs...>::iterator, bool>
+random_map<Key, Value, Container, ContainerArgs...>::insert_random(const Generator &g, Value &&val)
 {
 	iterator end = this->end();
 	while (true) {
-		Key k = this->generator_();
-		if (this->generator_.bad())
+		Key k = g();
+		if (g.bad())
 			return std::make_pair(end, false);
 		iterator it = this->find(k);
 		if (it == end) {
@@ -112,13 +102,53 @@ random_map<Key, Value, Generator, Container, ContainerArgs...>::insert_random(Va
 }
 
 
-template<class Key, class Value, class Generator,
+// Updates element key and returns true. If is is impossible (k does not exist
+// or new_k exists), returns false.
+template<class Key, class Value,
+		 template<class K, class V, class...>
+		 class Container,
+		 class ...ContainerArgs>
+bool
+random_map<Key, Value, Container, ContainerArgs...>::update(const Key &k, const Key &new_k)
+{
+	auto it = this->find(&k);
+	if (it == this->end()) return false;
+	
+	auto p = this->insert(std::move(std::make_pair(&new_k, it->second)));
+	if (p.second) {	// Inserted
+		this->erase(it);	// Cleaning old data
+		return true;
+	}
+	return false;
+}
+
+
+// Returns true, if key k exists, false otherwise
+template<class Key, class Value,
 		 template<class K, class V, class...>
 		 class Container,
 		 class ...ContainerArgs>
 inline
-const Generator &
-random_map<Key, Value, Generator, Container, ContainerArgs...>::generator() const
+bool
+random_map<Key, Value, Container, ContainerArgs...>::test(const Key &k) const
 {
-	return this->generator_;
+	auto it = this->find(k);
+	if (it == this->end()) return false;
+	return true;
+}
+
+
+// Returns vector with all keys in map
+template<class Key, class Value,
+		 template<class K, class V, class...>
+		 class Container,
+		 class ...ContainerArgs>
+std::vector<Key>
+random_map<Key, Value, Container, ContainerArgs...>::all_keys() const
+{
+	std::vector<Key> res;
+	res.reserve(this->size());
+	for (const auto &x: *this)
+		res.push_back(x.first);
+	return res;
 }

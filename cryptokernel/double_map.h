@@ -12,6 +12,7 @@
 
 #include <list>
 #include <unordered_map>
+#include <vector>
 
 #include "triple.h"
 
@@ -83,6 +84,15 @@ public:
 	inline void erase1(const Key1 &k1);
 	inline void erase2(const Key2 &k2);
 	
+	// Updates 1st or 2nd key and returns true. If it's impossible (new_k already
+	// exists or k1 does not exists), returns false and does NOT change any element.
+	bool update1(const Key1 &k1, const Key1 &new_k1);
+	bool update2(const Key2 &k2, const Key2 &new_k2);
+	
+	// As update1/update2, but use one key to update another.
+	bool update12(const Key1 &k1, const Key2 &new_k2);
+	bool update21(const Key2 &k2, const Key1 &new_k1);
+	
 	inline size_t size() const;
 	
 	const_iterator find1(const Key1 &k1) const;
@@ -93,6 +103,14 @@ public:
 	
 	inline Value & at2(const Key2 &k2);
 	inline const Value & at2(const Key2 &k2) const;
+	
+	// Returns true, if key exists, or false otherwise
+	bool test1(const Key1 &k1) const;
+	bool test2(const Key2 &k2) const;
+	
+	// Returns vector with all keys in map
+	std::vector<Key1> all_keys1() const;
+	std::vector<Key2> all_keys2() const;
 private:
 	container_t list_;
 	map1_t map1_;

@@ -21,11 +21,11 @@ void print(const RM &m)
 	for (const auto &x: m) std::cout << '\t' << x << std::endl;
 }
 
-template<class RM, class Val>
+template<class Generator, class RM, class Val>
 inline
-void insert_random(RM &m, const Val &val)
+void insert_random(const Generator &g, RM &m, const Val &val)
 {
-	auto p = m.insert_random(val);
+	auto p = m.insert_random(g, val);
 	if (p.second)
 		std::cout << "\tInserted " << *p.first << ": OK" << std::endl;
 	else
@@ -46,8 +46,9 @@ void emplace(RM &m, const Key &key, const Val &val)
 int main()
 {
 	// std::cin.get();
-	random_map<unsigned short, unsigned short, generator::dev_random<unsigned short>, std::unordered_map> m;
-	std::cout << ((m.generator().status() == generator::status::not_initialized)?
+	generator::dev_random<unsigned short> g;
+	random_map<unsigned short, unsigned short, std::unordered_map> m;
+	std::cout << ((g.status() == generator::status::not_initialized)?
 				 "Generator is not initialized!":
 				 "Generator is ok.") << std::endl;
 	
@@ -57,7 +58,7 @@ int main()
 	
 	std::cout << "Emplacing random values:" << std::endl;
 	for (unsigned short i = 0; i < 100; ++i)
-		insert_random(m, i);
+		insert_random(g, m, i);
 	
 	std::cout << "Trying to emplace values with existing keys:" << std::endl;
 	for (auto &x: m) {
