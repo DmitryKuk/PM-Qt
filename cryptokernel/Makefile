@@ -10,7 +10,7 @@ SOURCES_CPP = \
 	generator/dev_random.cpp
 
 # Static library
-TARGET_LIB = cryptokernel.a
+TARGET_LIB = libcryptokernel.a
 
 # Tests
 TEST_SOURCES_CPP = \
