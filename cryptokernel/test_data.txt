@@ -1,0 +1,10 @@
+1
+	0 10 hello_type 2
+		0 5 hello 1 *
+		1 2 hi 1 *
+
+1
+	0 4 test 0 3
+		0 5 first 0 2 ff
+		1 6 second 1 2 sf
+		2 5 third 0 3 tf

@@ -2,7 +2,10 @@
 
 #include "cryptokernel.h"
 
-#include <algorithm>
+#include <queue>
+#include "io.h"
+
+#define SPACE "\t"
 
 // Constructors, destructor and operator=()
 cryptokernel::cryptokernel():						// Default
@@ -50,25 +53,333 @@ cryptokernel::operator=(cryptokernel &&other)		// Move
 
 // Input/output functions
 // Reads all data from given stream. If any error occured, don't erase old data
-int
+bool
 cryptokernel::read(std::istream &s)
 {
-	std::cerr << "cryptokernel::read not implemented yet!" << std::endl;
-	return 0;
+	this->clear();
+	try {
+		// types_map: old_type_id -> (new_type_id, old_tfield_id -> new_tfield_id)
+		std::unordered_map<type_id_t,							
+						   std::pair<type_id_t,					
+						   			 std::unordered_map<tfield_id_t,
+						   			 					tfield_id_t>>> types_map;
+		
+		// groups_map: old_group_id -> new_group_id
+		std::unordered_map<group_id_t, group_id_t> groups_map;
+		
+		// records_map: old_record_id -> new_record_id
+		std::unordered_map<record_id_t, record_id_t> records_map;
+		
+		// Reading metadata
+		{
+			size_t types_count;
+			
+			// Global data
+			io::read(s, types_count);	// Number of types
+			this->types_order_.reserve(types_count);
+			
+			while (types_count--) {	// Types
+				type_id_t old_type_id;
+				std::string type_name;
+				size_t fields_count;
+				tfields_order_t tfields_order;
+				
+				// Type data
+				io::read(s, old_type_id);	// Id
+				io::read(s, type_name);		// Name
+				io::read(s, fields_count);	// Number of fields
+				
+				auto new_type_id = this->add_type(type_name);
+				if (new_type_id == invalid_type_id) throw (io::exception());
+				
+				auto &type_data = types_map[old_type_id];
+				type_data.first = new_type_id;
+				
+				while (fields_count--) {	// Fields of type
+					tfield_id_t old_tfield_id;
+					std::string field_name, field_format;
+					
+					// Field data
+					io::read(s, old_tfield_id);	// Id
+					io::read(s, field_name);	// Name
+					io::read(s, field_format);	// Format
+					
+					auto new_tfield_id = this->add_type_field(new_type_id, field_name, field_format);
+					if (new_tfield_id == invalid_tfield_id) throw (io::exception());
+					type_data.second[old_tfield_id] = new_tfield_id;
+				}
+			}
+		}
+		// Metadata read
+		
+		
+		// Reading data
+		// Reading groups
+		{
+			auto read_subgroups = [&s, this, &groups_map](group_id_t group_id) {
+				size_t subgroups_count;
+				
+				io::read(s, subgroups_count);
+				
+				while (subgroups_count--) {
+					group_id_t old_subgroup_id;
+					std::string subgroup_name;
+					
+					io::read(s, old_subgroup_id);
+					io::read(s, subgroup_name);
+					
+					group_id_t new_subgroup_id = this->add_group(group_id, subgroup_name);
+					if (new_subgroup_id == invalid_group_id) throw (io::exception());
+					groups_map[old_subgroup_id] = new_subgroup_id;
+				}
+			};
+			
+			auto read_subrecords = [&s, this, &records_map, &types_map](group_id_t group_id) {
+				size_t subrecords_count;
+				
+				io::read(s, subrecords_count);
+				
+				while (subrecords_count--) {
+					record_id_t old_subrecord_id;
+					std::string subrecord_name;
+					
+					io::read(s, old_subrecord_id);
+					io::read(s, subrecord_name);
+					
+					// invalid_type_id here is hack: change it later, when record data arrived
+					record_id_t new_subrecord_id = this->add_record(group_id,
+																	subrecord_name,
+																	invalid_type_id);
+					if (new_subrecord_id == invalid_record_id) throw (io::exception());
+					records_map[old_subrecord_id] = new_subrecord_id;
+				}
+			};
+			
+			
+			size_t groups_count;
+			group_id_t old_root_group_id;
+			
+			// Global data
+			io::read(s, old_root_group_id);	// Root group id
+			io::read(s, groups_count);		// Number of groups
+			
+			groups_map[invalid_group_id] = invalid_group_id;
+			
+			if (groups_count--) {	// Root group (always first)
+				group_id_t group_id;
+				
+				// Group data
+				io::read(s, group_id);	// Id
+				
+				if (group_id != old_root_group_id)
+					throw (io::exception());
+				
+				add_root_group();
+				if (this->root_group_id_ == invalid_group_id) throw (io::exception());
+				group_id = groups_map[old_root_group_id] = this->root_group_id_;
+				
+				groups_map[group_id] = this->root_group_id_;
+				
+				read_subgroups(group_id);	// Child groups
+				read_subrecords(group_id);	// Child records
+			}
+			
+			while (groups_count--) {	// Other groups
+				group_id_t group_id;
+				
+				// Group data
+				io::read(s, group_id);	// Id
+				
+				group_id = groups_map[group_id];
+				
+				read_subgroups(group_id);	// Child groups
+				read_subrecords(group_id);	// Child records
+			}
+		}
+		// Groups wrote
+		
+		
+		// Reading records
+		{
+			size_t records_count;
+			
+			// Global data
+			io::read(s, records_count);	// Number of records
+			
+			while (records_count--) {	// Records
+				record_id_t record_id;
+				type_id_t record_type_id;
+				size_t fields_count;
+				
+				// Record data
+				io::read(s, record_id);			// Id
+				io::read(s, record_type_id);			// Type of record
+				io::read(s, fields_count);		// Number of fields
+				
+				// Updating record type and id
+				auto &type_pair = types_map.at(record_type_id);
+				record_type_id = type_pair.first;
+				
+				record_id = records_map.at(record_id);
+				this->records_.at(record_id).type = record_type_id;
+				
+				while (fields_count--) {	// Fields
+					rfield_id_t field_id;
+					tfield_id_t field_type_id;
+					std::string field_data;
+					
+					// Field data
+					io::read(s, field_id);
+					io::read(s, field_type_id);
+					io::read(s, field_data);
+					
+					field_type_id = type_pair.second.at(field_type_id);
+					
+					auto new_field_id = this->add_field(record_id, field_type_id, field_data);
+					if (new_field_id == invalid_rfield_id) throw (io::exception());
+				}
+			}
+		}
+		// Records wrote
+		// Data wrote
+	} catch (...) {
+		this->clear();
+		return false;
+	}
+	return true;
 }
 
 // Writes all data to given stream
-int
+bool
 cryptokernel::write(std::ostream &s) const
 {
-	std::cerr << "cryptokernel::read not implemented yet!" << std::endl;
-	return 0;
+	try {
+		// Writing metadata
+		{
+			auto types_ids = this->types();
+			
+			// Global data
+			io::write(s, types_ids.size());	// Number of types
+			s << std::endl;
+			
+			for (auto type_id: types_ids) {	// Types
+				auto fields_ids = this->type_fields(type_id);
+				
+				// Type data
+				s << SPACE;
+				io::write(s, type_id);					// Id
+				io::write(s, this->type_name(type_id));	// Name
+				io::write(s, fields_ids.size());		// Number of fields
+				s << std::endl;
+				
+				for (auto field_id: fields_ids) {	// Fields of type
+					// Field data
+					s << SPACE SPACE;
+					io::write(s, field_id);										// Id
+					io::write(s, this->type_field_name(type_id, field_id));		// Name
+					io::write(s, this->type_field_format(type_id, field_id));	// Format
+					s << std::endl;
+				}
+			}
+			s << std::endl;
+		}
+		// Metadata wrote
+		
+		
+		// Writing data
+		// Writing groups
+		{
+			// auto groups_ids = this->groups();
+			
+			// Global data
+			io::write(s, this->root_group_id_);	// Root group id
+			io::write(s, this->groups_.size());	// Number of groups
+			s << std::endl;
+			
+			std::queue<group_id_t> groups_queue;		// Queue for BFS
+			groups_queue.push(this->root_group_id_);	// Start from root group
+			
+			while (!groups_queue.empty()) {
+				group_id_t group_id = groups_queue.front();
+				groups_queue.pop();
+				
+				const auto &group_data = this->groups_.at(group_id);
+				
+				s << SPACE;
+				io::write(s, group_id);	// Group id
+				s << std::endl;
+				
+				// Child groups
+				s << SPACE SPACE;
+				io::write(s, group_data.groups.size());
+				s << std::endl;
+				
+				for (const auto &child_group_triple: group_data.groups) {
+					groups_queue.push(child_group_triple.first);
+					
+					s << SPACE SPACE SPACE;
+					io::write(s, child_group_triple.first);		// Child group id
+					io::write(s, child_group_triple.second);	// Child group name
+					s << std::endl;
+				}
+				
+				// Child records
+				s << SPACE SPACE;
+				io::write(s, group_data.records.size());
+				s << std::endl;
+				
+				for (const auto &child_record_triple: group_data.records) {
+					s << SPACE SPACE SPACE;
+					io::write(s, child_record_triple.first);	// Child record id
+					io::write(s, child_record_triple.second);	// Child record name
+					s << std::endl;
+				}
+			}
+		}
+		// Groups wrote
+		
+		
+		// Writing records
+		{
+			auto records_ids = this->records();
+			
+			// Global data
+			io::write(s, records_ids.size());	// Number of records
+			s << std::endl;
+			
+			for (auto record_id: records_ids) {	// Records
+				auto fields_ids = this->fields(record_id);
+				
+				// Record data
+				s << SPACE;
+				io::write(s, record_id);					// Id
+				io::write(s, this->record_type(record_id));	// Type of record
+				io::write(s, fields_ids.size());			// Number of fields
+				s << std::endl;
+				
+				for (auto field_id: fields_ids) {	// Fields
+					// Field data
+					s << SPACE SPACE;
+					io::write(s, field_id);
+					io::write(s, this->field_type(record_id, field_id));
+					io::write(s, this->field_data(record_id, field_id));
+					s << std::endl;
+				}
+			}
+			s << std::endl;
+		}
+		// Records wrote
+		// Data wrote
+	} catch (...) {
+		return false;
+	}
+	return true;
 }
 // End of input/output functions
 
 
 // Metadata management
-// Type management (every type has own set of fields)
+// Types management (every type has own set of fields)
 // Returns all types ids (ids are ordered by user)
 std::vector<type_id_t>
 cryptokernel::types() const
@@ -143,10 +454,10 @@ cryptokernel::set_type_name(type_id_t tid, const std::string &type_name)
 		return invalid_type_id;
 	return tid;
 }
-// End of type management
+// End of types management
 
 
-// Field management (field ids are unique for same type)
+// Fields management (field ids are unique for same type)
 // Returns all fields ids for type (ids are ordered by user) or empty vector
 std::vector<tfield_id_t>
 cryptokernel::type_fields(type_id_t tid) const
@@ -249,7 +560,7 @@ cryptokernel::set_type_field_name(type_id_t tid, tfield_id_t fid, const std::str
 
 // Returns field data, if field fid exists in type tid or ""
 std::string
-cryptokernel::type_field_format(type_id_t tid, tfield_id_t fid)
+cryptokernel::type_field_format(type_id_t tid, tfield_id_t fid) const
 {
 	try {
 		return this->types_.at1(tid).fields.at1(fid).format;
@@ -267,11 +578,12 @@ cryptokernel::set_type_field_format(type_id_t tid, tfield_id_t fid, const std::s
 	} catch (...) {}
 	return invalid_tfield_id;
 }
-// End of field management
+// End of fields management
 // End of metadata management
 
 
-// Records management
+// Data management
+// Records and groups management
 // Returns root group id
 group_id_t
 cryptokernel::root_group_id() const
@@ -338,7 +650,8 @@ cryptokernel::test_group(group_id_t gid) const
 record_id_t
 cryptokernel::add_record(group_id_t gid, const std::string &record_name, type_id_t record_type)
 {
-	if (record_name.empty() || !this->types_.test1(record_type))
+	if (record_name.empty() || this->root_group_id_ == invalid_group_id
+		|| (!this->types_.test1(record_type) && record_type != invalid_type_id))
 		return invalid_record_id;
 	try {
 		auto &records = this->groups_.at(gid).records;
@@ -363,23 +676,38 @@ cryptokernel::add_record(group_id_t gid, const std::string &record_name, type_id
 group_id_t
 cryptokernel::add_group(group_id_t gid, const std::string &group_name)
 {
-	if (group_name.empty()) return invalid_group_id;
+	if (group_name.empty() || this->root_group_id_ == invalid_group_id)
+		return invalid_group_id;
 	try {
 		auto &groups = this->groups_.at(gid).groups;
 		if (groups.test2(group_name)) return invalid_group_id;
 		
 		// Inserting data into groups_
 		auto p = this->groups_.insert_random(this->group_generator_,
-											 { .parent_group = gid, });
+											 { .parent_group = gid });
 		if (p.second) {
 			groups.insert(std::move(make_triple(p.first->first,
 												group_name,
 												p.first->first)));
-			if (this->root_group_id_ == invalid_group_id)	// Updating root group id
-				this->root_group_id_ = p.first->first;
 			return p.first->first;
 		}
 	} catch (...) {}
+	return invalid_group_id;
+}
+
+// Generates new root group id and adds it or returns invalid_group_id
+group_id_t
+cryptokernel::add_root_group()
+{
+	if (this->root_group_id_ != invalid_group_id)
+		return invalid_group_id;
+	// Inserting data into groups_
+	auto p = this->groups_.insert_random(this->group_generator_,
+										 { .parent_group = invalid_group_id });
+	if (p.second) {
+		this->root_group_id_ = p.first->first;
+		return this->root_group_id_;
+	}
 	return invalid_group_id;
 }
 
@@ -405,6 +733,12 @@ cryptokernel::remove_record(record_id_t rid)
 group_id_t
 cryptokernel::remove_group(group_id_t gid)
 {
+	if (gid == this->root_group_id_) {
+		this->groups_.clear();
+		this->records_.clear();
+		return gid;
+	}
+	
 	auto group_it = this->groups_.find(gid);
 	if (group_it == this->groups_.end())
 		return invalid_group_id;	// Group does not exist
@@ -419,8 +753,6 @@ cryptokernel::remove_group(group_id_t gid)
 	
 	// Erasing record with its fields from groups_
 	this->groups_.erase(group_it);
-	if (this->root_group_id_ == gid)	// Updating root group id
-		this->root_group_id_ = invalid_group_id;
 	return gid;
 }
 
@@ -479,11 +811,88 @@ cryptokernel::set_group_name(group_id_t gid, const std::string &group_name)
 	} catch (...) {}
 	return invalid_group_id;
 }
-// End of records management
 
 
-// Field management (field ids are unique for same record)
+// Returns record id if it exists or invalid_type_id
+type_id_t
+cryptokernel::record_type(record_id_t rid) const
+{
+	try {
+		return this->records_.at(rid).type;
+	} catch (...) {}
+	return invalid_type_id;
+}
+
+// Sets new type for existing record if if does not contain fields
+// or returns invalid_record_id
+record_id_t
+cryptokernel::set_record_type(record_id_t rid, type_id_t record_type_id)
+{
+	try {
+		auto &record_data = this->records_.at(rid);
+		if (record_data.fields.empty() && this->test_type(record_type_id)) {
+			record_data.type = record_type_id;
+			return rid;
+		}
+	} catch (...) {}
+	return invalid_record_id;
+}
+
+
+// Returns records parent group id if record exists or invalid_group_id
+group_id_t
+cryptokernel::record_parent_group(record_id_t rid) const
+{
+	try {
+		return this->records_.at(rid).parent_group;
+	} catch (...) {}
+	return invalid_group_id;
+}
+
+// Returns groups parent group id if group exists or invalid_group_id
+group_id_t
+cryptokernel::group_parent_group(group_id_t gid) const
+{
+	try {
+		return this->groups_.at(gid).parent_group;
+	} catch (...) {}
+	return invalid_group_id;
+}
+
+
+// Sets new parent group for existing record or returns invalid_record_id
+record_id_t
+cryptokernel::set_record_parent_group(record_id_t rid, group_id_t parent_group_id)
+{
+	try {
+		auto &record_parent_group = this->records_.at(rid).parent_group;
+		if (this->test_group(parent_group_id)) {
+			record_parent_group = parent_group_id;
+			return rid;
+		}
+	} catch (...) {}
+	return invalid_record_id;
+}
+
+// Sets new parent group for existing group or returns invalid_group_id
+group_id_t
+cryptokernel::set_group_parent_group(group_id_t gid, group_id_t parent_group_id)
+{
+	try {
+		auto &group_parent_group = this->groups_.at(gid).parent_group;
+		if (this->test_group(parent_group_id)) {
+			group_parent_group = parent_group_id;
+			return gid;
+		}
+	} catch (...) {}
+	return invalid_group_id;
+}
+// End of records and groups management
+
+
+// Fields management (field ids are unique for same record)
 // Returns all fields ids for record (ids are ordered by user) or empty vector
+// Returns number of records
 std::vector<rfield_id_t>
 cryptokernel::fields(record_id_t rid) const
 {
@@ -516,7 +925,10 @@ cryptokernel::add_field(record_id_t rid, tfield_id_t type, const std::string &da
 		auto p = record.fields.insert_random(this->rfield_generator_,
 											 { .type = type,
 											   .data = data });
-		if (p.second) return p.first->first;
+		if (p.second) {
+			record.fields_order.push_back(p.first->first);
+			return p.first->first;
+		}
 	} catch (...) {}
 	return invalid_rfield_id;
 }
@@ -536,7 +948,7 @@ cryptokernel::remove_field(record_id_t rid, rfield_id_t fid)
 
 // Returns field type, if field fid exists in record rid, or invalid_type_id
 tfield_id_t
-cryptokernel::field_type(record_id_t rid, rfield_id_t fid)
+cryptokernel::field_type(record_id_t rid, rfield_id_t fid) const
 {
 	try {
 		return this->records_.at(rid).fields.at(fid).type;
@@ -558,7 +970,7 @@ cryptokernel::set_field_type(record_id_t rid, rfield_id_t fid, tfield_id_t type)
 
 // Returns field data, if field fid exists in record rid, or ""
 std::string
-cryptokernel::field_data(record_id_t rid, rfield_id_t fid)
+cryptokernel::field_data(record_id_t rid, rfield_id_t fid) const
 {
 	try {
 		return this->records_.at(rid).fields.at(fid).data;
@@ -575,4 +987,18 @@ cryptokernel::set_field_data(record_id_t rid, rfield_id_t fid, const std::string
 		return fid;
 	} catch (...) {}
 	return invalid_rfield_id;
+}
+// End of fields management
+// End of data management
+
+
+// Clears all data and metadata
+void
+cryptokernel::clear()
+{
+	this->records_.clear();
+	this->groups_.clear();
+	this->types_.clear();
+	this->types_order_.clear();
+	this->root_group_id_ = invalid_group_id;
 }

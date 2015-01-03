@@ -6,8 +6,8 @@
 
 // Example: [     GUI      ] <-> [          Agent          ] <-> [    Kernel    ]
 //          (Qt/ncurses/...)     (depends on GUI and Kernel)     (lib/daemon/...)
-// This version of program uses Qt GUI, so Agent has Qt API too. Agent has own
-// cache for some data. Some data caches in PasswordItem or GroupItem objects.
+// This version of program uses Qt GUI, so Agent has Qt-based API too. Agent may has
+// own cache for some data. Some data caches in PasswordItem or GroupItem objects.
 
 #ifndef CRYPTOKERNELAGENT_H
 #define CRYPTOKERNELAGENT_H
@@ -18,8 +18,6 @@
 #include <unordered_map>
 
 #include "types.h"
-
-// TODO: IMPLEMENT CORRECT addType() and AddField()!!!
 
 class CryptoKernelAgent
 {
@@ -35,10 +33,10 @@ public:
 																// or returns invalid_type_id
 	
 	// Field management (field ids are unique for same type)
-	std::vector<field_id_t> fields(type_id_t tid) const;			// Returns all fields ids for type or empty vector
-	QString field(type_id_t tid, field_id_t fid) const;				// Returns field id if it exists or empty string
-	field_id_t addField(type_id_t tid, const QString &fieldName);	// Generates new field id and adds it with name
-	field_id_t setField(type_id_t tid, field_id_t fid, const QString &fieldName);	// Sets new name for existing
+	std::vector<tfield_id_t> fields(type_id_t tid) const;			// Returns all fields ids for type or empty vector
+	QString field(type_id_t tid, tfield_id_t fid) const;				// Returns field id if it exists or empty string
+	tfield_id_t addField(type_id_t tid, const QString &fieldName);	// Generates new field id and adds it with name
+	tfield_id_t setField(type_id_t tid, tfield_id_t fid, const QString &fieldName);	// Sets new name for existing
 																					// field of existing type or
 																					// returns invalid_field_id
 private:

@@ -307,6 +307,16 @@ double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::size() const
 	return this->map1_.size();
 }
 
+template<class Key1, class Key2, class Value, class Hash1, class Hash2, class Pred1, class Pred2>
+inline
+void
+double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::clear()
+{
+	this->map1_.clear();
+	this->map2_.clear();
+	this->list_.clear();
+}
+
 
 template<class Key1, class Key2, class Value, class Hash1, class Hash2, class Pred1, class Pred2>
 typename double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::const_iterator

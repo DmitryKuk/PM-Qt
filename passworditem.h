@@ -21,7 +21,7 @@ public:
 	PasswordItem(id_t id, const QString &passwordName, GroupItem *parent = nullptr);
 	PasswordItem(id_t id, const QString &passwordName, QTreeWidget *parent = nullptr);
 private:
-	QList<QPair<field_id_t, QString>> fields_;	// Fields list: (FIELD_ID, FIELD_STRING)
+	QList<QPair<tfield_id_t, QString>> fields_;	// Fields list: (FIELD_ID, FIELD_STRING)
 };
 
 #endif // PASSWORDITEM_H

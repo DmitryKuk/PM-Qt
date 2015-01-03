@@ -2,6 +2,10 @@
 
 #include "cryptokernelagent.h"
 
+#include "cryptokernel/cryptokernel.h"
+
+cryptokernel k;
+
 CryptoKernelAgent::CryptoKernelAgent()
 {}
 
@@ -50,9 +54,9 @@ type_id_t setType(type_id_t tid, const QString &typeName)
 
 
 // Field management (field ids are unique for same type)
-std::vector<field_id_t> CryptoKernelAgent::fields(type_id_t tid) const
+std::vector<tfield_id_t> CryptoKernelAgent::fields(type_id_t tid) const
 {
-	std::vector<field_id_t> res;
+	std::vector<tfield_id_t> res;
 	auto it = this->types_.find(tid);
 	if (it != this->types_.end()) {
 		res.reserve(it->second.fields.size());
@@ -61,7 +65,7 @@ std::vector<field_id_t> CryptoKernelAgent::fields(type_id_t tid) const
 	return res;
 }
 
-QString CryptoKernelAgent::field(type_id_t tid, field_id_t fid) const
+QString CryptoKernelAgent::field(type_id_t tid, tfield_id_t fid) const
 {
 	auto it1 = this->types_.find(tid);
 	if (it1 != this->types_.end()) {
@@ -72,7 +76,7 @@ QString CryptoKernelAgent::field(type_id_t tid, field_id_t fid) const
 	return "";
 }
 
-field_id_t CryptoKernelAgent::addField(type_id_t tid, const QString &fieldName)
+tfield_id_t CryptoKernelAgent::addField(type_id_t tid, const QString &fieldName)
 {
 	if (typeName.isEmpty()) return invalid_type_id;
 	
@@ -84,7 +88,7 @@ field_id_t CryptoKernelAgent::addField(type_id_t tid, const QString &fieldName)
 	return tid;
 }
 
-field_id_t CryptoKernelAgent::setField(type_id_t tid, field_id_t fid, const QString &fieldName)
+tfield_id_t CryptoKernelAgent::setField(type_id_t tid, tfield_id_t fid, const QString &fieldName)
 {
 	
 }

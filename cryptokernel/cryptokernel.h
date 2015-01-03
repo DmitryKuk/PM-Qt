@@ -4,10 +4,8 @@
 // cryptokernel class uses random_map, double_map and
 // generator::dev_random<T> for managing types and their fields.
 
-// NOTE: type and field ids are NOT const, sometimes cryptokernel
-// changes them: on every program start or more often.
-
-// TODO: write double_set class and replace some double_maps by it
+// NOTE: type, record and their fields ids are NOT const, sometimes
+// cryptokernel changes them: on every program start.
 
 #ifndef CRYPTOKERNEL_H
 #define CRYPTOKERNEL_H
@@ -35,15 +33,15 @@ public:
   // Input/output functions
 	// Reads all data from given stream. If any error occured,
 	// don't erase old data
-	int read(std::istream &s);	// NOT IMPLEMENTED YET
+	bool read(std::istream &s);	// NOT IMPLEMENTED YET
 	
 	// Writes all data to given stream
-	int write(std::ostream &s) const;	// NOT IMPLEMENTED YET
+	bool write(std::ostream &s) const;	// NOT IMPLEMENTED YET
   // End of input/output functions
 	
 	
   // Metadata management
-  // Type management (every type has own set of fields)
+  // Types management (every type has own set of fields)
 	// Returns all types ids (ids are ordered by user)
 	std::vector<type_id_t> types() const;
 	
@@ -63,10 +61,10 @@ public:
 	
 	// Sets new name for existing type or returns invalid_type_id
 	type_id_t set_type_name(type_id_t tid, const std::string &type_name);
-  // End of type management
+  // End of types management
 	
 	
-  // Field management (field ids are unique for same type)
+  // Fields management (field ids are unique for same type)
 	// Returns all fields ids for type (ids are ordered by user) or empty vector
 	std::vector<tfield_id_t> type_fields(type_id_t tid) const;
 	
@@ -89,11 +87,11 @@ public:
 	
 	
 	// Returns field format, if field fid exists in type tid or ""
-	std::string type_field_format(type_id_t tid, tfield_id_t fid);
+	std::string type_field_format(type_id_t tid, tfield_id_t fid) const;
 	
 	// Sets field format, if field fid exists in type tid or returns invalid_tfield_id
 	tfield_id_t set_type_field_format(type_id_t tid, tfield_id_t fid, const std::string &format);
-  // End of field management
+  // End of fields management
   // End of metadata management
 	
 	
@@ -131,6 +129,9 @@ public:
 	// or returns invalid_group_id
 	group_id_t add_group(group_id_t gid, const std::string &group_name);
 	
+	// Generates new root group id and adds it or returns invalid_group_id
+	group_id_t add_root_group();
+	
 	
 	// Removes existing record or returns invalid_record_id
 	record_id_t remove_record(record_id_t rid);
@@ -151,9 +152,31 @@ public:
 	
 	// Sets new name for existing group or returns invalid_group_id
 	group_id_t set_group_name(group_id_t gid, const std::string &group_name);
+	
+	
+	// Returns record type id if record exists or invalid_type_id
+	type_id_t record_type(record_id_t rid) const;
+	
+	// Sets new type for existing record if if does not contain fields
+	// or returns invalid_record_id
+	record_id_t set_record_type(record_id_t rid, type_id_t record_type_id);
+	
+	
+	// Returns records parent group id if record exists or invalid_group_id
+	group_id_t record_parent_group(record_id_t rid) const;
+	
+	// Returns groups parent group id if group exists or invalid_group_id
+	group_id_t group_parent_group(group_id_t gid) const;
+	
+	
+	// Sets new parent group for existing record or returns invalid_record_id
+	record_id_t set_record_parent_group(record_id_t rid, group_id_t parent_group_id);
+	
+	// Sets new parent group for existing group or returns invalid_group_id
+	group_id_t set_group_parent_group(group_id_t gid, group_id_t parent_group_id);
   // End of records and groups management
 	
-  // Field management (field ids are unique for same record)
+  // Fields management (field ids are unique for same record)
 	// Returns all fields ids for record (ids are ordered by user) or empty vector
 	std::vector<rfield_id_t> fields(record_id_t rid) const;
 	
@@ -168,19 +191,23 @@ public:
 	rfield_id_t remove_field(record_id_t rid, rfield_id_t fid);
 	
 	// Returns field type, if field fid exists in record rid, or invalid_type_id
-	tfield_id_t field_type(record_id_t rid, rfield_id_t fid);
+	tfield_id_t field_type(record_id_t rid, rfield_id_t fid) const;
 	
 	// Sets field type or returns invalid_tfield_id, if it is impossible
 	rfield_id_t set_field_type(record_id_t rid, rfield_id_t fid, tfield_id_t type);
 	
 	
 	// Returns field data, if field fid exists in record rid, or ""
-	std::string field_data(record_id_t rid, rfield_id_t fid);
+	std::string field_data(record_id_t rid, rfield_id_t fid) const;
 	
 	// Sets field data, if field fid exists in record rid, or returns invalid_tfield_id
 	rfield_id_t set_field_data(record_id_t rid, rfield_id_t fid, const std::string &data);
-  // End of field management
+  // End of fields management
   // End of data management
+	
+	
+	// Clears all data and metadata
+	void clear();
 private:
   // Generators
 	// Default generators types

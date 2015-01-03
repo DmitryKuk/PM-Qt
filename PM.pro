@@ -12,7 +12,6 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-		cryptokernel/types.cpp\
 		mainwindow.cpp\
 		taskwidget.cpp\
 		tasklistwidget.cpp\
@@ -24,9 +23,10 @@ SOURCES += main.cpp\
 		settingssaver.cpp\
 		abstractitem.cpp\
 		groupitem.cpp\
-		passworditem.cpp
+		passworditem.cpp\
+		cryptokernelagent.cpp
 
-HEADERS += cryptokernel/types.h types.h\
+HEADERS += types.h\
 		mainwindow.h\
 		taskwidget.h\
 		tasklistwidget.h\
@@ -38,4 +38,7 @@ HEADERS += cryptokernel/types.h types.h\
 		settingssaver.h\
 		abstractitem.h\
 		groupitem.h\
-		passworditem.h
+		passworditem.h\
+		cryptokernelagent.h
+
+LIBS += cryptokernel/libcryptokernel.a

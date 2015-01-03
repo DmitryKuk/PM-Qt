@@ -17,7 +17,8 @@ TEST_SOURCES_CPP = \
 	test_dev_random.cpp \
 	test_random_map.cpp \
 	test_double_map.cpp \
-	test_cryptokernel.cpp
+	test_cryptokernel.cpp \
+	test_cryptokernel_io.cpp
 
 
 # Compiler and library archiever

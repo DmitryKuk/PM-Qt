@@ -94,6 +94,7 @@ public:
 	bool update21(const Key2 &k2, const Key1 &new_k1);
 	
 	inline size_t size() const;
+	inline void clear();
 	
 	const_iterator find1(const Key1 &k1) const;
 	const_iterator find2(const Key2 &k2) const;
