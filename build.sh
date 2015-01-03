@@ -9,8 +9,30 @@ if (( $# != 0 && $# != 1 )); then
 	exit 1
 fi
 
+# Building cryptokernel
+cd cryptokernel
+STATUS="$?"
+if [ "X$STATUS" != "X0" ]; then
+	echo "Build failed: can't find cryptokernel directory."
+	exit "$STATUS"
+fi
+
+make
+STATUS="$?"
+if [ "X$STATUS" != "X0" ]; then
+	echo "Build failed: can't build cryptokernel."
+	exit "$STATUS"
+fi
+
+cd ../
+
+# Building interface
 qmake -Wall && make
 STATUS="$?"
+if [ "X$STATUS" != "X0" ]; then
+	echo "Build failed: can't build interface."
+	exit "$STATUS"
+fi
 
 if [ "X$1" == "Xrun" ]; then
 	if [ "X$STATUS" == "X0" ]; then
