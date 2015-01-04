@@ -107,6 +107,10 @@ public:
 	// Returns all records ids in group gid
 	std::vector<record_id_t> records(group_id_t gid) const;
 	
+	// Returns all records of type tid
+	std::vector<record_id_t> records_of_type(type_id_t tid) const;
+	
+	
 	// Returns all groups ids
 	std::vector<group_id_t> groups() const;
 	

@@ -2,23 +2,11 @@
 
 #include "grouplistwidget.h"
 
-// TODO: Remove this test (some groups)
-#include "groupitem.h"
-
 GroupListWidget::GroupListWidget(QWidget *parent):
 	QTreeWidget(parent)
 {
 	this->setColumnCount(1);
-	this->setHeaderLabel(tr("Groups"));
-	
-	GroupItem *p = new GroupItem(1, "Home", this);
-	p = new GroupItem(2, "Copmuter passwords", p);
-	new GroupItem(3, "Linux", p);
-	new GroupItem(4, "Windows", p);
-	new GroupItem(5, "Etc", p);
-	
-	p = new GroupItem(6, "Work", this);
-	new GroupItem(7, "E-mail", p);
+	this->setHeaderLabel(tr("Filters"));
 }
 
 

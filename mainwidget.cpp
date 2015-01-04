@@ -4,14 +4,14 @@
 
 MainWidget::MainWidget(QWidget *parent):
 	QSplitter(parent),
-	passwordListWidget_(new PasswordListWidget(this)),
-	passwordContentWidget_(new PasswordContentWidget(this))
+	recordListWidget_(new RecordListWidget(this)),
+	recordContentWidget_(new RecordContentWidget(this))
 {
-	// Password list widget setting...
-	this->addWidget(this->passwordListWidget_);
+	// Record list widget setting...
+	this->addWidget(this->recordListWidget_);
 	
-	// Password content widget setting...
-	this->addWidget(this->passwordContentWidget_);
+	// Record content widget setting...
+	this->addWidget(this->recordContentWidget_);
 	
 	// Main setting...
 	this->setOrientation(Qt::Vertical);
@@ -27,8 +27,8 @@ void MainWidget::readSettings(QSettings &settings, const QString &prefix)
 	this->restoreState(settings.value(current_prefix + "/state").toByteArray());
 	
 	// Child widgets
-	this->passwordListWidget_->readSettings(settings, current_prefix);
-	this->passwordContentWidget_->readSettings(settings, current_prefix);
+	this->recordListWidget_->readSettings(settings, current_prefix);
+	this->recordContentWidget_->readSettings(settings, current_prefix);
 }
 
 void MainWidget::writeSettings(QSettings &settings, const QString &prefix) const
@@ -40,18 +40,18 @@ void MainWidget::writeSettings(QSettings &settings, const QString &prefix) const
 	settings.setValue(current_prefix + "/state", this->saveState());
 	
 	// Child widgets
-	this->passwordListWidget_->writeSettings(settings, current_prefix);
-	this->passwordContentWidget_->writeSettings(settings, current_prefix);
+	this->recordListWidget_->writeSettings(settings, current_prefix);
+	this->recordContentWidget_->writeSettings(settings, current_prefix);
 }
 
 
-PasswordListWidget * MainWidget::passwordListWidget()
+RecordListWidget * MainWidget::recordListWidget()
 {
-	return this->passwordListWidget_;
+	return this->recordListWidget_;
 }
 
 
-PasswordContentWidget * MainWidget::passwordContentWidget()
+RecordContentWidget * MainWidget::recordContentWidget()
 {
-	return this->passwordContentWidget_;
+	return this->recordContentWidget_;
 }

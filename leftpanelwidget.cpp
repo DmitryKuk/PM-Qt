@@ -38,12 +38,8 @@ void LeftPanelWidget::writeSettings(QSettings &settings, const QString &prefix) 
 
 
 GroupListWidget * LeftPanelWidget::groupListWidget()
-{
-	return this->groupListWidget_;
-}
+{ return this->groupListWidget_; }
 
 
 TaskListWidget * LeftPanelWidget::taskListWidget()
-{
-	return this->taskListWidget_;
-}
+{ return this->taskListWidget_; }

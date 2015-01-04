@@ -2,6 +2,8 @@
 
 #include "mainwindow.h"
 
+#include "cryptokernelagent.h"
+
 MainWindow::MainWindow(const QString &title,
 					   bool autoLoadSettings,
 					   bool autoSaveSettings,
@@ -61,6 +63,14 @@ MainWindow::MainWindow(const QString &title,
 	// Main setting...
 	this->setWindowTitle(title);
 	this->setCentralWidget(this->mainSplit_);
+	
+	this->connect(this->leftPanelWidget()->groupListWidget(), &GroupListWidget::itemSelectionChanged,
+				  this, &MainWindow::updateRecordListItems);
+}
+
+MainWindow::~MainWindow()
+{
+	removeAgent();
 }
 
 
@@ -97,26 +107,10 @@ void MainWindow::writeSettings(QSettings &settings, const QString &prefix) const
 }
 
 
-bool MainWindow::needSaveSettings() const
+void MainWindow::updateRecordListItems()
 {
-	return this->saveSettings_;
-}
-
-void MainWindow::setSaveSettings(bool enable)
-{
-	this->saveSettings_ = enable;
-}
-
-
-LeftPanelWidget * MainWindow::leftPanelWidget()
-{
-	return this->leftPanelWidget_;
-}
-
-
-MainWidget * MainWindow::mainWidget()
-{
-	return this->mainWidget_;
+	if (this->agent_ == nullptr) return;
+	this->agent_->updateRecordListItems();
 }
 
 

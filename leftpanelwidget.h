@@ -29,8 +29,8 @@ class LeftPanelWidget:
 public:
 	LeftPanelWidget(QWidget *parent = nullptr);
 	
-	void readSettings(QSettings &settings, const QString &prefix = "");
-	void writeSettings(QSettings &settings, const QString &prefix = "") const;
+	void readSettings(QSettings &settings, const QString &prefix = "") override;
+	void writeSettings(QSettings &settings, const QString &prefix = "") const override;
 	
 	GroupListWidget * groupListWidget();
 	TaskListWidget * taskListWidget();

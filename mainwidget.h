@@ -5,8 +5,8 @@
 
 #include <QtWidgets>
 
-#include "passwordlistwidget.h"
-#include "passwordcontentwidget.h"
+#include "recordlistwidget.h"
+#include "recordcontentwidget.h"
 #include "settingssaver.h"
 
 class MainWidget: public QSplitter
@@ -14,13 +14,13 @@ class MainWidget: public QSplitter
 	Q_OBJECT
 	
 	// Properties
-	Q_PROPERTY(PasswordListWidget *passwordListWidget
-			   READ passwordListWidget
+	Q_PROPERTY(RecordListWidget *recordListWidget
+			   READ recordListWidget
 			   DESIGNABLE false
 			   SCRIPTABLE false
 			   USER false);
-	Q_PROPERTY(PasswordContentWidget *passwordContentWidget
-			   READ passwordContentWidget
+	Q_PROPERTY(RecordContentWidget *recordContentWidget
+			   READ recordContentWidget
 			   DESIGNABLE false
 			   SCRIPTABLE false
 			   USER false);
@@ -30,11 +30,11 @@ public:
 	void readSettings(QSettings &settings, const QString &prefix = "");
 	void writeSettings(QSettings &settings, const QString &prefix = "") const;
 	
-	virtual PasswordListWidget * passwordListWidget();
-	virtual PasswordContentWidget * passwordContentWidget();
+	virtual RecordListWidget * recordListWidget();
+	virtual RecordContentWidget * recordContentWidget();
 private:
-	PasswordListWidget *passwordListWidget_;
-	PasswordContentWidget *passwordContentWidget_;
+	RecordListWidget *recordListWidget_;
+	RecordContentWidget *recordContentWidget_;
 };
 
 #endif	// MAINWIDGET_H

@@ -38,7 +38,7 @@ if [ "X$1" == "Xrun" ]; then
 	if [ "X$STATUS" == "X0" ]; then
 		TARGET_SYSTEM="$( uname )"
 		case "$( uname )" in
-			"Darwin") open PM.app/ ;;
+			"Darwin") ./PM.app/Contents/MacOS/PM ;; #open PM.app/ ;;
 			"Linux") ./PM ;;
 			"Windows") echo -e "It's a joke I hope: uname says this is Windows OS.\nI can\'t run output file." ;;
 			*) echo -e "Sorry, I don't know how to build it for target system \"$TARGET_SYSTEM\".\nSee \"build.sh\" for more information."

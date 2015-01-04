@@ -1,10 +1,5 @@
 // Author: Dmitry Kukovinets (d1021976@gmail.com)
 
-inline id_t AbstractItem::id() const
-{
-	return this->id_;
-}
-
 inline QString AbstractItem::name() const
 {
 	return this->text(0);

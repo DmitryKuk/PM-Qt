@@ -2,14 +2,16 @@
 
 #include "groupitem.h"
 
-GroupItem::GroupItem(id_t id,
-					 const QString &groupName,
+GroupItem::GroupItem(const QString &groupName,
 					 GroupItem *parent):
-	AbstractItem(id, groupName, parent)
+	AbstractItem(groupName, parent)
 {}
 
-GroupItem::GroupItem(id_t id,
-					 const QString &groupName,
+GroupItem::GroupItem(const QString &groupName,
 					 QTreeWidget *parent):
-	AbstractItem(id, groupName, parent)
+	AbstractItem(groupName, parent)
 {}
+
+
+int GroupItem::itemType() const
+{ return ::ItemType::Group; }

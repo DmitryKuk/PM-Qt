@@ -1,22 +1,29 @@
 // Author: Dmitry Kukovinets (d1021976@gmail.com)
 
-#ifndef GROUPLISTWIDGET_H
-#define GROUPLISTWIDGET_H
+#ifndef RECORDLISTWIDGET_H
+#define RECORDLISTWIDGET_H
 
 #include <QtWidgets>
 
 #include "settingssaver.h"
 
-class GroupListWidget:
+namespace RecordFieldPos {	// See RecordListWidget constructor!
+extern const int
+	Name,			// = 0
+	TypeName,		// = 1
+	ParentGroup;	// = 2
+};
+	
+
+class RecordListWidget:
 	public QTreeWidget,
 	public SettingsSaver
 {
-	Q_OBJECT
 public:
-	GroupListWidget(QWidget *parent = nullptr);
+	RecordListWidget(QWidget *parent = nullptr);
 	
 	void readSettings(QSettings &settings, const QString &prefix = "") override;
 	void writeSettings(QSettings &settings, const QString &prefix = "") const override;
 };
 
-#endif	// GROUPLISTWIDGET_H
+#endif // RECORDLISTWIDGET_H

@@ -12,6 +12,8 @@
 #include "leftpanelwidget.h"
 #include "mainwidget.h"
 
+class CryptoKernelAgent;
+
 class MainWindow:
 	public QMainWindow,
 	public SettingsSaver
@@ -30,18 +32,27 @@ public:
 			   bool autoLoadSettings = true,
 			   bool autoSaveSettings = true,
 			   QWidget *parent = nullptr);
+	~MainWindow();
 	
-	void readSettings(QSettings &settings, const QString &prefix = "");
-	void writeSettings(QSettings &settings, const QString &prefix = "") const;
+	void readSettings(QSettings &settings, const QString &prefix = "") override;
+	void writeSettings(QSettings &settings, const QString &prefix = "") const override;
 	
 	bool needSaveSettings() const;
 	void setSaveSettings(bool enable);
 	
-	virtual LeftPanelWidget * leftPanelWidget();
-	virtual MainWidget * mainWidget();
+	inline LeftPanelWidget * leftPanelWidget() const;
+	inline MainWidget * mainWidget() const;
+	
+	inline CryptoKernelAgent * agent() const;
+	inline bool addAgent(CryptoKernelAgent *agent);
+	inline bool removeAgent();
+	
+	void updateRecordListItems();
 protected:
 	void closeEvent(QCloseEvent *event);
 private:
+	CryptoKernelAgent *agent_;
+	
 	QSplitter *mainSplit_;
 	LeftPanelWidget *leftPanelWidget_;
 	MainWidget *mainWidget_;
@@ -49,4 +60,5 @@ private:
 	bool saveSettings_;
 };
 
+#include "mainwindow.hpp"
 #endif	// MAINWINDOW_H

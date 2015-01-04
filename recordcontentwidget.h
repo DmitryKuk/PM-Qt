@@ -7,16 +7,16 @@
 
 #include "settingssaver.h"
 
-class PasswordContentWidget:
+class RecordContentWidget:
 	public QGroupBox,
 	public SettingsSaver
 {
 	Q_OBJECT
 public:
-	PasswordContentWidget(QWidget *parent = nullptr);
+	RecordContentWidget(QWidget *parent = nullptr);
 	
-	void readSettings(QSettings &settings, const QString &prefix = "");
-	void writeSettings(QSettings &settings, const QString &prefix = "") const;
+	void readSettings(QSettings &settings, const QString &prefix = "") override;
+	void writeSettings(QSettings &settings, const QString &prefix = "") const override;
 private:
 	QLabel *label_;
 };

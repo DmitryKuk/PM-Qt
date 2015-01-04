@@ -11,34 +11,36 @@ TARGET = PM
 TEMPLATE = app
 
 
-SOURCES += main.cpp\
-		mainwindow.cpp\
-		taskwidget.cpp\
-		tasklistwidget.cpp\
-		leftpanelwidget.cpp\
-		mainwidget.cpp\
-		grouplistwidget.cpp\
-		passwordlistwidget.cpp\
-		passwordcontentwidget.cpp\
-		settingssaver.cpp\
-		abstractitem.cpp\
-		groupitem.cpp\
-		passworditem.cpp\
+SOURCES += main.cpp \
+		mainwindow.cpp \
+		taskwidget.cpp \
+		tasklistwidget.cpp \
+		leftpanelwidget.cpp \
+		mainwidget.cpp \
+		grouplistwidget.cpp \
+		recordlistwidget.cpp \
+		recordcontentwidget.cpp \
+		settingssaver.cpp \
+		abstractitem.cpp \
+		groupitem.cpp \
+		recorditem.cpp \
+		typeitem.cpp \
 		cryptokernelagent.cpp
 
-HEADERS += types.h\
-		mainwindow.h\
-		taskwidget.h\
-		tasklistwidget.h\
-		leftpanelwidget.h\
-		mainwidget.h\
-		grouplistwidget.h\
-		passwordlistwidget.h\
-		passwordcontentwidget.h\
-		settingssaver.h\
-		abstractitem.h\
-		groupitem.h\
-		passworditem.h\
-		cryptokernelagent.h
+HEADERS += types.h \
+		mainwindow.h mainwindow.hpp \
+		taskwidget.h \
+		tasklistwidget.h \
+		leftpanelwidget.h \
+		mainwidget.h \
+		grouplistwidget.h \
+		recordlistwidget.h \
+		recordcontentwidget.h \
+		settingssaver.h \
+		abstractitem.h abstractitem.hpp \
+		groupitem.h \
+		recorditem.h \
+		typeitem.h \
+		cryptokernelagent.h cryptokernelagent.hpp
 
 LIBS += cryptokernel/libcryptokernel.a

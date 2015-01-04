@@ -7,14 +7,15 @@
 
 #include <QString>
 
-#include "types.h"
 #include "abstractitem.h"
 
 class GroupItem: public AbstractItem
 {
 public:
-	GroupItem(id_t id, const QString &groupName, GroupItem *parent = nullptr);
-	GroupItem(id_t id, const QString &groupName, QTreeWidget *parent = nullptr);
+	GroupItem(const QString &groupName, GroupItem *parent = nullptr);
+	GroupItem(const QString &groupName, QTreeWidget *parent = nullptr);
+	
+	virtual int itemType() const override;
 };
 
 #endif // GROUPITEM_H

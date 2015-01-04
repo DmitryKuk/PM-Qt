@@ -2,23 +2,32 @@
 
 #include "abstractitem.h"
 
-AbstractItem::AbstractItem(id_t id,
-						   const QString &itemName,
+
+// Item types
+const int
+	ItemType::Abstract = 0,
+	ItemType::Group = 10,
+	ItemType::Record = 20,
+	ItemType::Type = 30;
+
+
+AbstractItem::AbstractItem(const QString &itemName,
 						   AbstractItem *parent):
-	QTreeWidgetItem(parent),
-	id_(id)
+	QTreeWidgetItem(parent)
 {
 	this->setText(0, itemName);
 }
 
-AbstractItem::AbstractItem(id_t id,
-						   const QString &itemName,
+AbstractItem::AbstractItem(const QString &itemName,
 						   QTreeWidget *parent):
-	QTreeWidgetItem(parent),
-	id_(id)
+	QTreeWidgetItem(parent)
 {
 	this->setText(0, itemName);
 }
 
 AbstractItem::~AbstractItem()
 {}
+
+
+int AbstractItem::itemType() const
+{ return ::ItemType::Abstract; }

@@ -609,6 +609,21 @@ cryptokernel::records(group_id_t gid) const
 	return std::vector<record_id_t>();
 }
 
+// Returns all records of type tid
+std::vector<record_id_t>
+cryptokernel::records_of_type(type_id_t tid) const
+{
+	std::vector<record_id_t> res;
+	if (!this->test_type(tid)) return res;
+	
+	// Search for records of type tid (linear time)
+	for (const auto &record: this->records_)
+		if (record.second.type == tid)
+			res.push_back(record.first);
+	return res;
+}
+
+
 // Returns all groups ids
 std::vector<group_id_t>
 cryptokernel::groups() const
