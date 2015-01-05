@@ -45,7 +45,9 @@ public:
 	
 	CryptoKernelAgent * agent() const;
 	
+	// Update functions
 	void updateRecordListItems();
+	void updateRecordContent();
 protected:
 	void closeEvent(QCloseEvent *event);
 private:

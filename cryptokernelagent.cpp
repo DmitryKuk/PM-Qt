@@ -67,10 +67,10 @@ void CryptoKernelAgent::updateRecordListItems()
 	// Lambda-helpers
 	auto showRecordItem = [this, &oldShownRecordItems](RecordItem *recordItem) {
 		try {
-			auto recordItemInList = this->recordItemsMap_.at(recordItem).second;
-			recordItemInList->setHidden(false);					// Showing item
-			this->shownRecordItems_.insert(recordItemInList);	// Updating agent's cache
-			oldShownRecordItems.erase(recordItemInList);		// DON'T FORGET to update this later
+			auto recordListItem = this->recordItemsMap_.at(recordItem).second;
+			recordListItem->setHidden(false);				// Showing item
+			this->shownRecordItems_.insert(recordListItem);	// Updating agent's cache
+			oldShownRecordItems.erase(recordListItem);		// DON'T FORGET to update this later
 		} catch (...) {}
 	};
 	
@@ -102,7 +102,7 @@ void CryptoKernelAgent::updateRecordListItems()
 	
 	
 	for (auto &selectedItem: selectedItemsList) {
-		auto selectedItemType = selectedItem->data(0, Qt::UserRole);
+		int selectedItemType = selectedItem->data(0, Qt::UserRole).toInt();
 		
 		if (selectedItemType == ItemType::Record) {	// Simply showing record item
 			showRecordItem(reinterpret_cast<RecordItem *>(selectedItem));
@@ -140,6 +140,50 @@ void CryptoKernelAgent::updateRecordListItems()
 	// Updating agent's cache
 	for (auto notSelectedItemInList: oldShownRecordItems)
 		notSelectedItemInList->setHidden(true);
+}
+
+
+void CryptoKernelAgent::updateRecordContent()
+{
+	if (this->mainWindow() == nullptr) return;
+	
+	auto recordListWidget = this->mainWindow()->mainWidget()->recordListWidget();
+	auto recordContentWidget = this->mainWindow()->mainWidget()->recordContentWidget();
+	
+	auto selectedRecordItems = recordListWidget->selectedItems();
+	if (selectedRecordItems.size() != 1) {	// Selected 0 or >1 items: don't need to show fields
+		recordContentWidget->clearFields();
+		return;
+	}
+	
+	try {
+		// Record metadata
+		auto recordItem = selectedRecordItems[0];
+		auto recordId = this->recordListItemsMap_.at(recordItem);
+		auto typeId = this->kernel_.record_type(recordId);
+		auto parentGroupId = this->kernel_.record_parent_group(recordId);
+		
+		const QString &typeName = this->typeIdsMap_.at(typeId)->name();
+		const QString &parentGroupName = this->groupIdsMap_.at(parentGroupId)->name();
+		
+		// Filling record metadata
+		QList<QPair<QString, QString>> fieldsToShow;
+		fieldsToShow.append(qMakePair(QObject::tr("Type"), typeName));
+		fieldsToShow.append(qMakePair(QObject::tr("Group"), parentGroupName));
+		
+		// Processing record fields
+		for (auto fieldId: this->kernel_.fields(recordId)) {
+			auto fieldTypeId = this->kernel_.field_type(recordId, fieldId);
+			auto fieldTypeName = QString::fromStdString(this->kernel_.type_field_name(typeId, fieldTypeId));
+			auto fieldData = QString::fromStdString(this->kernel_.field_data(recordId, fieldId));
+			
+			fieldsToShow.append(qMakePair(fieldTypeName, fieldData));
+		}
+		
+		recordContentWidget->setFields(fieldsToShow);
+	} catch (...) {
+		recordContentWidget->clearFields();
+	}
 }
 
 
@@ -219,22 +263,24 @@ void CryptoKernelAgent::showData()
 			
 			
 			// Adding data into recordListWidget
-			auto recordItemInList = new QTreeWidgetItem(recordListWidget);
-			recordItemInList->setText(RecordFieldPos::Name, recordName);
+			auto recordListItem = new QTreeWidgetItem(recordListWidget);
+			recordListItem->setText(RecordFieldPos::Name,
+									  recordName);
 			
 			auto recordTypeId = this->kernel_.record_type(recordId);
-			recordItemInList->setText(RecordFieldPos::TypeName,
-									this->typeIdsMap_[recordTypeId]->name());
+			recordListItem->setText(RecordFieldPos::TypeName,
+									  this->typeIdsMap_[recordTypeId]->name());
 			
 			auto recordParentGroupId = this->kernel_.record_parent_group(recordId);
-			recordItemInList->setText(RecordFieldPos::ParentGroup,
-									this->groupIdsMap_[recordParentGroupId]->name());
+			recordListItem->setText(RecordFieldPos::ParentGroup,
+									  this->groupIdsMap_[recordParentGroupId]->name());
 			
 			
 			// Updating agent's cached relations
-			this->recordItemsMap_[recordItem] = std::make_pair(recordId, recordItemInList);
+			this->recordItemsMap_[recordItem] = std::make_pair(recordId, recordListItem);
 			this->recordIdsMap_[recordId] = recordItem;
-			this->shownRecordItems_.insert(recordItemInList);
+			this->recordListItemsMap_[recordListItem] = recordId;
+			this->shownRecordItems_.insert(recordListItem);
 		}
 	}
 }

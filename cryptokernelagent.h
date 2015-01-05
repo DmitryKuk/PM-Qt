@@ -37,7 +37,10 @@ public:
 	MainWindow * mainWindow() const;
 	
 	void run();
+	
+	// Update functions
 	void updateRecordListItems();
+	void updateRecordContent();
 private:
 	void showData();
 	
@@ -68,6 +71,8 @@ private:
 	// Record id -> record item *
 	std::unordered_map<record_id_t, RecordItem *> recordIdsMap_;
 	
+	// Record item in list -> record id
+	std::unordered_map<QTreeWidgetItem *, record_id_t> recordListItemsMap_;
 	
 	// Records are shown in record list in mainWindow->mainWidget->recordListWidget
 	// This set is part of set of all "QTreeWidgetItem *"s im recordItemsMap_

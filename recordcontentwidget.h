@@ -5,6 +5,12 @@
 
 #include <QtWidgets>
 
+#include <QString>
+#include <QList>
+#include <QPair>
+
+#include <unordered_map>
+
 #include "settingssaver.h"
 
 class RecordContentWidget:
@@ -14,11 +20,20 @@ class RecordContentWidget:
 	Q_OBJECT
 public:
 	RecordContentWidget(QWidget *parent = nullptr);
+	~RecordContentWidget();
+	
+	void setFields(const QList<QPair<QString, QString>> &fields);
+	void clearFields();
 	
 	void readSettings(QSettings &settings, const QString &prefix = "") override;
 	void writeSettings(QSettings &settings, const QString &prefix = "") const override;
 private:
-	QLabel *label_;
+	QVBoxLayout *mainLayout_;
+	
+	QScrollArea *scrollArea_;
+	QFormLayout *formLayout_;
+	
+	std::unordered_map<QPushButton *, QLineEdit *> buttonEditMap_;
 };
 
 #endif // PASSWORDCONTENTWIDGET_H
