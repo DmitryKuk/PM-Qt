@@ -27,24 +27,25 @@
 #include "recorditem.h"
 #include "typeitem.h"
 
+
 class CryptoKernelAgent
 {
 public:
 	CryptoKernelAgent();
 	~CryptoKernelAgent();
 	
-	inline MainWindow * mainWindow() const;
-	inline bool addMainWindow(MainWindow *mainWindow);
-	inline bool removeMainWindow();
+	MainWindow * mainWindow() const;
 	
-	void showData();
+	void run();
 	void updateRecordListItems();
 private:
-	inline QString typeName(RecordItem *recordItem) const;
-	inline QString parentGroupName(RecordItem *recordItem) const;
+	void showData();
 	
-	inline void showRecordInList(RecordItem *recordItem);
-	inline void hideRecordInList(RecordItem *recordItem);
+	QString typeName(RecordItem *recordItem) const;
+	QString parentGroupName(RecordItem *recordItem) const;
+	
+	void showRecordInList(RecordItem *recordItem);
+	void hideRecordInList(RecordItem *recordItem);
 	
 	
 	cryptokernel kernel_;		// Cryptokernel used by this agent
@@ -88,9 +89,4 @@ private:
 	CryptoKernelAgent & operator=(const CryptoKernelAgent &other);
 };
 
-// Connects (or disconnects) agent and its main window
-inline bool connect(CryptoKernelAgent *agent, MainWindow *mainWindow);
-inline bool disconnect(CryptoKernelAgent *agent, MainWindow *mainWindow);
-
-#include "cryptokernelagent.hpp"
 #endif // CRYPTOKERNELAGENT_H

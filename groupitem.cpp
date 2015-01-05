@@ -11,7 +11,3 @@ GroupItem::GroupItem(const QString &groupName,
 					 QTreeWidget *parent):
 	AbstractItem(groupName, parent)
 {}
-
-
-int GroupItem::itemType() const
-{ return ::ItemType::Group; }

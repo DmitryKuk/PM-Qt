@@ -2,15 +2,6 @@
 
 #include "abstractitem.h"
 
-
-// Item types
-const int
-	ItemType::Abstract = 0,
-	ItemType::Group = 10,
-	ItemType::Record = 20,
-	ItemType::Type = 30;
-
-
 AbstractItem::AbstractItem(const QString &itemName,
 						   AbstractItem *parent):
 	QTreeWidgetItem(parent)
@@ -29,5 +20,12 @@ AbstractItem::~AbstractItem()
 {}
 
 
-int AbstractItem::itemType() const
-{ return ::ItemType::Abstract; }
+QString AbstractItem::name() const
+{
+	return this->text(0);
+}
+
+void AbstractItem::setName(const QString &newName)
+{
+	this->setText(0, newName);
+}

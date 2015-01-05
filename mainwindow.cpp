@@ -4,11 +4,13 @@
 
 #include "cryptokernelagent.h"
 
-MainWindow::MainWindow(const QString &title,
+MainWindow::MainWindow(CryptoKernelAgent *agent,
+					   const QString &title,
 					   bool autoLoadSettings,
 					   bool autoSaveSettings,
 					   QWidget *parent):
 	QMainWindow(parent),
+	agent_(agent),
 	mainSplit_(new QSplitter(this)),
 	leftPanelWidget_(new LeftPanelWidget(mainSplit_)),
 	mainWidget_(new MainWidget(mainSplit_)),
@@ -68,11 +70,6 @@ MainWindow::MainWindow(const QString &title,
 				  this, &MainWindow::updateRecordListItems);
 }
 
-MainWindow::~MainWindow()
-{
-	removeAgent();
-}
-
 
 void MainWindow::readSettings(QSettings &settings, const QString &prefix)
 {
@@ -105,6 +102,25 @@ void MainWindow::writeSettings(QSettings &settings, const QString &prefix) const
 	this->leftPanelWidget_->writeSettings(settings, current_prefix);
 	this->mainWidget_->writeSettings(settings, current_prefix);
 }
+
+
+bool MainWindow::needSaveSettings() const
+{ return this->saveSettings_; }
+
+void MainWindow::setSaveSettings(bool enable)
+{ this->saveSettings_ = enable; }
+
+
+LeftPanelWidget * MainWindow::leftPanelWidget() const
+{ return this->leftPanelWidget_; }
+
+
+MainWidget * MainWindow::mainWidget() const
+{ return this->mainWidget_; }
+
+
+CryptoKernelAgent * MainWindow::agent() const
+{ return this->agent_; }
 
 
 void MainWindow::updateRecordListItems()

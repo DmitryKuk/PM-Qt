@@ -28,11 +28,11 @@ class MainWindow:
 			   SCRIPTABLE false
 			   USER true);
 public:
-	MainWindow(const QString &title = tr("PM"),
+	MainWindow(CryptoKernelAgent *agent,
+			   const QString &title = tr("PM"),
 			   bool autoLoadSettings = true,
 			   bool autoSaveSettings = true,
 			   QWidget *parent = nullptr);
-	~MainWindow();
 	
 	void readSettings(QSettings &settings, const QString &prefix = "") override;
 	void writeSettings(QSettings &settings, const QString &prefix = "") const override;
@@ -40,12 +40,10 @@ public:
 	bool needSaveSettings() const;
 	void setSaveSettings(bool enable);
 	
-	inline LeftPanelWidget * leftPanelWidget() const;
-	inline MainWidget * mainWidget() const;
+	LeftPanelWidget * leftPanelWidget() const;
+	MainWidget * mainWidget() const;
 	
-	inline CryptoKernelAgent * agent() const;
-	inline bool addAgent(CryptoKernelAgent *agent);
-	inline bool removeAgent();
+	CryptoKernelAgent * agent() const;
 	
 	void updateRecordListItems();
 protected:
@@ -60,5 +58,4 @@ private:
 	bool saveSettings_;
 };
 
-#include "mainwindow.hpp"
 #endif	// MAINWINDOW_H

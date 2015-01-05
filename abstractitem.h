@@ -8,17 +8,6 @@
 
 #include <QString>
 
-namespace ItemType {
-
-extern const int
-	Abstract,	// = 0
-	Group,		// = 10
-	Record,		// = 20
-	Type;		// = 30
-
-};
-
-
 class AbstractItem: public QTreeWidgetItem
 {
 public:
@@ -26,11 +15,8 @@ public:
 	AbstractItem(const QString &itemName, QTreeWidget *parent = nullptr);
 	virtual ~AbstractItem() = 0;
 	
-	virtual int itemType() const;
-	
-	inline QString name() const;
-	inline void setName(const QString &newName);
+	QString name() const;
+	void setName(const QString &newName);
 };
 
-#include "abstractitem.hpp"
 #endif // ABSTRACTITEM_H

@@ -6,8 +6,20 @@
 #include <fstream>
 #include <queue>
 
+// Constants for identification of selected elements in groupListWidget
+// Set one of these with setData(0, Qt::UserRole, oneOfThese)
+namespace ItemType {
+static const int
+	Record			= 10,
+	Group			= 20,
+	Type			= 30,
+	RootGroup		= 40,
+	RootTypeGroup	= 50;
+};
+
+
 CryptoKernelAgent::CryptoKernelAgent():
-	mainWindow_(nullptr),
+	mainWindow_(new MainWindow(this)),
 	rootTypeGroup_(nullptr)
 {
 	std::ifstream f("test_input.txt");
@@ -22,8 +34,112 @@ CryptoKernelAgent::CryptoKernelAgent():
 
 CryptoKernelAgent::~CryptoKernelAgent()
 {
-	if (this->mainWindow() != nullptr)
-		disconnect(this, this->mainWindow());
+	delete this->mainWindow_;
+}
+
+
+MainWindow * CryptoKernelAgent::mainWindow() const
+{ return this->mainWindow_; }
+
+
+void CryptoKernelAgent::run()
+{
+	this->showData();
+	this->mainWindow()->show();
+}
+
+
+void CryptoKernelAgent::updateRecordListItems()
+{
+	if (this->mainWindow() == nullptr) return;
+	
+	auto groupListWidget = this->mainWindow()->leftPanelWidget()->groupListWidget();
+	auto selectedItemsList = groupListWidget->selectedItems();
+	
+	// New set of shown items
+	std::unordered_set<QTreeWidgetItem *> oldShownRecordItems;
+	oldShownRecordItems.swap(this->shownRecordItems_);
+	
+	// Queue for searching records in groups (BFS)
+	std::queue<group_id_t> groupIdQueue;
+	
+	
+	// Lambda-helpers
+	auto showRecordItem = [this, &oldShownRecordItems](RecordItem *recordItem) {
+		try {
+			auto recordItemInList = this->recordItemsMap_.at(recordItem).second;
+			recordItemInList->setHidden(false);					// Showing item
+			this->shownRecordItems_.insert(recordItemInList);	// Updating agent's cache
+			oldShownRecordItems.erase(recordItemInList);		// DON'T FORGET to update this later
+		} catch (...) {}
+	};
+	
+	auto showRecordsByTypeItem = [this, &showRecordItem](TypeItem *typeItem) {
+		try {
+			auto typeId = this->typeItemsMap_.at(typeItem);
+			
+			auto recordIds = std::move(this->kernel_.records_of_type(typeId));
+			for (auto recordId: recordIds) {
+				try {
+					auto recordItem = this->recordIdsMap_.at(recordId);
+					showRecordItem(recordItem);
+				} catch (...) {}
+			}
+		} catch (...) {}
+	};
+	
+	
+	auto processGroupId = [this, &groupIdQueue, &showRecordItem](group_id_t groupId) {
+		for (auto childGroupId: this->kernel_.groups(groupId))
+			groupIdQueue.push(childGroupId);
+		for (auto childRecordId: this->kernel_.records(groupId)) {
+			try {
+				auto childRecordItem = this->recordIdsMap_.at(childRecordId);
+				showRecordItem(childRecordItem);
+			} catch (...) {}
+		}
+	};
+	
+	
+	for (auto &selectedItem: selectedItemsList) {
+		auto selectedItemType = selectedItem->data(0, Qt::UserRole);
+		
+		if (selectedItemType == ItemType::Record) {	// Simply showing record item
+			showRecordItem(reinterpret_cast<RecordItem *>(selectedItem));
+		} else if (selectedItemType == ItemType::Group) {	// Adding group into the queue for processing
+			auto groupItem = reinterpret_cast<GroupItem *>(selectedItem);
+			group_id_t groupId;
+			try {
+				groupId = this->groupItemsMap_.at(groupItem);
+			} catch (...) {}
+			processGroupId(groupId);
+		} else if (selectedItemType == ItemType::Type) {	// Showing all records of this type
+			showRecordsByTypeItem(reinterpret_cast<TypeItem *>(selectedItem));
+		} else if (selectedItemType == ItemType::RootGroup) {	// "Data"
+			auto rootGroupItem = reinterpret_cast<GroupItem *>(selectedItem);
+			group_id_t rootGroupId;
+			try {
+				rootGroupId = this->groupItemsMap_.at(rootGroupItem);
+			} catch (...) { break; }
+			processGroupId(rootGroupId);
+		} else if (selectedItemType == ItemType::RootTypeGroup) {	// "Types"
+			// Processing all child types (all types)
+			for (auto i = selectedItem->childCount() - 1; i >= 0; --i)
+				showRecordsByTypeItem(reinterpret_cast<TypeItem *>(selectedItem->child(i)));
+		}	// Else variant is impossible
+	}
+	
+	// Groups BFS
+	while (!groupIdQueue.empty()) {
+		auto groupId = groupIdQueue.front();
+		groupIdQueue.pop();
+		
+		processGroupId(groupId);
+	}
+	
+	// Updating agent's cache
+	for (auto notSelectedItemInList: oldShownRecordItems)
+		notSelectedItemInList->setHidden(true);
 }
 
 
@@ -39,6 +155,8 @@ void CryptoKernelAgent::showData()
 		// Root group
 		auto rootGroupId = this->kernel_.root_group_id();
 		auto rootGroupItem = new GroupItem(QObject::tr("Data"), rootGroupWidget);
+		rootGroupItem->setData(0, Qt::UserRole, ItemType::RootGroup);
+		rootGroupItem->setExpanded(true);
 		
 		this->groupItemsMap_[rootGroupItem] = rootGroupId;
 		this->groupIdsMap_[rootGroupId] = rootGroupItem;
@@ -59,6 +177,7 @@ void CryptoKernelAgent::showData()
 				
 				QString childGroupName = QString::fromStdString(this->kernel_.group_name(childGroupId));
 				auto childGroupItem = new GroupItem(childGroupName, currentGroupItem);
+				childGroupItem->setData(0, Qt::UserRole, ItemType::Group);
 				
 				// Updating agent cached relations
 				this->groupItemsMap_[childGroupItem] = childGroupId;
@@ -70,10 +189,13 @@ void CryptoKernelAgent::showData()
 	// Adding types
 	{
 		this->rootTypeGroup_ = new GroupItem(QObject::tr("Types"), rootGroupWidget);
+		this->rootTypeGroup_->setData(0, Qt::UserRole, ItemType::RootTypeGroup);
+		this->rootTypeGroup_->setExpanded(true);
 		
 		for (auto typeId: this->kernel_.types()) {
 			QString typeName = QString::fromStdString(this->kernel_.type_name(typeId));
 			TypeItem *typeItem = new TypeItem(typeName, this->rootTypeGroup_);
+			typeItem->setData(0, Qt::UserRole, ItemType::Type);
 			
 			// Updating agent cached relations
 			this->typeItemsMap_[typeItem] = typeId;
@@ -89,105 +211,68 @@ void CryptoKernelAgent::showData()
 			auto parentGroupId = this->kernel_.record_parent_group(recordId);
 			auto parentGroupItem = this->groupIdsMap_[parentGroupId];
 			
+			
+			// Adding data into groupsListWidget
 			QString recordName = QString::fromStdString(this->kernel_.record_name(recordId));
 			RecordItem *recordItem = new RecordItem(recordName, parentGroupItem);
+			recordItem->setData(0, Qt::UserRole, ItemType::Record);
 			
-			// Adding data into records list
-			auto recordListItem = new QTreeWidgetItem(recordListWidget);
-			recordListItem->setText(RecordFieldPos::Name, recordName);
+			
+			// Adding data into recordListWidget
+			auto recordItemInList = new QTreeWidgetItem(recordListWidget);
+			recordItemInList->setText(RecordFieldPos::Name, recordName);
 			
 			auto recordTypeId = this->kernel_.record_type(recordId);
-			recordListItem->setText(RecordFieldPos::TypeName,
+			recordItemInList->setText(RecordFieldPos::TypeName,
 									this->typeIdsMap_[recordTypeId]->name());
 			
 			auto recordParentGroupId = this->kernel_.record_parent_group(recordId);
-			recordListItem->setText(RecordFieldPos::ParentGroup,
+			recordItemInList->setText(RecordFieldPos::ParentGroup,
 									this->groupIdsMap_[recordParentGroupId]->name());
 			
+			
 			// Updating agent's cached relations
-			this->recordItemsMap_[recordItem] = std::make_pair(recordId, recordListItem);
+			this->recordItemsMap_[recordItem] = std::make_pair(recordId, recordItemInList);
 			this->recordIdsMap_[recordId] = recordItem;
-			this->shownRecordItems_.insert(recordItem);
+			this->shownRecordItems_.insert(recordItemInList);
 		}
 	}
 }
 
 
-void CryptoKernelAgent::updateRecordListItems()
+QString CryptoKernelAgent::typeName(RecordItem *recordItem) const
 {
-	if (this->mainWindow() == nullptr) return;
-	std::cerr << "Inside updateRecordListItems: beginning" << std::endl;
-	
-	auto groupListWidget = this->mainWindow()->leftPanelWidget()->groupListWidget();
-	std::cerr << "Inside updateRecordListItems: after groupListWidget" << std::endl;
-	auto selectedItemsList = groupListWidget->selectedItems();
-	std::cerr << "Inside updateRecordListItems: data here" << std::endl;
-	// New set of shown items
-	std::unordered_set<QTreeWidgetItem *> oldShownRecordItems;
-	oldShownRecordItems.swap(this->shownRecordItems_);
-	
-	auto showRecordItem = [this, &oldShownRecordItems](RecordItem *recordItem) {
-		try {
-			auto recordItemInList = this->recordItemsMap_.at(recordItem).second;
-			recordItemInList->setHidden(false);					// Showing item
-			this->shownRecordItems_.insert(recordItemInList);	// Updating agent's cache
-			oldShownRecordItems.erase(recordItemInList);		// DON'T FORGET to update this later
-		} catch (...) {}
-	};
-	std::cerr << "Inside updateRecordListItems: after lambda" << std::endl;
-	
-	// Queue for searching records in groups (BFS)
-	std::queue<group_id_t> groupIdQueue;
-	std::cerr << "Inside updateRecordListItems: before cycle" << std::endl;
-	for (auto &selectedItem: selectedItemsList) {
-		std::cerr << "\tInside cycle" << std::endl;
-		auto selectedItemType = dynamic_cast<AbstractItem *>(selectedItem)->type();
-		std::cerr << "\tInside cycle, after AbstractItem" << std::endl;
-		
-		if (selectedItemType == ItemType::Record) {	// Simply showing record item
-			showRecordItem(dynamic_cast<RecordItem *>(selectedItem));
-		} else if (selectedItemType == ItemType::Group) {	// Adding group into the queue for processing
-			try {
-				auto groupItem = dynamic_cast<GroupItem *>(selectedItem);
-				auto groupId = this->groupItemsMap_.at(groupItem);
-				groupIdQueue.push(groupId);
-			} catch (...) {}
-		} else if (selectedItemType == ItemType::Type) {	// Showing all records of this type
-			try {
-				auto typeItem = dynamic_cast<TypeItem *>(selectedItem);
-				auto typeId = this->typeItemsMap_.at(typeItem);
-				
-				auto recordIds = std::move(this->kernel_.records_of_type(typeId));
-				for (auto recordId: recordIds) {
-					try {
-						auto recordItem = this->recordIdsMap_.at(recordId);
-						showRecordItem(recordItem);
-					} catch (...) {}
-				}
-			} catch (...) {}
-		}	// Else variant is impossible
-	}
-	
-	std::cerr << "Inside updateRecordListItems: after records and types" << std::endl;
-	
-	// Groups BFS
-	while (!groupIdQueue.empty()) {
-		auto groupId = groupIdQueue.front();
-		groupIdQueue.pop();
-		
-		try {
-			for (auto childGroupId: this->kernel_.groups(groupId))
-				groupIdQueue.push(childGroupId);
-			for (auto childRecordId: this->kernel_.records(groupId)) {
-				auto childRecordItem = this->recordIdsMap_.at(childRecordId);
-				showRecordItem(childRecordItem);
-			}
-		} catch (...) {}
-	}
-	std::cerr << "Inside updateRecordListItems: after groups" << std::endl;
-	
-	// Updating agent's cache
-	for (auto notSelectedItemInList: oldShownRecordItems)
-		notSelectedItemInList->setHidden(true);
-	std::cerr << "Inside updateRecordListItems" << std::endl;
+	try {
+		auto recordId = this->recordItemsMap_.at(recordItem).first;
+		auto typeId = this->kernel_.record_type(recordId);
+		auto typeItem = this->typeIdsMap_.at(typeId);
+		return typeItem->name();
+	} catch (...) {}
+	return QString();
+}
+
+QString CryptoKernelAgent::parentGroupName(RecordItem *recordItem) const
+{
+	try {
+		auto recordId = this->recordItemsMap_.at(recordItem).first;
+		auto parentGroupId = this->kernel_.record_parent_group(recordId);
+		auto parentGroupItem = this->groupIdsMap_.at(parentGroupId);
+		return parentGroupItem->name();
+	} catch (...) {}
+	return QString();
+}
+
+
+void CryptoKernelAgent::showRecordInList(RecordItem *recordItem)
+{
+	try {
+		this->recordItemsMap_.at(recordItem).second->setHidden(false);
+	} catch (...) {}
+}
+
+void CryptoKernelAgent::hideRecordInList(RecordItem *recordItem)
+{
+	try {
+		this->recordItemsMap_.at(recordItem).second->setHidden(true);
+	} catch (...) {}
 }

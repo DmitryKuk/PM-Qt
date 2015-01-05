@@ -15,8 +15,6 @@ class TypeItem: public AbstractItem
 public:
 	TypeItem(const QString &typeName, GroupItem *parent = nullptr);
 	TypeItem(const QString &typeName, QTreeWidget *parent = nullptr);
-	
-	virtual int itemType() const override;
 };
 
 #endif // TYPEITEM_H

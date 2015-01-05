@@ -28,7 +28,7 @@ SOURCES += main.cpp \
 		cryptokernelagent.cpp
 
 HEADERS += types.h \
-		mainwindow.h mainwindow.hpp \
+		mainwindow.h \
 		taskwidget.h \
 		tasklistwidget.h \
 		leftpanelwidget.h \
@@ -37,10 +37,10 @@ HEADERS += types.h \
 		recordlistwidget.h \
 		recordcontentwidget.h \
 		settingssaver.h \
-		abstractitem.h abstractitem.hpp \
+		abstractitem.h \
 		groupitem.h \
 		recorditem.h \
 		typeitem.h \
-		cryptokernelagent.h cryptokernelagent.hpp
+		cryptokernelagent.h
 
 LIBS += cryptokernel/libcryptokernel.a

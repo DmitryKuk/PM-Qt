@@ -15,8 +15,6 @@ class RecordItem: public AbstractItem
 public:
 	RecordItem(const QString &recordName, GroupItem *parent = nullptr);
 	RecordItem(const QString &recordName, QTreeWidget *parent = nullptr);
-	
-	virtual int itemType() const override;
 };
 
 #endif // RECORDITEM_H

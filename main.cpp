@@ -2,19 +2,14 @@
 
 #include <QApplication>
 
-#include "mainwindow.h"
 #include "cryptokernelagent.h"
 
 int main(int argc, char *argv[])
 {
-	QApplication a(argc, argv);
+	QApplication app(argc, argv);
 	
-	MainWindow mainWindow;
 	CryptoKernelAgent agent;
+	agent.run();
 	
-	connect(&agent, &mainWindow);	// Connect agent and main window
-	agent.showData();				// Agent sends data into interface
-	
-	mainWindow.show();
-	return a.exec();
+	return app.exec();
 }
