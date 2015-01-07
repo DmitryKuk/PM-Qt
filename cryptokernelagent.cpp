@@ -46,9 +46,12 @@ void CryptoKernelAgent::run()
 {
 	this->showData();
 	this->mainWindow()->show();
+	this->mainWindow()->mainWidget()->recordContentWidget()->hide();
 }
 
 
+// Slots
+// Update functions
 void CryptoKernelAgent::updateRecordListItems()
 {
 	if (this->mainWindow() == nullptr) return;
@@ -149,17 +152,16 @@ void CryptoKernelAgent::updateRecordContent()
 	
 	auto recordListWidget = this->mainWindow()->mainWidget()->recordListWidget();
 	auto recordContentWidget = this->mainWindow()->mainWidget()->recordContentWidget();
+	recordContentWidget->clear();
 	
 	auto selectedRecordItems = recordListWidget->selectedItems();
-	if (selectedRecordItems.size() != 1) {	// Selected 0 or >1 items: don't need to show fields
-		recordContentWidget->clearFields();
-		return;
-	}
+	if (selectedRecordItems.size() != 1) return;	// Selected 0 or >1 items: don't need to show fields
 	
 	try {
 		// Record metadata
 		auto recordItem = selectedRecordItems[0];
 		auto recordId = this->recordListItemsMap_.at(recordItem);
+		auto recordName = this->recordIdsMap_.at(recordId)->name();
 		auto typeId = this->kernel_.record_type(recordId);
 		auto parentGroupId = this->kernel_.record_parent_group(recordId);
 		
@@ -167,11 +169,12 @@ void CryptoKernelAgent::updateRecordContent()
 		const QString &parentGroupName = this->groupIdsMap_.at(parentGroupId)->name();
 		
 		// Filling record metadata
-		QList<QPair<QString, QString>> fieldsToShow;
-		fieldsToShow.append(qMakePair(QObject::tr("Type"), typeName));
-		fieldsToShow.append(qMakePair(QObject::tr("Group"), parentGroupName));
+		recordContentWidget->setName(recordName);
+		recordContentWidget->setType(typeName);
+		recordContentWidget->setGroup(parentGroupName);
 		
 		// Processing record fields
+		QList<QPair<QString, QString>> fieldsToShow;
 		for (auto fieldId: this->kernel_.fields(recordId)) {
 			auto fieldTypeId = this->kernel_.field_type(recordId, fieldId);
 			auto fieldTypeName = QString::fromStdString(this->kernel_.type_field_name(typeId, fieldTypeId));
@@ -179,11 +182,38 @@ void CryptoKernelAgent::updateRecordContent()
 			
 			fieldsToShow.append(qMakePair(fieldTypeName, fieldData));
 		}
-		
 		recordContentWidget->setFields(fieldsToShow);
+		
+		recordContentWidget->show();
 	} catch (...) {
-		recordContentWidget->clearFields();
+		recordContentWidget->clear();
 	}
+}
+
+
+// Slots
+void CryptoKernelAgent::onNameClicked()
+{
+	auto name = this->mainWindow()->mainWidget()->recordContentWidget()->name();
+	std::cerr << "Copy name \"" << name.toStdString() << "\"." << std::endl;
+}
+
+void CryptoKernelAgent::onTypeClicked()
+{
+	auto typeName = this->mainWindow()->mainWidget()->recordContentWidget()->type();
+	std::cerr << "Copy type \"" << typeName.toStdString() << "\"." << std::endl;
+}
+
+void CryptoKernelAgent::onGroupClicked()
+{
+	auto groupName = this->mainWindow()->mainWidget()->recordContentWidget()->group();
+	std::cerr << "Copy group \"" << groupName.toStdString() << "\"." << std::endl;
+}
+
+void CryptoKernelAgent::onFieldClicked(int index)
+{
+	auto fieldData = this->mainWindow()->mainWidget()->recordContentWidget()->field(index);
+	std::cerr << "Copy field \"" << fieldData.toStdString() << "\"." << std::endl;
 }
 
 

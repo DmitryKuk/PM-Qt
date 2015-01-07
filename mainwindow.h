@@ -51,6 +51,13 @@ public:
 protected:
 	void closeEvent(QCloseEvent *event);
 private:
+	// Slots
+	void onNameClicked();
+	void onTypeClicked();
+	void onGroupClicked();
+	void onFieldClicked(int index);
+	
+	
 	CryptoKernelAgent *agent_;
 	
 	QSplitter *mainSplit_;

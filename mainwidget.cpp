@@ -15,6 +15,7 @@ MainWidget::MainWidget(QWidget *parent):
 	
 	// Main setting...
 	this->setOrientation(Qt::Vertical);
+	this->setCollapsible(0, false);
 }
 
 

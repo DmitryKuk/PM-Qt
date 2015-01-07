@@ -25,10 +25,18 @@ MainWindow::MainWindow(CryptoKernelAgent *agent,
 	this->mainSplit_->setOrientation(Qt::Horizontal);
 	this->mainSplit_->addWidget(this->leftPanelWidget_);
 	this->mainSplit_->addWidget(this->mainWidget_);
+	this->mainSplit_->setCollapsible(0, false);
+	this->mainSplit_->setCollapsible(1, false);
+	this->mainSplit_->setHandleWidth(0);
 	
 	// Main setting...
 	this->setWindowTitle(title);
 	this->setCentralWidget(this->mainSplit_);
+	
+	// Background color
+	auto palette = this->palette();
+	palette.setColor(QPalette::Background, Qt::white);
+	this->setPalette(palette);
 	
 	
 	// Connections
@@ -39,6 +47,16 @@ MainWindow::MainWindow(CryptoKernelAgent *agent,
 	// Records list -> record content widget
 	this->connect(this->mainWidget()->recordListWidget(), &RecordListWidget::itemSelectionChanged,
 				  this, &MainWindow::updateRecordContent);
+	
+	// Record content -> agent
+	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::nameClicked,
+				  this, &MainWindow::onNameClicked);
+	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::typeClicked,
+				  this, &MainWindow::onTypeClicked);
+	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::groupClicked,
+				  this, &MainWindow::onGroupClicked);
+	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::fieldClicked,
+				  this, &MainWindow::onFieldClicked);
 }
 
 
@@ -115,4 +133,30 @@ void MainWindow::closeEvent(QCloseEvent *event)
 		this->writeSettings(settings);
 	}
 	this->QMainWindow::closeEvent(event);
+}
+
+
+// Slots
+void MainWindow::onNameClicked()
+{
+	if (this->agent_ == nullptr) return;
+	this->agent_->onNameClicked();
+}
+
+void MainWindow::onTypeClicked()
+{
+	if (this->agent_ == nullptr) return;
+	this->agent_->onTypeClicked();
+}
+
+void MainWindow::onGroupClicked()
+{
+	if (this->agent_ == nullptr) return;
+	this->agent_->onGroupClicked();
+}
+
+void MainWindow::onFieldClicked(int index)
+{
+	if (this->agent_ == nullptr) return;
+	this->agent_->onFieldClicked(index);
 }

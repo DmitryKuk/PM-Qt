@@ -38,9 +38,15 @@ public:
 	
 	void run();
 	
+	// Slots
 	// Update functions
 	void updateRecordListItems();
 	void updateRecordContent();
+	
+	void onNameClicked();
+	void onTypeClicked();
+	void onGroupClicked();
+	void onFieldClicked(int index);
 private:
 	void showData();
 	

@@ -25,6 +25,8 @@ SOURCES += main.cpp \
 		groupitem.cpp \
 		recorditem.cpp \
 		typeitem.cpp \
+		labelbutton.cpp \
+		lineeditconfirm.cpp \
 		cryptokernelagent.cpp
 
 HEADERS += types.h \
@@ -41,6 +43,8 @@ HEADERS += types.h \
 		groupitem.h \
 		recorditem.h \
 		typeitem.h \
+		labelbutton.h \
+		lineeditconfirm.h \
 		cryptokernelagent.h
 
 LIBS += cryptokernel/libcryptokernel.a
