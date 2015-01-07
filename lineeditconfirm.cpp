@@ -21,6 +21,8 @@ LineEditConfirm::LineEditConfirm(QWidget *parent):
 	this->setLayout(this->layout_);
 	this->hideButtons();
 	
+	this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	
 	// Connections
 	this->connect(this->lineEdit_, &QLineEdit::textEdited,
 				  this, &LineEditConfirm::onTextEdited);
@@ -45,6 +47,8 @@ LineEditConfirm::LineEditConfirm(const QString &title, QWidget *parent):
 	this->layout_->addWidget(this->cancelButton_);
 	this->setLayout(this->layout_);
 	this->hideButtons();
+	
+	this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	
 	// Connections
 	this->connect(this->lineEdit_, &QLineEdit::textEdited,
