@@ -11,6 +11,8 @@
 
 #include <QString>
 
+// TODO: Icons on buttons without text
+
 class LineEditConfirm:
 	public QFrame
 {
@@ -31,6 +33,8 @@ public:
 signals:
 	void confirmButtonClicked(LineEditConfirm *object, QString newText);
 private:
+	void init();
+	
 	void showButtons();
 	void hideButtons();
 	
@@ -39,7 +43,7 @@ private:
 	void onConfirmButtonClicked();
 	void onCancelButtonClicked();
 	
-	static QIcon confirmIcon_, cancelIcon_;
+	//static QIcon confirmIcon_, cancelIcon_;
 	
 	QHBoxLayout *layout_;
 	QLineEdit *lineEdit_;

@@ -173,9 +173,13 @@ void CryptoKernelAgent::updateRecordContent()
 		recordContentWidget->setType(typeName);
 		recordContentWidget->setGroup(parentGroupName);
 		
+		// Update agent's cache
+		this->shownRecordId_ = recordId;
+		this->shownFieldIds_ = this->kernel_.fields(recordId);
+		
 		// Processing record fields
 		QList<QPair<QString, QString>> fieldsToShow;
-		for (auto fieldId: this->kernel_.fields(recordId)) {
+		for (auto fieldId: this->shownFieldIds_) {
 			auto fieldTypeId = this->kernel_.field_type(recordId, fieldId);
 			auto fieldTypeName = QString::fromStdString(this->kernel_.type_field_name(typeId, fieldTypeId));
 			auto fieldData = QString::fromStdString(this->kernel_.field_data(recordId, fieldId));
@@ -198,10 +202,20 @@ void CryptoKernelAgent::onNameClicked()
 	std::cerr << "Copy name \"" << name.toStdString() << "\"." << std::endl;
 }
 
+void CryptoKernelAgent::onNameChanged(QString newName)
+{
+	std::cerr << "Inside CryptoKernelAgent::onNameChanged(\"" << newName.toStdString() << "\"): NOT IMPLEMENTED" << std::endl;
+}
+
 void CryptoKernelAgent::onTypeClicked()
 {
 	auto typeName = this->mainWindow()->mainWidget()->recordContentWidget()->type();
 	std::cerr << "Copy type \"" << typeName.toStdString() << "\"." << std::endl;
+}
+
+void CryptoKernelAgent::onTypeChanged(QString newTypeName)
+{
+	std::cerr << "Inside CryptoKernelAgent::onTypeChanged(\"" << newTypeName.toStdString() << "\"): NOT IMPLEMENTED" << std::endl;
 }
 
 void CryptoKernelAgent::onGroupClicked()
@@ -210,10 +224,32 @@ void CryptoKernelAgent::onGroupClicked()
 	std::cerr << "Copy group \"" << groupName.toStdString() << "\"." << std::endl;
 }
 
+void CryptoKernelAgent::onGroupChanged(QString newGroupName)
+{
+	std::cerr << "Inside CryptoKernelAgent::onGroupChanged(\"" << newGroupName.toStdString() << "\"): NOT IMPLEMENTED" << std::endl;
+}
+
 void CryptoKernelAgent::onFieldClicked(int index)
 {
-	auto fieldData = this->mainWindow()->mainWidget()->recordContentWidget()->field(index);
+	auto fieldData = this->mainWindow()->mainWidget()->recordContentWidget()->originalField(index);
 	std::cerr << "Copy field \"" << fieldData.toStdString() << "\"." << std::endl;
+}
+
+void CryptoKernelAgent::onFieldChanged(int index, QString newText)
+{
+	try {
+		auto fieldId = this->shownFieldIds_.at(index);
+		if (newText.size() == 0) {
+			this->kernel_.remove_field(this->shownRecordId_, fieldId);
+			this->mainWindow()->mainWidget()->recordContentWidget()->removeField(index);
+			
+			// Updating agent's cache
+			this->shownFieldIds_.erase(this->shownFieldIds_.begin() + index);
+		} else {
+			this->kernel_.set_field_data(this->shownRecordId_, fieldId, newText.toStdString());
+			this->mainWindow()->mainWidget()->recordContentWidget()->confirmFieldChanges(index);
+		}
+	} catch (...) {}
 }
 
 

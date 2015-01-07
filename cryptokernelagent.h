@@ -44,9 +44,16 @@ public:
 	void updateRecordContent();
 	
 	void onNameClicked();
+	void onNameChanged(QString newName);
+	
 	void onTypeClicked();
+	void onTypeChanged(QString newTypeName);
+	
 	void onGroupClicked();
+	void onGroupChanged(QString newGroupName);
+	
 	void onFieldClicked(int index);
+	void onFieldChanged(int index, QString newText);
 private:
 	void showData();
 	
@@ -90,6 +97,11 @@ private:
 	std::unordered_map<TypeItem *, type_id_t> typeItemsMap_;
 	std::unordered_map<type_id_t, TypeItem *> typeIdsMap_;
 	GroupItem *rootTypeGroup_;	// Root group of types in mainWindow->leftPanel->groupListWidget
+	
+	
+	// Shown record content
+	record_id_t shownRecordId_;
+	std::vector<rfield_id_t> shownFieldIds_;
 	
 	
 	// Deprecated constructor and operator=()

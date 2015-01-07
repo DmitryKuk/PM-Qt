@@ -53,9 +53,16 @@ protected:
 private:
 	// Slots
 	void onNameClicked();
+	void onNameChanged(QString newName);
+	
 	void onTypeClicked();
+	void onTypeChanged(QString newTypeName);
+	
 	void onGroupClicked();
+	void onGroupChanged(QString newGroupName);
+	
 	void onFieldClicked(int index);
+	void onFieldChanged(int index, QString newText);
 	
 	
 	CryptoKernelAgent *agent_;

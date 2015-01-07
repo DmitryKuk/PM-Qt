@@ -2,61 +2,30 @@
 
 #include "lineeditconfirm.h"
 
-QIcon
-	LineEditConfirm::confirmIcon_	= QIcon::fromTheme("list-add"),
-	LineEditConfirm::cancelIcon_	= QIcon::fromTheme("edit-delete");
+// QIcon
+// 	LineEditConfirm::confirmIcon_	= QIcon::fromTheme("edit-undo"),
+// 	LineEditConfirm::cancelIcon_	= QIcon::fromTheme("edit-redo");
 
 LineEditConfirm::LineEditConfirm(QWidget *parent):
 	QFrame(parent),
 	layout_(new QHBoxLayout(this)),
 	lineEdit_(new QLineEdit(this)),
-	confirmButton_(new QPushButton(LineEditConfirm::confirmIcon_, tr("OK"), this)),
-	cancelButton_(new QPushButton(LineEditConfirm::cancelIcon_, tr("Cancel"), this))
+	confirmButton_(new QPushButton(/*LineEditConfirm::confirmIcon_, */tr("Apply"), this)),
+	cancelButton_(new QPushButton(/*LineEditConfirm::cancelIcon_, */tr("Cancel"), this)),
+	originalText_("")
 {
-	this->lineEdit_->setFrame(false);
-	
-	this->layout_->addWidget(this->lineEdit_);
-	this->layout_->addWidget(this->confirmButton_);
-	this->layout_->addWidget(this->cancelButton_);
-	this->setLayout(this->layout_);
-	this->hideButtons();
-	
-	this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	
-	// Connections
-	this->connect(this->lineEdit_, &QLineEdit::textEdited,
-				  this, &LineEditConfirm::onTextEdited);
-	this->connect(this->confirmButton_, &QPushButton::clicked,
-				  this, &LineEditConfirm::onConfirmButtonClicked);
-	this->connect(this->cancelButton_, &QPushButton::clicked,
-				  this, &LineEditConfirm::onCancelButtonClicked);
+	this->init();
 }
 
 LineEditConfirm::LineEditConfirm(const QString &title, QWidget *parent):
 	QFrame(parent),
 	layout_(new QHBoxLayout(this)),
 	lineEdit_(new QLineEdit(title, this)),
-	confirmButton_(new QPushButton(LineEditConfirm::confirmIcon_, tr("OK"), this)),
-	cancelButton_(new QPushButton(LineEditConfirm::cancelIcon_, tr("Cancel"), this)),
+	confirmButton_(new QPushButton(/*LineEditConfirm::confirmIcon_, */tr("Apply"), this)),
+	cancelButton_(new QPushButton(/*LineEditConfirm::cancelIcon_, */tr("Cancel"), this)),
 	originalText_(title)
 {
-	this->lineEdit_->setFrame(false);
-	
-	this->layout_->addWidget(this->lineEdit_);
-	this->layout_->addWidget(this->confirmButton_);
-	this->layout_->addWidget(this->cancelButton_);
-	this->setLayout(this->layout_);
-	this->hideButtons();
-	
-	this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	
-	// Connections
-	this->connect(this->lineEdit_, &QLineEdit::textEdited,
-				  this, &LineEditConfirm::onTextEdited);
-	this->connect(this->confirmButton_, &QPushButton::clicked,
-				  this, &LineEditConfirm::onConfirmButtonClicked);
-	this->connect(this->cancelButton_, &QPushButton::clicked,
-				  this, &LineEditConfirm::onCancelButtonClicked);
+	this->init();
 }
 
 
@@ -92,6 +61,31 @@ void LineEditConfirm::restoreText()
 {
 	this->lineEdit_->setText(this->originalText_);
 	this->hideButtons();
+}
+
+
+void LineEditConfirm::init()
+{
+	this->lineEdit_->setFrame(false);
+	this->setFrameShadow(QFrame::Sunken);
+	
+	this->layout_->setContentsMargins(7, 7, 5, 0);
+	this->layout_->addWidget(this->lineEdit_);
+	this->layout_->addWidget(this->confirmButton_);
+	this->layout_->addWidget(this->cancelButton_);
+	this->setLayout(this->layout_);
+	this->hideButtons();
+	
+	//this->setContentsMargins(1, 1, 1, 1);
+	this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	
+	// Connections
+	this->connect(this->lineEdit_, &QLineEdit::textEdited,
+				  this, &LineEditConfirm::onTextEdited);
+	this->connect(this->confirmButton_, &QPushButton::clicked,
+				  this, &LineEditConfirm::onConfirmButtonClicked);
+	this->connect(this->cancelButton_, &QPushButton::clicked,
+				  this, &LineEditConfirm::onCancelButtonClicked);
 }
 
 

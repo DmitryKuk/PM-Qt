@@ -51,12 +51,24 @@ MainWindow::MainWindow(CryptoKernelAgent *agent,
 	// Record content -> agent
 	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::nameClicked,
 				  this, &MainWindow::onNameClicked);
+	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::nameChanged,
+				  this, &MainWindow::onNameChanged);
+	
 	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::typeClicked,
 				  this, &MainWindow::onTypeClicked);
+	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::typeChanged,
+				  this, &MainWindow::onTypeChanged);
+	
 	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::groupClicked,
 				  this, &MainWindow::onGroupClicked);
+	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::groupChanged,
+				  this, &MainWindow::onGroupChanged);
+	
 	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::fieldClicked,
 				  this, &MainWindow::onFieldClicked);
+	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::fieldChanged,
+				  this, &MainWindow::onFieldChanged);
+	
 }
 
 
@@ -143,10 +155,22 @@ void MainWindow::onNameClicked()
 	this->agent_->onNameClicked();
 }
 
+void MainWindow::onNameChanged(QString newName)
+{
+	if (this->agent_ == nullptr) return;
+	this->agent_->onNameChanged(newName);
+}
+
 void MainWindow::onTypeClicked()
 {
 	if (this->agent_ == nullptr) return;
 	this->agent_->onTypeClicked();
+}
+
+void MainWindow::onTypeChanged(QString newTypeName)
+{
+	if (this->agent_ == nullptr) return;
+	this->agent_->onTypeChanged(newTypeName);
 }
 
 void MainWindow::onGroupClicked()
@@ -155,8 +179,20 @@ void MainWindow::onGroupClicked()
 	this->agent_->onGroupClicked();
 }
 
+void MainWindow::onGroupChanged(QString newGroupName)
+{
+	if (this->agent_ == nullptr) return;
+	this->agent_->onGroupChanged(newGroupName);
+}
+
 void MainWindow::onFieldClicked(int index)
 {
 	if (this->agent_ == nullptr) return;
 	this->agent_->onFieldClicked(index);
+}
+
+void MainWindow::onFieldChanged(int index, QString newText)
+{
+	if (this->agent_ == nullptr) return;
+	this->agent_->onFieldChanged(index, newText);
 }

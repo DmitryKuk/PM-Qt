@@ -38,6 +38,9 @@ public:
 	QString originalField(int index) const;
 	void setFields(const QList<QPair<QString, QString>> &fields);
 	
+	void removeField(int index);
+	void confirmFieldChanges(int index);
+	
 	void clear();
 	
 	void readSettings(QSettings &settings, const QString &prefix = "") override;

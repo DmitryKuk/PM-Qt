@@ -123,6 +123,7 @@ void RecordContentWidget::setFields(const QList<QPair<QString, QString>> &fields
 		auto lineEdit = new LineEditConfirm(field.second, this);	// LineEdit with text of the second
 		
 		label->setPalette(palette);
+		label->setMinimumHeight(lineEdit->height());
 		
 		this->connect(label, &LabelButton::clicked,
 					  this, &RecordContentWidget::onFieldClicked);
@@ -132,6 +133,20 @@ void RecordContentWidget::setFields(const QList<QPair<QString, QString>> &fields
 		this->formLayout_->addRow(label, lineEdit);
 		this->fields_.append(qMakePair(label, lineEdit));
 	}
+}
+
+
+void RecordContentWidget::removeField(int index)
+{
+	auto &p = this->fields_.at(index);
+	delete p.first;
+	delete p.second;
+	this->fields_.removeAt(index);
+}
+
+void RecordContentWidget::confirmFieldChanges(int index)
+{
+	this->fields_[index].second->confirmText();
 }
 
 
