@@ -43,6 +43,7 @@ public:
 	void updateRecordListItems();
 	void updateRecordContent();
 	
+	// Record content
 	void onNameClicked();
 	void onNameChanged(QString newName);
 	
@@ -54,6 +55,12 @@ public:
 	
 	void onFieldClicked(int index);
 	void onFieldChanged(int index, QString newText);
+	
+	// Add group/record/type, remove selected
+	void addGroup();
+	void addRecord();
+	void addType();
+	void remove();
 private:
 	void showData();
 	
@@ -69,23 +76,37 @@ private:
 	
 	
 	// Groups maps
-	// Group item * <-> group id
-	std::unordered_map<GroupItem *, group_id_t> groupItemsMap_;
-	std::unordered_map<group_id_t, GroupItem *> groupIdsMap_;
+	struct GroupInfo {
+		group_id_t id;
+		GroupItem *item;
+		
+		QString name;
+	};
+	typedef std::list<GroupInfo> GroupInfoContainer;
+	typedef GroupInfoContainer::iterator groupInfoIterator;
+	
+	GroupInfoContainer groups_;
+	std::unordered_map<group_id_t, groupInfoIterator> groupIdsMap_;
+	std::unordered_map<GroupItem *, groupInfoIterator> groupItemsMap_;
 	// The root group in mainWindow->leftPanel->groupListWidget availible as
 	// groupIdsMap_[kernel_.root_group_id()]
 	
 	
 	// Records maps
-	// Record item * -> (record id, record item in record list *)
-	std::unordered_map<RecordItem *,
-					   std::pair<record_id_t,
-					   			 QTreeWidgetItem *>> recordItemsMap_;
-	// Record id -> record item *
-	std::unordered_map<record_id_t, RecordItem *> recordIdsMap_;
+	struct RecordInfo {
+		record_id_t id;
+		RecordItem *item;
+		QTreeWidgetItem *recordListItem;
+		
+		QString name;
+	};
+	typedef std::list<RecordInfo> RecordInfoContainer;
+	typedef RecordInfoContainer::iterator RecordInfoIterator;
 	
-	// Record item in list -> record id
-	std::unordered_map<QTreeWidgetItem *, record_id_t> recordListItemsMap_;
+	RecordInfoContainer records_;
+	std::unordered_map<record_id_t, RecordInfoIterator> recordIdsMap_;
+	std::unordered_map<RecordItem *, RecordInfoIterator> recordItemsMap_;
+	std::unordered_map<QTreeWidgetItem *, RecordInfoIterator> recordListItemsMap_;
 	
 	// Records are shown in record list in mainWindow->mainWidget->recordListWidget
 	// This set is part of set of all "QTreeWidgetItem *"s im recordItemsMap_
@@ -93,9 +114,18 @@ private:
 	
 	
 	// Type maps and root group
-	// Type item <-> type id
-	std::unordered_map<TypeItem *, type_id_t> typeItemsMap_;
-	std::unordered_map<type_id_t, TypeItem *> typeIdsMap_;
+	struct TypeInfo {
+		type_id_t id;
+		TypeItem *item;
+		
+		QString name;
+	};
+	typedef std::list<TypeInfo> TypeInfoContainer;
+	typedef TypeInfoContainer::iterator TypeInfoIterator;
+	
+	TypeInfoContainer types_;
+	std::unordered_map<type_id_t, TypeInfoIterator> typeIdsMap_;
+	std::unordered_map<TypeItem *, TypeInfoIterator> typeItemsMap_;
 	GroupItem *rootTypeGroup_;	// Root group of types in mainWindow->leftPanel->groupListWidget
 	
 	

@@ -115,7 +115,7 @@ cryptokernel::read(std::istream &s)
 		
 		// Reading data
 		// Reading groups
-		{
+		do {	// Cycle do { ... } while (false) -- breaks if no groups exist
 			auto read_subgroups = [&s, this, &groups_map](group_id_t group_id) {
 				size_t subgroups_count;
 				
@@ -163,6 +163,10 @@ cryptokernel::read(std::istream &s)
 			io::read(s, old_root_group_id);	// Root group id
 			io::read(s, groups_count);		// Number of groups
 			
+			// No groups exist => no records exist
+			if (old_root_group_id == invalid_group_id || groups_count == 0)
+				break;
+			
 			groups_map[invalid_group_id] = invalid_group_id;
 			
 			if (groups_count--) {	// Root group (always first)
@@ -195,8 +199,8 @@ cryptokernel::read(std::istream &s)
 				read_subgroups(group_id);	// Child groups
 				read_subrecords(group_id);	// Child records
 			}
-		}
-		// Groups wrote
+		} while (false);
+		// Groups read
 		
 		
 		// Reading records
@@ -206,6 +210,11 @@ cryptokernel::read(std::istream &s)
 			// Global data
 			io::read(s, records_count);	// Number of records
 			
+			// Check: no groups exist, but records exist => incorrect database stream
+			if (!this->groups_exist()) {
+				if (records_count != 0) throw (io::exception());
+			}
+			
 			while (records_count--) {	// Records
 				record_id_t record_id;
 				type_id_t record_type_id;
@@ -213,7 +222,7 @@ cryptokernel::read(std::istream &s)
 				
 				// Record data
 				io::read(s, record_id);			// Id
-				io::read(s, record_type_id);			// Type of record
+				io::read(s, record_type_id);	// Type of record
 				io::read(s, fields_count);		// Number of fields
 				
 				// Updating record type and id
@@ -240,8 +249,8 @@ cryptokernel::read(std::istream &s)
 				}
 			}
 		}
-		// Records wrote
-		// Data wrote
+		// Records read
+		// Data read
 	} catch (...) {
 		this->clear();
 		return false;
@@ -288,13 +297,14 @@ cryptokernel::write(std::ostream &s) const
 		
 		// Writing data
 		// Writing groups
-		{
-			// auto groups_ids = this->groups();
-			
+		do {	// Cycle do { ... } while (false) breaks if no groups exist => no records exist
 			// Global data
 			io::write(s, this->root_group_id_);	// Root group id
 			io::write(s, this->groups_.size());	// Number of groups
 			s << std::endl;
+			
+			// No groups exist
+			if (!this->groups_exist()) break;
 			
 			std::queue<group_id_t> groups_queue;		// Queue for BFS
 			groups_queue.push(this->root_group_id_);	// Start from root group
@@ -335,15 +345,23 @@ cryptokernel::write(std::ostream &s) const
 					s << std::endl;
 				}
 			}
-		}
+		} while (false);
 		// Groups wrote
 		
 		
 		// Writing records
 		{
 			auto records_ids = this->records();
+			bool groups_do_not_exist = !this->groups_exist();
 			
 			// Global data
+			// Check: if groups do not exist, but records do => incorrect cryptokernel data
+			if (groups_do_not_exist && !records_ids.empty()) { // It's impossible
+				io::write(s, 0);	// Writing correct data: 0 records
+				s << std::endl;
+				throw (io::exception());
+			}
+			
 			io::write(s, records_ids.size());	// Number of records
 			s << std::endl;
 			
@@ -1016,4 +1034,14 @@ cryptokernel::clear()
 	this->types_.clear();
 	this->types_order_.clear();
 	this->root_group_id_ = invalid_group_id;
+}
+
+
+// Checks groups, returns false if no groups exist, true otherwise
+bool
+cryptokernel::groups_exist() const
+{
+	if (this->root_group_id_ == invalid_group_id || this->groups_.empty())
+		return false;
+	return true;
 }

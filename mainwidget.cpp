@@ -24,7 +24,7 @@ void MainWidget::readSettings(QSettings &settings, const QString &prefix)
 	QString current_prefix = prefix + "/mainWidget";
 	
 	// This widget
-	this->restoreGeometry(settings.value(current_prefix + "/geometry").toByteArray());
+	//this->restoreGeometry(settings.value(current_prefix + "/geometry").toByteArray());
 	this->restoreState(settings.value(current_prefix + "/state").toByteArray());
 	
 	// Child widgets

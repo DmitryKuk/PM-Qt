@@ -213,6 +213,10 @@ public:
 	// Clears all data and metadata
 	void clear();
 private:
+	// Checks groups, returns false if no groups exist, true otherwise
+	bool groups_exist() const;
+	
+	
   // Generators
 	// Default generators types
 	typedef generator::dev_random<type_id_t> type_generator_t;

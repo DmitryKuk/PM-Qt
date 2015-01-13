@@ -42,7 +42,6 @@ public:
 	
 	LeftPanelWidget * leftPanelWidget() const;
 	MainWidget * mainWidget() const;
-	
 	CryptoKernelAgent * agent() const;
 	
 	// Update functions
@@ -52,6 +51,7 @@ protected:
 	void closeEvent(QCloseEvent *event);
 private:
 	// Slots
+	// Record content
 	void onNameClicked();
 	void onNameChanged(QString newName);
 	
@@ -64,13 +64,25 @@ private:
 	void onFieldClicked(int index);
 	void onFieldChanged(int index, QString newText);
 	
+	// Adding new groups/records/types
+	void onAddGroupActionActivated();
+	void onAddRecordActionActivated();
+	void onAddTypeActionActivated();
+	void onRemoveActionActivated();
 	
+	
+	// Agent
 	CryptoKernelAgent *agent_;
 	
-	QSplitter *mainSplit_;
-	LeftPanelWidget *leftPanelWidget_;
-	MainWidget *mainWidget_;
 	
+	// Context menu
+	QAction *addGroupAction_, *addRecordAction_, *addTypeAction_, *removeAction_;
+	
+	QSplitter *mainSplit_;
+	LeftPanelWidget *leftPanelWidget_;	// Left panel
+	MainWidget *mainWidget_;			// Main widget
+	
+	// Other
 	bool saveSettings_;
 };
 

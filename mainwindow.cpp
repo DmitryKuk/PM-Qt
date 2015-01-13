@@ -9,17 +9,32 @@ MainWindow::MainWindow(CryptoKernelAgent *agent,
 					   bool autoLoadSettings,
 					   bool autoSaveSettings,
 					   QWidget *parent):
-	QMainWindow(parent),
-	agent_(agent),
+	QMainWindow(parent),	// Parent
+	agent_(agent),			// Agent
+	
+	// Context menu
+	addGroupAction_(new QAction(tr("Add group"), this)),
+	addRecordAction_(new QAction(tr("Add record"), this)),
+	addTypeAction_(new QAction(tr("Add type"), this)),
+	removeAction_(new QAction(tr("Remove"), this)),
+	
 	mainSplit_(new QSplitter(this)),
 	leftPanelWidget_(new LeftPanelWidget(mainSplit_)),
 	mainWidget_(new MainWidget(mainSplit_)),
-	saveSettings_(autoSaveSettings? true: false)
+	
+	saveSettings_(autoSaveSettings? true: false)	// Other
 {
 	if (autoLoadSettings) {
 		QSettings settings;
 		this->readSettings(settings);
 	}
+	
+	// Context menu
+	this->leftPanelWidget()->groupListWidget()->setContextMenuPolicy(Qt::ActionsContextMenu);
+	this->leftPanelWidget()->groupListWidget()->addAction(this->addRecordAction_);
+	this->leftPanelWidget()->groupListWidget()->addAction(this->addGroupAction_);
+	this->leftPanelWidget()->groupListWidget()->addAction(this->addTypeAction_);
+	this->leftPanelWidget()->groupListWidget()->addAction(this->removeAction_);
 	
 	// Main splitter setting...
 	this->mainSplit_->setOrientation(Qt::Horizontal);
@@ -40,6 +55,17 @@ MainWindow::MainWindow(CryptoKernelAgent *agent,
 	
 	
 	// Connections
+	// Menu bar
+	// Add group/record/type
+	this->connect(this->addGroupAction_, &QAction::triggered,
+				  this, &MainWindow::onAddGroupActionActivated);
+	this->connect(this->addRecordAction_, &QAction::triggered,
+				  this, &MainWindow::onAddRecordActionActivated);
+	this->connect(this->addTypeAction_, &QAction::triggered,
+				  this, &MainWindow::onAddTypeActionActivated);
+	this->connect(this->removeAction_, &QAction::triggered,
+				  this, &MainWindow::onRemoveActionActivated);
+	
 	// Groups list -> records list
 	this->connect(this->leftPanelWidget()->groupListWidget(), &GroupListWidget::itemSelectionChanged,
 				  this, &MainWindow::updateRecordListItems);
@@ -68,7 +94,6 @@ MainWindow::MainWindow(CryptoKernelAgent *agent,
 				  this, &MainWindow::onFieldClicked);
 	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::fieldChanged,
 				  this, &MainWindow::onFieldChanged);
-	
 }
 
 
@@ -115,10 +140,8 @@ void MainWindow::setSaveSettings(bool enable)
 LeftPanelWidget * MainWindow::leftPanelWidget() const
 { return this->leftPanelWidget_; }
 
-
 MainWidget * MainWindow::mainWidget() const
 { return this->mainWidget_; }
-
 
 CryptoKernelAgent * MainWindow::agent() const
 { return this->agent_; }
@@ -195,4 +218,29 @@ void MainWindow::onFieldChanged(int index, QString newText)
 {
 	if (this->agent_ == nullptr) return;
 	this->agent_->onFieldChanged(index, newText);
+}
+
+
+void MainWindow::onAddGroupActionActivated()
+{
+	if (this->agent_ == nullptr) return;
+	this->agent_->addGroup();
+}
+
+void MainWindow::onAddRecordActionActivated()
+{
+	if (this->agent_ == nullptr) return;
+	this->agent_->addRecord();
+}
+
+void MainWindow::onAddTypeActionActivated()
+{
+	if (this->agent_ == nullptr) return;
+	this->agent_->addType();
+}
+
+void MainWindow::onRemoveActionActivated()
+{
+	if (this->agent_ == nullptr) return;
+	this->agent_->remove();
 }

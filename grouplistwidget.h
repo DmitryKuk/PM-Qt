@@ -3,7 +3,7 @@
 #ifndef GROUPLISTWIDGET_H
 #define GROUPLISTWIDGET_H
 
-#include <QtWidgets>
+#include <QTreeWidget>
 
 #include "settingssaver.h"
 
