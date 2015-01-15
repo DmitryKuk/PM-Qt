@@ -55,31 +55,17 @@ void CryptoKernelAgent::removeGroup(GroupItem *item)
 		
 		if (id == rootGroupId)
 			this->removeRootGroup();
-		else {
-			std::stack<GroupItem *> groupItemsStack;	// Stack for groups DFS
-			groupItemsStack.push(item);
-			
-			while (!groupItemsStack.empty()) {
-				auto groupItem = groupItemsStack.top();
-				groupItemsStack.pop();
-				
-				for (auto i = groupItem->childCount() - 1; i >= 0; --i) {
-					auto childItem = groupItem->child(i);
-					std::cerr << "Here: i: " << i << std::endl;
-					if (itemType(childItem) == ItemType::Record)
-						this->removeRecord(reinterpret_cast<RecordItem *>(childItem));
-					else
-						groupItemsStack.push(reinterpret_cast<GroupItem *>(childItem));
-				}
-				std::cerr << "HERE1! " << groupItem->name().toStdString() << std::endl;
-				this->groups_.erase(groupItem);	// Cleaning cache
-				std::cerr << "HERE2!" << std::endl;
+		else {	
+			for (auto i = item->childCount() - 1; i >= 0; --i) {
+				auto childItem = item->child(i);
+				if (itemType(childItem) == ItemType::Record)
+					this->removeRecord(reinterpret_cast<RecordItem *>(childItem));
+				else
+					this->removeGroup(reinterpret_cast<GroupItem *>(childItem));
 			}
-			std::cerr << "HERE, at the end!" << std::endl;
 			delete item;	// Qt cleans all children
-			std::cerr << "Almost at the end!" << std::endl;
 			this->kernel_.remove_group(id);
-			std::cerr << "HERE, at the end!" << std::endl;
+			this->groups_.erase(item);	// Cleaning cache
 		}
 	} catch (...) {}
 }

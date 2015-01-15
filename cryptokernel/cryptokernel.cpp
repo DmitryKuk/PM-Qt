@@ -773,22 +773,22 @@ cryptokernel::remove_group(group_id_t gid)
 		this->root_group_id_ = invalid_group_id;
 		return gid;
 	}
-	std::cerr << "Here 776!" << std::endl;
+	
 	auto group_it = this->groups_.find(gid);
 	if (group_it == this->groups_.end())
 		return invalid_group_id;	// Group does not exist
-	std::cerr << "Here 780!" << std::endl;
+	
 	try {	// Erasing group from its parent group
 		this->groups_.at(group_it->second.parent_group).groups.erase1(gid);
 	} catch (...) {}
-	std::cerr << "Here 784!" << std::endl;
+	
 	// Erasing groups child records and groups
 	for (auto &x: group_it->second.records) this->remove_record(x.first);
 	for (auto &x: group_it->second.groups) this->remove_group(x.first);
-	std::cerr << "Here 788!" << std::endl;
+	
 	// Erasing record with its fields from groups_
 	this->groups_.erase(group_it);
-	std::cerr << "Here 791!" << std::endl;
+	
 	return gid;
 }
 
