@@ -168,6 +168,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
 		this->writeSettings(settings);
 	}
 	this->QMainWindow::closeEvent(event);
+	
+	if (this->agent_ != nullptr) this->agent_->mainWindowClosed();
 }
 
 
@@ -242,5 +244,5 @@ void MainWindow::onAddTypeActionActivated()
 void MainWindow::onRemoveActionActivated()
 {
 	if (this->agent_ == nullptr) return;
-	this->agent_->remove();
+	this->agent_->removeSelectedItems();
 }

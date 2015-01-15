@@ -14,7 +14,7 @@ class TypeItem: public AbstractItem
 {
 public:
 	TypeItem(const QString &typeName, GroupItem *parent = nullptr);
-	TypeItem(const QString &typeName, QTreeWidget *parent = nullptr);
+	TypeItem(const QString &typeName, QTreeWidget *parent);
 };
 
 #endif // TYPEITEM_H

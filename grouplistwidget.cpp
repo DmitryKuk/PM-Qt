@@ -7,6 +7,7 @@ GroupListWidget::GroupListWidget(QWidget *parent):
 {
 	this->setColumnCount(1);
 	this->setHeaderLabel(tr("Filters"));
+	this->setSelectionMode(QAbstractItemView::ExtendedSelection);
 }
 
 

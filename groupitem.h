@@ -13,7 +13,7 @@ class GroupItem: public AbstractItem
 {
 public:
 	GroupItem(const QString &groupName, GroupItem *parent = nullptr);
-	GroupItem(const QString &groupName, QTreeWidget *parent = nullptr);
+	GroupItem(const QString &groupName, QTreeWidget *parent);
 };
 
 #endif // GROUPITEM_H

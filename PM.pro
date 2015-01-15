@@ -27,7 +27,8 @@ SOURCES += main.cpp \
 		typeitem.cpp \
 		labelbutton.cpp \
 		lineeditconfirm.cpp \
-		cryptokernelagent.cpp
+		warningwindow.cpp \
+		cryptokernelagent.cpp cryptokernelagent_data.cpp cryptokernelagent_gui.cpp
 
 HEADERS += types.h \
 		mainwindow.h \
@@ -39,12 +40,14 @@ HEADERS += types.h \
 		recordlistwidget.h \
 		recordcontentwidget.h \
 		settingssaver.h \
-		abstractitem.h \
+		abstractitem.h abstractitem.hpp \
 		groupitem.h \
 		recorditem.h \
 		typeitem.h \
 		labelbutton.h \
 		lineeditconfirm.h \
-		cryptokernelagent.h
+		warningwindow.h \
+		cryptokernelagent.h cryptokernelagent_data.hpp \
+		algorithm.h algorithm.hpp
 
 LIBS += cryptokernel/libcryptokernel.a

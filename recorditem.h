@@ -14,7 +14,7 @@ class RecordItem: public AbstractItem
 {
 public:
 	RecordItem(const QString &recordName, GroupItem *parent = nullptr);
-	RecordItem(const QString &recordName, QTreeWidget *parent = nullptr);
+	RecordItem(const QString &recordName, QTreeWidget *parent);
 };
 
 #endif // RECORDITEM_H

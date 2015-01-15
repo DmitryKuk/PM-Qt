@@ -21,6 +21,7 @@
 
 #include "cryptokernel/cryptokernel.h"
 #include "mainwindow.h"
+#include "warningwindow.h"
 
 #include "abstractitem.h"
 #include "groupitem.h"
@@ -34,11 +35,13 @@ public:
 	CryptoKernelAgent();
 	~CryptoKernelAgent();
 	
-	MainWindow * mainWindow() const;
-	
+  // Other functions
 	void run();
+  // End of other functions
 	
-	// Slots
+  // GUI management
+	MainWindow * mainWindow();
+	
 	// Update functions
 	void updateRecordListItems();
 	void updateRecordContent();
@@ -60,78 +63,152 @@ public:
 	void addGroup();
 	void addRecord();
 	void addType();
-	void remove();
-private:
-	void showData();
+	void removeSelectedItems();
 	
+	void mainWindowClosed();
+	
+	void showWarning(const QString &title, const QString &text);
+	void closeWarning();
+  // End of GUI management
+private:
 	QString typeName(RecordItem *recordItem) const;
 	QString parentGroupName(RecordItem *recordItem) const;
 	
 	void showRecordInList(RecordItem *recordItem);
 	void hideRecordInList(RecordItem *recordItem);
 	
+  // GUI management (see cryptokernelagent_gui.cpp)
+	MainWindow *mainWindow_;		// Main window attached to this agent
+	WarningWindow *warningWindow_;	// Window with warning text (new window)
+  // End of GUI management
 	
-	cryptokernel kernel_;		// Cryptokernel used by this agent
-	MainWindow *mainWindow_;	// Main window attached to this agent
+	
+  // Other functions
+	void removeRecord(RecordItem *item);
+	void removeGroup(GroupItem *item);
+	void removeType(TypeItem *item);
+  // End of other functions
 	
 	
-	// Groups maps
-	struct GroupInfo {
-		group_id_t id;
-		GroupItem *item;
+  // Data management (see cryptokernelagent_data.cpp)
+	cryptokernel kernel_;			// Cryptokernel used by this agent
+	
+	
+	struct Groups {	// Groups maps
+		struct GroupInfo {
+			group_id_t id;
+			GroupItem *item;
+			
+			QString name;
+		};
+		typedef std::list<GroupInfo> Container;
+		typedef Container::iterator iterator;
 		
-		QString name;
-	};
-	typedef std::list<GroupInfo> GroupInfoContainer;
-	typedef GroupInfoContainer::iterator groupInfoIterator;
-	
-	GroupInfoContainer groups_;
-	std::unordered_map<group_id_t, groupInfoIterator> groupIdsMap_;
-	std::unordered_map<GroupItem *, groupInfoIterator> groupItemsMap_;
-	// The root group in mainWindow->leftPanel->groupListWidget availible as
-	// groupIdsMap_[kernel_.root_group_id()]
-	
-	
-	// Records maps
-	struct RecordInfo {
-		record_id_t id;
-		RecordItem *item;
-		QTreeWidgetItem *recordListItem;
 		
-		QString name;
-	};
-	typedef std::list<RecordInfo> RecordInfoContainer;
-	typedef RecordInfoContainer::iterator RecordInfoIterator;
-	
-	RecordInfoContainer records_;
-	std::unordered_map<record_id_t, RecordInfoIterator> recordIdsMap_;
-	std::unordered_map<RecordItem *, RecordInfoIterator> recordItemsMap_;
-	std::unordered_map<QTreeWidgetItem *, RecordInfoIterator> recordListItemsMap_;
-	
-	// Records are shown in record list in mainWindow->mainWidget->recordListWidget
-	// This set is part of set of all "QTreeWidgetItem *"s im recordItemsMap_
-	std::unordered_set<QTreeWidgetItem *> shownRecordItems_;
-	
-	
-	// Type maps and root group
-	struct TypeInfo {
-		type_id_t id;
-		TypeItem *item;
+		Container list;
+		std::unordered_map<group_id_t, iterator> idsMap;
+		std::unordered_map<GroupItem *, iterator> itemsMap;
+		// The root group in mainWindow->leftPanel->groupListWidget availible as
+		// groupIdsMap[kernel_.root_group_id()]
 		
-		QString name;
-	};
-	typedef std::list<TypeInfo> TypeInfoContainer;
-	typedef TypeInfoContainer::iterator TypeInfoIterator;
+		
+		bool add(const GroupInfo &info);
+		void erase(group_id_t id);
+		void erase(GroupItem *item);
+		
+		inline bool cached(group_id_t id);
+		inline bool cached(GroupItem *item);
+		
+		void clear();
+	};	// struct Groups
+	Groups groups_;
 	
-	TypeInfoContainer types_;
-	std::unordered_map<type_id_t, TypeInfoIterator> typeIdsMap_;
-	std::unordered_map<TypeItem *, TypeInfoIterator> typeItemsMap_;
-	GroupItem *rootTypeGroup_;	// Root group of types in mainWindow->leftPanel->groupListWidget
+	void addRootGroup();	// Unsafe! Use loadData()!
+	void removeRootGroup();	// Unsafe! Use removeSelectedItems() or removeGroup()!
+	
+	void loadGroups();	// Unsafe! Use loadData()!
 	
 	
-	// Shown record content
-	record_id_t shownRecordId_;
-	std::vector<rfield_id_t> shownFieldIds_;
+	struct Records {	// Records maps and set of shown items
+		struct RecordInfo {
+			record_id_t id;
+			RecordItem *item;
+			QTreeWidgetItem *recordListItem;
+			
+			QString name;
+		};
+		typedef std::list<RecordInfo> Container;
+		typedef Container::iterator iterator;
+		
+		
+		Container list;
+		std::unordered_map<record_id_t, iterator> idsMap;
+		std::unordered_map<RecordItem *, iterator> itemsMap;
+		std::unordered_map<QTreeWidgetItem *, iterator> recordListItemsMap;
+		
+		
+		// Records are shown in record list in mainWindow->mainWidget->recordListWidget
+		// This set is part of set of all "QTreeWidgetItem *"s im recordItemsMap
+		std::unordered_set<QTreeWidgetItem *> shownRecordListItems;
+		
+		
+		bool add(const RecordInfo &info);
+		void erase(record_id_t id);
+		void erase(RecordItem *item);
+		void erase(QTreeWidgetItem *recordListItem);
+		
+		inline bool cached(record_id_t id);
+		inline bool cached(RecordItem *item);
+		
+		void clear();
+	};	// struct Records
+	Records records_;
+	
+	void loadRecords();	// Unsafe! Use loadData()!
+	
+	
+	struct Types {	// Type maps and root group
+		struct TypeInfo {
+			type_id_t id;
+			TypeItem *item;
+			
+			QString name;
+		};
+		typedef std::list<TypeInfo> Container;
+		typedef Container::iterator iterator;
+		
+		
+		Container list;
+		std::unordered_map<type_id_t, iterator> idsMap;
+		std::unordered_map<TypeItem *, iterator> itemsMap;
+		GroupItem *rootGroup = nullptr;	// Root group of types in mainWindow->leftPanel->groupListWidget
+		
+		
+		bool add(const TypeInfo &info);
+		void erase(type_id_t id);
+		void erase(TypeItem *item);
+		
+		inline bool cached(type_id_t id);
+		inline bool cached(TypeItem *item);
+		
+		void clear();
+	};	// struct Types
+	Types types_;
+	
+	void loadTypes();	// Unsafe! Use loadData()!
+	
+	
+	struct RecordContent {	// Shown record content
+		record_id_t shownRecordId;
+		std::vector<rfield_id_t> shownFieldIds;
+		
+		void clear();
+	};	// struct RecordContent
+	RecordContent recordContent_;
+	
+	
+	void loadData();	// Safe
+  // End of data management
 	
 	
 	// Deprecated constructor and operator=()
@@ -142,4 +219,6 @@ private:
 	CryptoKernelAgent & operator=(const CryptoKernelAgent &other);
 };
 
+
+#include "cryptokernelagent_data.hpp"
 #endif // CRYPTOKERNELAGENT_H
