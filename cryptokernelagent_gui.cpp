@@ -296,14 +296,10 @@ void CryptoKernelAgent::removeSelectedItems()
 	for (auto &selectedItem: selectedItemsList) {
 		auto selectedItemType = itemType(selectedItem);
 		
-		std::cerr << "HERE: type = " << selectedItemType << std::endl;
-		
 		if (selectedItemType == ItemType::Record) {
 			this->removeRecord(reinterpret_cast<RecordItem *>(selectedItem));
 		} else if (selectedItemType == ItemType::Group || selectedItemType == ItemType::RootGroup) {
-			std::cerr << "Deleting group" << std::endl;
 			this->removeGroup(reinterpret_cast<GroupItem *>(selectedItem));
-			std::cerr << "Group deleted" << std::endl;
 		} else if (selectedItemType == ItemType::Type) {
 			this->removeType(reinterpret_cast<TypeItem *>(selectedItem));
 		} else if (selectedItemType == ItemType::RootTypeGroup) {	// "Types"

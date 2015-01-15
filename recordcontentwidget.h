@@ -11,7 +11,6 @@
 
 #include <unordered_map>
 
-#include "hline.h"
 #include "labelbutton.h"
 #include "lineeditconfirm.h"
 #include "settingssaver.h"
