@@ -150,14 +150,14 @@ CryptoKernelAgent * MainWindow::agent() const
 void MainWindow::updateRecordListItems()
 {
 	if (this->agent_ == nullptr) return;
-	this->agent_->updateRecordListItems();
+	this->agent_->GUI_updateRecordListItems();
 }
 
 
 void MainWindow::updateRecordContent()
 {
 	if (this->agent_ == nullptr) return;
-	this->agent_->updateRecordContent();
+	this->agent_->GUI_updateRecordContent();
 }
 
 
@@ -169,7 +169,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 	}
 	this->QMainWindow::closeEvent(event);
 	
-	if (this->agent_ != nullptr) this->agent_->mainWindowClosed();
+	if (this->agent_ != nullptr) this->agent_->GUI_onMainWindowClosed();
 }
 
 
@@ -177,72 +177,72 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::onNameClicked()
 {
 	if (this->agent_ == nullptr) return;
-	this->agent_->onNameClicked();
+	this->agent_->GUI_onNameClicked();
 }
 
 void MainWindow::onNameChanged(QString newName)
 {
 	if (this->agent_ == nullptr) return;
-	this->agent_->onNameChanged(newName);
+	this->agent_->GUI_onNameChanged(newName);
 }
 
 void MainWindow::onTypeClicked()
 {
 	if (this->agent_ == nullptr) return;
-	this->agent_->onTypeClicked();
+	this->agent_->GUI_onTypeClicked();
 }
 
 void MainWindow::onTypeChanged(QString newTypeName)
 {
 	if (this->agent_ == nullptr) return;
-	this->agent_->onTypeChanged(newTypeName);
+	this->agent_->GUI_onTypeChanged(newTypeName);
 }
 
 void MainWindow::onGroupClicked()
 {
 	if (this->agent_ == nullptr) return;
-	this->agent_->onGroupClicked();
+	this->agent_->GUI_onGroupClicked();
 }
 
 void MainWindow::onGroupChanged(QString newGroupName)
 {
 	if (this->agent_ == nullptr) return;
-	this->agent_->onGroupChanged(newGroupName);
+	this->agent_->GUI_onGroupChanged(newGroupName);
 }
 
 void MainWindow::onFieldClicked(int index)
 {
 	if (this->agent_ == nullptr) return;
-	this->agent_->onFieldClicked(index);
+	this->agent_->GUI_onFieldClicked(index);
 }
 
 void MainWindow::onFieldChanged(int index, QString newText)
 {
 	if (this->agent_ == nullptr) return;
-	this->agent_->onFieldChanged(index, newText);
+	this->agent_->GUI_onFieldChanged(index, newText);
 }
 
 
 void MainWindow::onAddGroupActionActivated()
 {
 	if (this->agent_ == nullptr) return;
-	this->agent_->addGroup();
+	this->agent_->GUI_addGroup();
 }
 
 void MainWindow::onAddRecordActionActivated()
 {
 	if (this->agent_ == nullptr) return;
-	this->agent_->addRecord();
+	this->agent_->GUI_addRecord();
 }
 
 void MainWindow::onAddTypeActionActivated()
 {
 	if (this->agent_ == nullptr) return;
-	this->agent_->addType();
+	this->agent_->GUI_addType();
 }
 
 void MainWindow::onRemoveActionActivated()
 {
 	if (this->agent_ == nullptr) return;
-	this->agent_->removeSelectedItems();
+	this->agent_->GUI_removeSelectedItems();
 }

@@ -4,7 +4,7 @@
 #include <queue>
 
 
-QString CryptoKernelAgent::typeName(RecordItem *recordItem) const
+QString CryptoKernelAgent::DATA_typeName(RecordItem *recordItem) const
 {
 	try {
 		return this->records_.itemsMap.at(recordItem)->name;
@@ -12,13 +12,82 @@ QString CryptoKernelAgent::typeName(RecordItem *recordItem) const
 	return QString();
 }
 
-QString CryptoKernelAgent::parentGroupName(RecordItem *recordItem) const
+QString CryptoKernelAgent::DATA_parentGroupName(RecordItem *recordItem) const
 {
 	try {
 		auto parentGroupId = this->kernel_.record_parent_group(this->records_.itemsMap.at(recordItem)->id);
 		return this->groups_.idsMap.at(parentGroupId)->name;
 	} catch (...) {}
 	return QString();
+}
+
+
+void CryptoKernelAgent::DATA_showRecordInList(RecordItem *recordItem)
+{
+	try {
+		auto recordListItem = this->records_.itemsMap.at(recordItem)->recordListItem;
+		recordListItem->setHidden(false);
+		this->records_.shownRecordListItems.insert(recordListItem);
+	} catch (...) {}
+}
+
+void CryptoKernelAgent::DATA_hideRecordInList(RecordItem *recordItem)
+{
+	try {
+		auto recordListItem = this->records_.itemsMap.at(recordItem)->recordListItem;
+		recordListItem->setHidden(true);
+		this->records_.shownRecordListItems.erase(recordListItem);
+	} catch (...) {}
+}
+
+
+void CryptoKernelAgent::DATA_removeRecord(RecordItem *item)
+{
+	try {
+		auto &info = *(this->records_.itemsMap.at(item));
+		delete info.recordListItem;	// Removing items
+		delete item;
+		this->kernel_.remove_record(info.id);	// Removing record from kernel
+		this->records_.erase(item);	// Cleaning cache
+	} catch (...) {}
+}
+
+
+void CryptoKernelAgent::DATA_removeGroup(GroupItem *item)
+{
+	try {
+		auto rootGroupId = this->groups_.idsMap.at(this->kernel_.root_group_id())->id;
+		auto id = this->groups_.itemsMap.at(item)->id;
+		
+		if (id == rootGroupId)
+			this->DATA_removeRootGroup();
+		else {	
+			for (auto i = item->childCount() - 1; i >= 0; --i) {
+				auto childItem = item->child(i);
+				if (itemType(childItem) == ItemType::Record)
+					this->DATA_removeRecord(reinterpret_cast<RecordItem *>(childItem));
+				else
+					this->DATA_removeGroup(reinterpret_cast<GroupItem *>(childItem));
+			}
+			delete item;	// Qt cleans all children
+			this->kernel_.remove_group(id);
+			this->groups_.erase(item);	// Cleaning cache
+		}
+	} catch (...) {}
+}
+
+
+void CryptoKernelAgent::DATA_removeType(TypeItem *item)
+{
+	try {
+		auto id = this->types_.itemsMap.at(item)->id;
+		for (auto recordId: this->kernel_.records_of_type(id))
+			this->DATA_removeRecord(this->records_.idsMap.at(recordId)->item);
+		
+		this->kernel_.remove_type(id);
+		delete item;
+		this->types_.erase(item);
+	} catch (...) {}
 }
 
 
@@ -69,7 +138,7 @@ void CryptoKernelAgent::Groups::clear()
 }
 
 
-void CryptoKernelAgent::addRootGroup()
+void CryptoKernelAgent::DATA_addRootGroup()
 {
 	auto rootGroupId = this->kernel_.root_group_id();
 	if (rootGroupId == invalid_group_id)	// Creating root group, if it does not exist
@@ -79,7 +148,7 @@ void CryptoKernelAgent::addRootGroup()
 	auto rootGroupItem = new GroupItem(rootGroupName);
 	setItemType(rootGroupItem, ItemType::RootGroup);
 	
-	auto groupListWidget = this->mainWindow()->leftPanelWidget()->groupListWidget();
+	auto groupListWidget = this->GUI_mainWindow()->leftPanelWidget()->groupListWidget();
 	groupListWidget->insertTopLevelItem(0, rootGroupItem);
 	rootGroupItem->setExpanded(true);
 	
@@ -89,7 +158,7 @@ void CryptoKernelAgent::addRootGroup()
 						.name = rootGroupName });
 }
 
-void CryptoKernelAgent::removeRootGroup()
+void CryptoKernelAgent::DATA_removeRootGroup()
 {
 	// Cleaning records in record list
 	for (auto &info: this->records_.list)
@@ -104,13 +173,13 @@ void CryptoKernelAgent::removeRootGroup()
 	this->groups_.clear();
 	
 	this->kernel_.remove_group(rootGroupId);	// Clears all records and groups in kernel
-	this->addRootGroup();	// Adds empty root group and "Data" to the left panel
+	this->DATA_addRootGroup();	// Adds empty root group and "Data" to the left panel
 }
 
 
-void CryptoKernelAgent::loadGroups()
+void CryptoKernelAgent::DATA_loadGroups()
 {
-	this->addRootGroup(); // Adding root group
+	this->DATA_addRootGroup(); // Adding root group
 	
 	std::queue<group_id_t> groupIdQueue;	// Queue for BFS
 	groupIdQueue.push(this->kernel_.root_group_id());
@@ -204,38 +273,45 @@ void CryptoKernelAgent::Records::clear()
 }
 
 
-void CryptoKernelAgent::loadRecords()
+bool CryptoKernelAgent::DATA_loadRecord(record_id_t id)
 {
-	auto recordListWidget = this->mainWindow()->mainWidget()->recordListWidget();
-	
-	for (auto recordId: this->kernel_.records()) {
-		auto parentGroupId = this->kernel_.record_parent_group(recordId);
-		auto parentGroupItem = this->groups_.idsMap[parentGroupId]->item;
+	try {
+		auto recordListWidget = this->GUI_mainWindow()->mainWidget()->recordListWidget();
+		
+		auto parentGroupId = this->kernel_.record_parent_group(id);
+		if (parentGroupId == invalid_group_id) throw (int());
+		
+		auto parentGroupItem = this->groups_.idsMap.at(parentGroupId)->item;
 		
 		// Adding data into groupsListWidget
-		QString recordName = QString::fromStdString(this->kernel_.record_name(recordId));
-		auto recordItem = new RecordItem(recordName, parentGroupItem);
-		
+		Records::RecordInfo info;
+		info.id = id;
+		info.name = QString::fromStdString(this->kernel_.record_name(id));
+		info.item = new RecordItem(info.name, parentGroupItem);
 		
 		// Adding data into recordListWidget
-		auto recordListItem = new QTreeWidgetItem(recordListWidget);
-		recordListItem->setText(RecordFieldPos::Name,
-								recordName);
+		info.recordListItem = new QTreeWidgetItem(recordListWidget);
+		info.recordListItem->setText(RecordFieldPos::Name, info.name);
 		
-		auto recordTypeId = this->kernel_.record_type(recordId);
-		recordListItem->setText(RecordFieldPos::TypeName,
-								this->types_.idsMap[recordTypeId]->name);
+		auto typeId = this->kernel_.record_type(id);
+		info.recordListItem->setText(RecordFieldPos::TypeName, this->types_.idsMap.at(typeId)->name);
 		
-		auto recordParentGroupId = this->kernel_.record_parent_group(recordId);
-		recordListItem->setText(RecordFieldPos::ParentGroup,
-								this->groups_.idsMap[recordParentGroupId]->name);
+		auto recordParentGroupId = this->kernel_.record_parent_group(id);
+		info.recordListItem->setText(RecordFieldPos::ParentGroup, this->groups_.idsMap.at(recordParentGroupId)->name);
 		
 		// Updating agent's cache
-		this->records_.add({ .id = recordId,
-							 .item = recordItem,
-							 .recordListItem = recordListItem,
-							 .name = recordName });
+		this->records_.add(info);
+	} catch (...) {
+		return false;
 	}
+	return true;
+}
+
+
+void CryptoKernelAgent::DATA_loadRecords()
+{
+	for (auto id: this->kernel_.records())
+		this->DATA_loadRecord(id);
 }
 
 
@@ -293,10 +369,10 @@ void CryptoKernelAgent::RecordContent::clear()
 }
 
 
-void CryptoKernelAgent::loadTypes()
+void CryptoKernelAgent::DATA_loadTypes()
 {
 	// Creating root type group
-	auto rootGroupWidget = this->mainWindow()->leftPanelWidget()->groupListWidget();
+	auto rootGroupWidget = this->GUI_mainWindow()->leftPanelWidget()->groupListWidget();
 	this->types_.rootGroup = new GroupItem(QObject::tr("Types"), rootGroupWidget);
 	setItemType(this->types_.rootGroup, ItemType::RootTypeGroup);
 	this->types_.rootGroup->setExpanded(true);
@@ -314,9 +390,9 @@ void CryptoKernelAgent::loadTypes()
 }
 
 
-void CryptoKernelAgent::loadData()
+void CryptoKernelAgent::DATA_loadData()
 {
-	this->loadGroups();		// Adding groups (must be before loadRecords()!)
-	this->loadTypes();		// Adding types (must be before loadRecords()!)
-	this->loadRecords();	// Adding records
+	this->DATA_loadGroups();		// Adding groups (must be before loadRecords()!)
+	this->DATA_loadTypes();		// Adding types (must be before loadRecords()!)
+	this->DATA_loadRecords();	// Adding records
 }

@@ -40,42 +40,42 @@ public:
   // End of other functions
 	
   // GUI management
-	MainWindow * mainWindow();
+	MainWindow * GUI_mainWindow();
 	
 	// Update functions
-	void updateRecordListItems();
-	void updateRecordContent();
+	void GUI_updateRecordListItems();
+	void GUI_updateRecordContent();
 	
 	// Record content
-	void onNameClicked();
-	void onNameChanged(QString newName);
+	void GUI_onNameClicked();
+	void GUI_onNameChanged(QString newName);
 	
-	void onTypeClicked();
-	void onTypeChanged(QString newTypeName);
+	void GUI_onTypeClicked();
+	void GUI_onTypeChanged(QString newTypeName);
 	
-	void onGroupClicked();
-	void onGroupChanged(QString newGroupName);
+	void GUI_onGroupClicked();
+	void GUI_onGroupChanged(QString newGroupName);
 	
-	void onFieldClicked(int index);
-	void onFieldChanged(int index, QString newText);
+	void GUI_onFieldClicked(int index);
+	void GUI_onFieldChanged(int index, QString newText);
+	
+	void GUI_onMainWindowClosed();
 	
 	// Add group/record/type, remove selected
-	void addGroup();
-	void addRecord();
-	void addType();
-	void removeSelectedItems();
+	void GUI_addGroup();
+	void GUI_addRecord();
+	void GUI_addType();
+	void GUI_removeSelectedItems();
 	
-	void mainWindowClosed();
-	
-	void showWarning(const QString &title, const QString &text);
-	void closeWarning();
+	void GUI_showWarning(const QString &title, const QString &text);
+	void GUI_closeWarning();
   // End of GUI management
 private:
-	QString typeName(RecordItem *recordItem) const;
-	QString parentGroupName(RecordItem *recordItem) const;
+	QString DATA_typeName(RecordItem *recordItem) const;
+	QString DATA_parentGroupName(RecordItem *recordItem) const;
 	
-	void showRecordInList(RecordItem *recordItem);
-	void hideRecordInList(RecordItem *recordItem);
+	void DATA_showRecordInList(RecordItem *recordItem);
+	void DATA_hideRecordInList(RecordItem *recordItem);
 	
   // GUI management (see cryptokernelagent_gui.cpp)
 	MainWindow *mainWindow_;		// Main window attached to this agent
@@ -84,9 +84,9 @@ private:
 	
 	
   // Other functions
-	void removeRecord(RecordItem *item);
-	void removeGroup(GroupItem *item);
-	void removeType(TypeItem *item);
+	void DATA_removeRecord(RecordItem *item);
+	void DATA_removeGroup(GroupItem *item);
+	void DATA_removeType(TypeItem *item);
   // End of other functions
 	
 	
@@ -123,10 +123,10 @@ private:
 	};	// struct Groups
 	Groups groups_;
 	
-	void addRootGroup();	// Unsafe! Use loadData()!
-	void removeRootGroup();	// Unsafe! Use removeSelectedItems() or removeGroup()!
+	void DATA_addRootGroup();	// Unsafe! Use loadData()!
+	void DATA_removeRootGroup();	// Unsafe! Use removeSelectedItems() or removeGroup()!
 	
-	void loadGroups();	// Unsafe! Use loadData()!
+	void DATA_loadGroups();	// Unsafe! Use loadData()!
 	
 	
 	struct Records {	// Records maps and set of shown items
@@ -164,7 +164,8 @@ private:
 	};	// struct Records
 	Records records_;
 	
-	void loadRecords();	// Unsafe! Use loadData()!
+	bool DATA_loadRecord(record_id_t id);
+	void DATA_loadRecords();	// Unsafe! Use loadData()!
 	
 	
 	struct Types {	// Type maps and root group
@@ -195,7 +196,7 @@ private:
 	};	// struct Types
 	Types types_;
 	
-	void loadTypes();	// Unsafe! Use loadData()!
+	void DATA_loadTypes();	// Unsafe! Use loadData()!
 	
 	
 	struct RecordContent {	// Shown record content
@@ -207,7 +208,7 @@ private:
 	RecordContent recordContent_;
 	
 	
-	void loadData();	// Safe
+	void DATA_loadData();	// Safe
   // End of data management
 	
 	
