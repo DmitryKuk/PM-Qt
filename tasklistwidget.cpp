@@ -54,14 +54,3 @@ TaskListWidget::Container::const_iterator TaskListWidget::addTask(const QString 
 	return TaskListWidget::Container::insert(TaskListWidget::Container::end(),
 											 taskWidget);
 }
-
-
-TaskListWidget::Container::const_iterator TaskListWidget::begin() const
-{
-	return TaskListWidget::Container::begin();
-}
-
-TaskListWidget::Container::const_iterator TaskListWidget::end() const
-{
-	return TaskListWidget::Container::end();
-}

@@ -27,15 +27,15 @@ SOURCES += main.cpp \
 		typeitem.cpp \
 		labelbutton.cpp \
 		lineeditconfirm.cpp \
-		warningwindow.cpp \
+		typeeditdialog.cpp \
 		cryptokernelagent.cpp cryptokernelagent_data.cpp cryptokernelagent_gui.cpp
 
 HEADERS += types.h \
-		mainwindow.h \
+		mainwindow.h mainwindow.hpp \
 		taskwidget.h \
 		tasklistwidget.h \
-		leftpanelwidget.h \
-		mainwidget.h \
+		leftpanelwidget.h leftpanelwidget.hpp \
+		mainwidget.h mainwidget.hpp \
 		grouplistwidget.h \
 		recordlistwidget.h \
 		recordcontentwidget.h \
@@ -46,8 +46,14 @@ HEADERS += types.h \
 		typeitem.h \
 		labelbutton.h \
 		lineeditconfirm.h \
-		warningwindow.h \
+		typeeditdialog.h \
 		cryptokernelagent.h cryptokernelagent_data.hpp \
 		algorithm.h algorithm.hpp
 
+
+# Cryptokernel
+libcryptokernel.target = cryptokernel/libcryptokernel.a
+libcryptokernel.commands = make --directory='cryptokernel'
+QMAKE_EXTRA_TARGETS += libcryptokernel
+PRE_TARGETDEPS += cryptokernel/libcryptokernel.a
 LIBS += cryptokernel/libcryptokernel.a

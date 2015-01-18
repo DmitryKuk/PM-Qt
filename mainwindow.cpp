@@ -16,7 +16,8 @@ MainWindow::MainWindow(CryptoKernelAgent *agent,
 	addGroupAction_(new QAction(tr("Add group"), this)),
 	addRecordAction_(new QAction(tr("Add record"), this)),
 	addTypeAction_(new QAction(tr("Add type"), this)),
-	removeAction_(new QAction(tr("Remove"), this)),
+	removeAction_(new QAction(tr("Remove selected"), this)),
+	editTypeAction_(new QAction(tr("Edit type"), this)),
 	
 	mainSplit_(new QSplitter(this)),
 	leftPanelWidget_(new LeftPanelWidget(mainSplit_)),
@@ -35,6 +36,7 @@ MainWindow::MainWindow(CryptoKernelAgent *agent,
 	this->leftPanelWidget()->groupListWidget()->addAction(this->addGroupAction_);
 	this->leftPanelWidget()->groupListWidget()->addAction(this->addTypeAction_);
 	this->leftPanelWidget()->groupListWidget()->addAction(this->removeAction_);
+	this->leftPanelWidget()->groupListWidget()->addAction(this->editTypeAction_);
 	
 	// Main splitter setting...
 	this->mainSplit_->setOrientation(Qt::Horizontal);
@@ -55,45 +57,38 @@ MainWindow::MainWindow(CryptoKernelAgent *agent,
 	
 	
 	// Connections
-	// Menu bar
-	// Add group/record/type
-	this->connect(this->addGroupAction_, &QAction::triggered,
-				  this, &MainWindow::onAddGroupActionActivated);
-	this->connect(this->addRecordAction_, &QAction::triggered,
-				  this, &MainWindow::onAddRecordActionActivated);
-	this->connect(this->addTypeAction_, &QAction::triggered,
-				  this, &MainWindow::onAddTypeActionActivated);
-	this->connect(this->removeAction_, &QAction::triggered,
-				  this, &MainWindow::onRemoveActionActivated);
+	// Add group/record/type, remove selected, edit type
+	this->connect(this->addGroupAction_,  &QAction::triggered, [this]() { this->agent_->GUI_addGroup();            });
+	this->connect(this->addRecordAction_, &QAction::triggered, [this]() { this->agent_->GUI_addRecord();           });
+	this->connect(this->addTypeAction_,   &QAction::triggered, [this]() { this->agent_->GUI_addType();             });
+	this->connect(this->removeAction_,    &QAction::triggered, [this]() { this->agent_->GUI_removeSelectedItems(); });
+	this->connect(this->editTypeAction_,  &QAction::triggered, [this]() { this->agent_->GUI_showTypeEditDialog();  });
 	
 	// Groups list -> records list
 	this->connect(this->leftPanelWidget()->groupListWidget(), &GroupListWidget::itemSelectionChanged,
-				  this, &MainWindow::updateRecordListItems);
+				  [this]() { this->agent_->GUI_updateRecordListItems(); });
 	
 	// Records list -> record content widget
 	this->connect(this->mainWidget()->recordListWidget(), &RecordListWidget::itemSelectionChanged,
-				  this, &MainWindow::updateRecordContent);
+				  [this]() { this->agent_->GUI_updateRecordContent(); });
 	
 	// Record content -> agent
-	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::nameClicked,
-				  this, &MainWindow::onNameClicked);
 	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::nameChanged,
-				  this, &MainWindow::onNameChanged);
+				  [this](QString newName) { this->agent_->GUI_onRecordNameChanged(newName); });
+	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::typeNameClicked,
+				  [this]() { this->agent_->GUI_onRecordTypeNameClicked(); });
+	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::groupNameClicked,
+				  [this]() { this->agent_->GUI_onRecordGroupNameClicked(); });
 	
-	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::typeClicked,
-				  this, &MainWindow::onTypeClicked);
-	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::typeChanged,
-				  this, &MainWindow::onTypeChanged);
-	
-	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::groupClicked,
-				  this, &MainWindow::onGroupClicked);
-	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::groupChanged,
-				  this, &MainWindow::onGroupChanged);
 	
 	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::fieldClicked,
-				  this, &MainWindow::onFieldClicked);
+				  [this](int index) { this->agent_->GUI_onRecordFieldClicked(index); });
 	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::fieldChanged,
-				  this, &MainWindow::onFieldChanged);
+				  [this](int index, QString newText) { this->agent_->GUI_onRecordFieldChanged(index, newText); });
+	
+	// Group list: items names
+	this->connect(this->leftPanelWidget()->groupListWidget(), &GroupListWidget::itemChanged,
+				  [this](QTreeWidgetItem *item, int index) { this->agent_->GUI_onItemDataChanged(item, index); });
 }
 
 
@@ -130,37 +125,6 @@ void MainWindow::writeSettings(QSettings &settings, const QString &prefix) const
 }
 
 
-bool MainWindow::needSaveSettings() const
-{ return this->saveSettings_; }
-
-void MainWindow::setSaveSettings(bool enable)
-{ this->saveSettings_ = enable; }
-
-
-LeftPanelWidget * MainWindow::leftPanelWidget() const
-{ return this->leftPanelWidget_; }
-
-MainWidget * MainWindow::mainWidget() const
-{ return this->mainWidget_; }
-
-CryptoKernelAgent * MainWindow::agent() const
-{ return this->agent_; }
-
-
-void MainWindow::updateRecordListItems()
-{
-	if (this->agent_ == nullptr) return;
-	this->agent_->GUI_updateRecordListItems();
-}
-
-
-void MainWindow::updateRecordContent()
-{
-	if (this->agent_ == nullptr) return;
-	this->agent_->GUI_updateRecordContent();
-}
-
-
 void MainWindow::closeEvent(QCloseEvent *event)
 {
 	if (this->needSaveSettings()) {
@@ -168,81 +132,4 @@ void MainWindow::closeEvent(QCloseEvent *event)
 		this->writeSettings(settings);
 	}
 	this->QMainWindow::closeEvent(event);
-	
-	if (this->agent_ != nullptr) this->agent_->GUI_onMainWindowClosed();
-}
-
-
-// Slots
-void MainWindow::onNameClicked()
-{
-	if (this->agent_ == nullptr) return;
-	this->agent_->GUI_onNameClicked();
-}
-
-void MainWindow::onNameChanged(QString newName)
-{
-	if (this->agent_ == nullptr) return;
-	this->agent_->GUI_onNameChanged(newName);
-}
-
-void MainWindow::onTypeClicked()
-{
-	if (this->agent_ == nullptr) return;
-	this->agent_->GUI_onTypeClicked();
-}
-
-void MainWindow::onTypeChanged(QString newTypeName)
-{
-	if (this->agent_ == nullptr) return;
-	this->agent_->GUI_onTypeChanged(newTypeName);
-}
-
-void MainWindow::onGroupClicked()
-{
-	if (this->agent_ == nullptr) return;
-	this->agent_->GUI_onGroupClicked();
-}
-
-void MainWindow::onGroupChanged(QString newGroupName)
-{
-	if (this->agent_ == nullptr) return;
-	this->agent_->GUI_onGroupChanged(newGroupName);
-}
-
-void MainWindow::onFieldClicked(int index)
-{
-	if (this->agent_ == nullptr) return;
-	this->agent_->GUI_onFieldClicked(index);
-}
-
-void MainWindow::onFieldChanged(int index, QString newText)
-{
-	if (this->agent_ == nullptr) return;
-	this->agent_->GUI_onFieldChanged(index, newText);
-}
-
-
-void MainWindow::onAddGroupActionActivated()
-{
-	if (this->agent_ == nullptr) return;
-	this->agent_->GUI_addGroup();
-}
-
-void MainWindow::onAddRecordActionActivated()
-{
-	if (this->agent_ == nullptr) return;
-	this->agent_->GUI_addRecord();
-}
-
-void MainWindow::onAddTypeActionActivated()
-{
-	if (this->agent_ == nullptr) return;
-	this->agent_->GUI_addType();
-}
-
-void MainWindow::onRemoveActionActivated()
-{
-	if (this->agent_ == nullptr) return;
-	this->agent_->GUI_removeSelectedItems();
 }

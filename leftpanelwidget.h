@@ -3,7 +3,7 @@
 #ifndef LEFTPANELWIDGET_H
 #define LEFTPANELWIDGET_H
 
-#include <QtWidgets>
+#include <QSplitter>
 
 #include "grouplistwidget.h"
 #include "tasklistwidget.h"
@@ -14,29 +14,18 @@ class LeftPanelWidget:
 	public SettingsSaver
 {
 	Q_OBJECT
-	
-	// Properties
-	Q_PROPERTY(GroupListWidget *groupListWidget
-			   READ groupListWidget
-			   DESIGNABLE false
-			   SCRIPTABLE false
-			   USER false);
-	Q_PROPERTY(TaskListWidget *taskListWidget
-			   READ taskListWidget
-			   DESIGNABLE false
-			   SCRIPTABLE false
-			   USER false);
 public:
 	LeftPanelWidget(QWidget *parent = nullptr);
 	
-	void readSettings(QSettings &settings, const QString &prefix = "") override;
-	void writeSettings(QSettings &settings, const QString &prefix = "") const override;
+	virtual void readSettings(QSettings &settings, const QString &prefix = "") override;
+	virtual void writeSettings(QSettings &settings, const QString &prefix = "") const override;
 	
-	GroupListWidget * groupListWidget();
-	TaskListWidget * taskListWidget();
+	inline GroupListWidget * groupListWidget() const;
+	inline TaskListWidget * taskListWidget() const;
 private:
 	GroupListWidget *groupListWidget_;
 	TaskListWidget *taskListWidget_;
 };
 
+#include "leftpanelwidget.hpp"
 #endif	// LEFTPANELWIDGET_H

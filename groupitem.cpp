@@ -3,15 +3,27 @@
 #include "groupitem.h"
 
 GroupItem::GroupItem(const QString &groupName,
-					 GroupItem *parent):
+					 GroupItem *parent,
+					 bool isRootGroup):
 	AbstractItem(groupName, parent)
 {
-	setItemType(this, ::ItemType::Group);
+	if (isRootGroup)
+		setItemType(this, ::ItemType::RootGroup);
+	else {
+		setItemType(this, ::ItemType::Group);
+		this->setFlags(this->flags() | Qt::ItemIsEditable);
+	}
 }
 
 GroupItem::GroupItem(const QString &groupName,
-					 QTreeWidget *parent):
+					 QTreeWidget *parent,
+					 bool isRootGroup):
 	AbstractItem(groupName, parent)
 {
-	setItemType(this, ::ItemType::Group);
+	if (isRootGroup)
+		setItemType(this, ::ItemType::RootGroup);
+	else {
+		setItemType(this, ::ItemType::Group);
+		this->setFlags(this->flags() | Qt::ItemIsEditable);
+	}
 }

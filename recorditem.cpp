@@ -7,6 +7,7 @@ RecordItem::RecordItem(const QString &recordName,
 	AbstractItem(recordName, parent)
 {
 	setItemType(this, ::ItemType::Record);
+	this->setFlags(this->flags() | Qt::ItemIsEditable);
 }
 
 RecordItem::RecordItem(const QString &recordName,
@@ -14,4 +15,5 @@ RecordItem::RecordItem(const QString &recordName,
 	AbstractItem(recordName, parent)
 {
 	setItemType(this, ::ItemType::Record);
+	this->setFlags(this->flags() | Qt::ItemIsEditable);
 }

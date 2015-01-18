@@ -48,9 +48,22 @@ int main()
 	k.add_type_field(types[1], "world field 3");
 	
 	// Type changing
-	std::cerr << ((k.set_type_name(types[0], "new hello") != invalid_type_id)?
+	
+	std::cerr << "Setting \"new hello\"..." << std::endl
+			  << ((k.set_type_name(types[0], "new hello") != invalid_type_id)?
 				 "OK: Correct type changed":
 				 "ERROR: Can't set correct type") << std::endl;
+	
+	std::cerr << "Setting \"new hello 1\"..." << std::endl
+			  << ((k.set_type_name(types[0], "new hello 1") != invalid_type_id)?
+				 "OK: Correct type changed":
+				 "ERROR: Can't set correct type") << std::endl;
+	
+	std::cerr << "Setting \"new hello\" again..." << std::endl
+			  << ((k.set_type_name(types[0], "new hello") != invalid_type_id)?
+				 "OK: Correct type changed":
+				 "ERROR: Can't set correct type") << std::endl;
+	
 	
 	std::cerr << ((k.set_type_name(0, "new incorrect type") == invalid_type_id)?
 				 "OK: Incorrect type not changed":

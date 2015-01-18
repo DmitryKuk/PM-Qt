@@ -36,11 +36,3 @@ void LeftPanelWidget::writeSettings(QSettings &settings, const QString &prefix) 
 	settings.setValue(current_prefix + "/geometry", this->saveGeometry());
 	settings.setValue(current_prefix + "/state", this->saveState());
 }
-
-
-GroupListWidget * LeftPanelWidget::groupListWidget()
-{ return this->groupListWidget_; }
-
-
-TaskListWidget * LeftPanelWidget::taskListWidget()
-{ return this->taskListWidget_; }

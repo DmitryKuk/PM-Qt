@@ -3,38 +3,29 @@
 #ifndef MAINWIDGET_H
 #define MAINWIDGET_H
 
-#include <QtWidgets>
+#include <QSplitter>
 
 #include "recordlistwidget.h"
 #include "recordcontentwidget.h"
 #include "settingssaver.h"
 
-class MainWidget: public QSplitter
+class MainWidget:
+	public QSplitter,
+	public SettingsSaver
 {
 	Q_OBJECT
-	
-	// Properties
-	Q_PROPERTY(RecordListWidget *recordListWidget
-			   READ recordListWidget
-			   DESIGNABLE false
-			   SCRIPTABLE false
-			   USER false);
-	Q_PROPERTY(RecordContentWidget *recordContentWidget
-			   READ recordContentWidget
-			   DESIGNABLE false
-			   SCRIPTABLE false
-			   USER false);
 public:
 	MainWidget(QWidget *parent = nullptr);
 	
-	void readSettings(QSettings &settings, const QString &prefix = "");
-	void writeSettings(QSettings &settings, const QString &prefix = "") const;
+	virtual void readSettings(QSettings &settings, const QString &prefix = "") override;
+	virtual void writeSettings(QSettings &settings, const QString &prefix = "") const override;
 	
-	virtual RecordListWidget * recordListWidget();
-	virtual RecordContentWidget * recordContentWidget();
+	inline RecordListWidget * recordListWidget() const;
+	inline RecordContentWidget * recordContentWidget() const;
 private:
 	RecordListWidget *recordListWidget_;
 	RecordContentWidget *recordContentWidget_;
 };
 
+#include "mainwidget.hpp"
 #endif	// MAINWIDGET_H

@@ -44,15 +44,3 @@ void MainWidget::writeSettings(QSettings &settings, const QString &prefix) const
 	this->recordListWidget_->writeSettings(settings, current_prefix);
 	this->recordContentWidget_->writeSettings(settings, current_prefix);
 }
-
-
-RecordListWidget * MainWidget::recordListWidget()
-{
-	return this->recordListWidget_;
-}
-
-
-RecordContentWidget * MainWidget::recordContentWidget()
-{
-	return this->recordContentWidget_;
-}

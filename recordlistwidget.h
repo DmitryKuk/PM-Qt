@@ -3,7 +3,7 @@
 #ifndef RECORDLISTWIDGET_H
 #define RECORDLISTWIDGET_H
 
-#include <QtWidgets>
+#include <QTreeWidget>
 
 #include "settingssaver.h"
 
@@ -22,8 +22,8 @@ class RecordListWidget:
 public:
 	RecordListWidget(QWidget *parent = nullptr);
 	
-	void readSettings(QSettings &settings, const QString &prefix = "") override;
-	void writeSettings(QSettings &settings, const QString &prefix = "") const override;
+	virtual void readSettings(QSettings &settings, const QString &prefix = "") override;
+	virtual void writeSettings(QSettings &settings, const QString &prefix = "") const override;
 };
 
 #endif // RECORDLISTWIDGET_H

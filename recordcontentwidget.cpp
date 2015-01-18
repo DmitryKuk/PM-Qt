@@ -6,7 +6,7 @@ RecordContentWidget::RecordContentWidget(QWidget *parent):
 	QFrame(parent),
 	mainLayout_(new QVBoxLayout(this)),
 	
-	nameLabel_(new LabelButton(this)),
+	nameLineEdit_(new LineEditConfirm(this)),
 	
 	headWidget_(new QWidget(this)),
 	headLayout_(new QFormLayout(this->headWidget_)),
@@ -26,11 +26,11 @@ RecordContentWidget::RecordContentWidget(QWidget *parent):
 	palette.setColor(QPalette::Foreground, Qt::gray);
 	
 	// Head
-	this->nameLabel_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	auto nameLabelFont = this->nameLabel_->font();
+	this->nameLineEdit_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	auto nameLabelFont = this->nameLineEdit_->font();
 	nameLabelFont.setWeight(QFont::Bold);
 	nameLabelFont.setPointSize(nameLabelFont.pointSize() + 4);
-	this->nameLabel_->setFont(nameLabelFont);
+	this->nameLineEdit_->setFont(nameLabelFont);
 	
 	this->typeLabel_->setPalette(palette);
 	this->typeLabel_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::MinimumExpanding);
@@ -61,7 +61,7 @@ RecordContentWidget::RecordContentWidget(QWidget *parent):
 	this->scrollArea_->setFrameShape(QFrame::NoFrame);
 	
 	// Main
-	this->mainLayout_->addWidget(this->nameLabel_);
+	this->mainLayout_->addWidget(this->nameLineEdit_);
 	this->mainLayout_->addWidget(this->headWidget_);
 	this->mainLayout_->addWidget(this->hLine_);
 	this->mainLayout_->addWidget(this->scrollArea_);
@@ -70,12 +70,12 @@ RecordContentWidget::RecordContentWidget(QWidget *parent):
 	
 	
 	// Connections
-	this->connect(this->nameLabel_, &LabelButton::clicked,
-				  this, &RecordContentWidget::onNameClicked);
+	this->connect(this->nameLineEdit_, &LineEditConfirm::accepted,
+				  this, &RecordContentWidget::onNameChanged);
 	this->connect(this->typeLabel_, &LabelButton::clicked,
-				  this, &RecordContentWidget::onTypeClicked);
+				  this, &RecordContentWidget::onTypeNameClicked);
 	this->connect(this->groupLabel_, &LabelButton::clicked,
-				  this, &RecordContentWidget::onGroupClicked);
+				  this, &RecordContentWidget::onGroupNameClicked);
 }
 
 RecordContentWidget::~RecordContentWidget()
@@ -85,23 +85,29 @@ RecordContentWidget::~RecordContentWidget()
 
 
 QString RecordContentWidget::name() const
-{ return this->nameLabel_->text(); }
+{ return this->nameLineEdit_->text(); }
+
+QString RecordContentWidget::origanalName() const
+{ return this->nameLineEdit_->originalText(); }
 
 void RecordContentWidget::setName(const QString &name)
-{ this->nameLabel_->setText(name); }
+{ this->nameLineEdit_->setText(name); }
+
+void RecordContentWidget::confirmNameChanges()
+{ this->nameLineEdit_->confirmText(); }
 
 
-QString RecordContentWidget::group() const
+QString RecordContentWidget::groupName() const
 { return this->groupContent_->text(); }
 
-void RecordContentWidget::setGroup(const QString &groupName)
+void RecordContentWidget::setGroupName(const QString &groupName)
 { this->groupContent_->setText(groupName); }
 
 
-QString RecordContentWidget::type() const
+QString RecordContentWidget::typeName() const
 { return this->typeContent_->text(); }
 
-void RecordContentWidget::setType(const QString &typeName)
+void RecordContentWidget::setTypeName(const QString &typeName)
 { this->typeContent_->setText(typeName); }
 
 
@@ -118,6 +124,7 @@ void RecordContentWidget::setFields(const QList<QPair<QString, QString>> &fields
 	palette.setColor(QPalette::Foreground, Qt::gray);
 	
 	// Adding type labels and fields data
+	int i = 0;
 	for (const auto &field: fields) {
 		auto label = new LabelButton(field.first, this);	// Label with text of first
 		auto lineEdit = new LineEditConfirm(field.second, this);	// LineEdit with text of the second
@@ -126,9 +133,10 @@ void RecordContentWidget::setFields(const QList<QPair<QString, QString>> &fields
 		label->setMinimumHeight(lineEdit->height());
 		
 		this->connect(label, &LabelButton::clicked,
-					  this, &RecordContentWidget::onFieldClicked);
-		this->connect(lineEdit, &LineEditConfirm::confirmButtonClicked,
-					  this, &RecordContentWidget::onFieldChanged);
+					  [this, i]() { this->onFieldClicked(i); });
+		this->connect(lineEdit, &LineEditConfirm::accepted,
+					  [this, i](QString newText) { this->onFieldChanged(i, newText); });
+		++i;
 		
 		this->formLayout_->addRow(label, lineEdit);
 		this->fields_.append(qMakePair(label, lineEdit));
@@ -145,16 +153,14 @@ void RecordContentWidget::removeField(int index)
 }
 
 void RecordContentWidget::confirmFieldChanges(int index)
-{
-	this->fields_[index].second->confirmText();
-}
+{ this->fields_[index].second->confirmText(); }
 
 
 void RecordContentWidget::clear()
 {
 	this->hide();
 	
-	this->nameLabel_->setText("");
+	this->nameLineEdit_->setText("");
 	this->groupContent_->setText("");
 	this->typeContent_->setText("");
 	
@@ -184,59 +190,18 @@ void RecordContentWidget::writeSettings(QSettings &settings, const QString &pref
 
 
 // Slots
-void RecordContentWidget::onNameClicked(LabelButton *button)
-{
-	if (button == this->nameLabel_)
-		emit nameClicked();
-}
-
 void RecordContentWidget::onNameChanged(QString newText)
-{
-	emit nameChanged(newText);
-}
+{ emit nameChanged(newText); }
 
-void RecordContentWidget::onTypeClicked(LabelButton *button)
-{
-	if (button == this->typeLabel_)
-		emit typeClicked();
-}
+void RecordContentWidget::onTypeNameClicked()
+{ emit typeNameClicked(); }
 
-void RecordContentWidget::onTypeChanged(QString newText)
-{
-	emit typeChanged(newText);
-}
+void RecordContentWidget::onGroupNameClicked()
+{ emit groupNameClicked(); }
 
-void RecordContentWidget::onGroupClicked(LabelButton *button)
-{
-	if (button == this->groupLabel_)
-		emit groupClicked();
-}
 
-void RecordContentWidget::onGroupChanged(QString newText)
-{
-	emit groupChanged(newText);
-}
+void RecordContentWidget::onFieldClicked(int index)
+{ emit fieldClicked(index); }
 
-void RecordContentWidget::onFieldClicked(LabelButton *button)
-{
-	int i = 0;
-	for (const auto &p: this->fields_) {
-		if (button == p.first) {
-			emit fieldClicked(i);
-			break;
-		}
-		++i;
-	}
-}
-
-void RecordContentWidget::onFieldChanged(LineEditConfirm *field, QString newText)
-{
-	int i = 0;
-	for (const auto &p: this->fields_) {
-		if (field == p.second) {
-			emit fieldChanged(i, newText);
-			break;
-		}
-		++i;
-	}
-}
+void RecordContentWidget::onFieldChanged(int index, QString newText)
+{ emit fieldChanged(index, newText); }

@@ -3,7 +3,7 @@
 #ifndef TASKBUTTON_H
 #define TASKBUTTON_H
 
-#include <QWidget>
+#include <QPushButton>
 
 typedef QPushButton TaskButton;
 

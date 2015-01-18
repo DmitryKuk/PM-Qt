@@ -15,8 +15,8 @@ class GroupListWidget:
 public:
 	GroupListWidget(QWidget *parent = nullptr);
 	
-	void readSettings(QSettings &settings, const QString &prefix = "") override;
-	void writeSettings(QSettings &settings, const QString &prefix = "") const override;
+	virtual void readSettings(QSettings &settings, const QString &prefix = "") override;
+	virtual void writeSettings(QSettings &settings, const QString &prefix = "") const override;
 };
 
 #endif	// GROUPLISTWIDGET_H

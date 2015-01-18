@@ -3,11 +3,11 @@
 #ifndef LINEEDITCONFIRM_H
 #define LINEEDITCONFIRM_H
 
-#include <QWidget>
 #include <QFrame>
 #include <QLineEdit>
-#include <QPushButton>
+#include <QDialogButtonBox>
 #include <QHBoxLayout>
+#include <QPushButton>
 
 #include <QString>
 
@@ -18,8 +18,8 @@ class LineEditConfirm:
 {
 	Q_OBJECT
 public:
-	LineEditConfirm(QWidget *parent = nullptr);
-	LineEditConfirm(const QString &title, QWidget *parent = nullptr);
+	LineEditConfirm(QWidget *parent = nullptr, bool isTitle = false);
+	LineEditConfirm(const QString &title, QWidget *parent = nullptr, bool isTitle = false);
 	
 	void setText(const QString &text);
 	QString text() const;
@@ -31,23 +31,23 @@ public:
 	void confirmText();
 	void restoreText();
 signals:
-	void confirmButtonClicked(LineEditConfirm *object, QString newText);
+	void accepted(QString newText);
+	void rejected();
 private:
-	void init();
+	void init(bool isTitle);
 	
 	void showButtons();
 	void hideButtons();
 	
+	void onAccepted();
+	void onRejected();
+	
 	// Slots
 	void onTextEdited(const QString &newText);
-	void onConfirmButtonClicked();
-	void onCancelButtonClicked();
-	
-	//static QIcon confirmIcon_, cancelIcon_;
 	
 	QHBoxLayout *layout_;
 	QLineEdit *lineEdit_;
-	QPushButton *confirmButton_, *cancelButton_;
+	QDialogButtonBox *buttonBox_;
 	
 	QString originalText_;
 };

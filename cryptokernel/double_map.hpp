@@ -249,32 +249,32 @@ template<class Key1, class Key2, class Value, class Hash1, class Hash2, class Pr
 bool
 double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::update1(const Key1 &k1, const Key1 &new_k1)
 {
-	auto it = this->map1_.find(&k1);
-	if (it == this->map1_.end()) return false;
+	auto it1 = this->map1_.find(&k1);
+	if (it1 == this->map1_.end()							// Old element not found
+		|| this->map1_.find(&new_k1) != this->map1_.end())	// Or the new one already exists
+		return false;
 	
-	auto p = this->map1_.insert(std::move(std::make_pair(&new_k1, it->second)));
-	if (p.second) {	// Inserted
-		it->second->first = new_k1;	// Updating element in container
-		this->map1_.erase(it);	// Cleaning old data from map1_
-		return true;
-	}
-	return false;
+	auto it = it1->second;
+	this->map1_.erase(it1);	// Cleaning old data from map1_
+	it->first = new_k1;
+	this->map1_.emplace(&(it->first), it);	// Inserting new data into map1_
+	return true;
 }
 
 template<class Key1, class Key2, class Value, class Hash1, class Hash2, class Pred1, class Pred2>
 bool
 double_map<Key1, Key2, Value, Hash1, Hash2, Pred1, Pred2>::update2(const Key2 &k2, const Key2 &new_k2)
 {
-	auto it = this->map2_.find(&k2);
-	if (it == this->map2_.end()) return false;
+	auto it2 = this->map2_.find(&k2);
+	if (it2 == this->map2_.end()							// Old element not found
+		|| this->map2_.find(&new_k2) != this->map2_.end())	// Or the new one already exists
+		return false;
 	
-	auto p = this->map2_.insert(std::move(std::make_pair(&new_k2, it->second)));
-	if (p.second) {	// Inserted
-		it->second->second = new_k2;	// Updating element in container
-		this->map2_.erase(it);	// Cleaning old data from map1_
-		return true;
-	}
-	return false;
+	auto it = it2->second;
+	this->map2_.erase(it2);	// Cleaning old data from map2_
+	it->second = new_k2;
+	this->map2_.emplace(&(it->second), it);	// Inserting new data into map2_
+	return true;
 }
 
 

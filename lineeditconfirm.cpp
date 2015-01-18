@@ -2,30 +2,25 @@
 
 #include "lineeditconfirm.h"
 
-// QIcon
-// 	LineEditConfirm::confirmIcon_	= QIcon::fromTheme("edit-undo"),
-// 	LineEditConfirm::cancelIcon_	= QIcon::fromTheme("edit-redo");
 
-LineEditConfirm::LineEditConfirm(QWidget *parent):
+LineEditConfirm::LineEditConfirm(QWidget *parent, bool isTitle):
 	QFrame(parent),
 	layout_(new QHBoxLayout(this)),
 	lineEdit_(new QLineEdit(this)),
-	confirmButton_(new QPushButton(/*LineEditConfirm::confirmIcon_, */tr("Apply"), this)),
-	cancelButton_(new QPushButton(/*LineEditConfirm::cancelIcon_, */tr("Cancel"), this)),
+	buttonBox_(new QDialogButtonBox(this)),
 	originalText_("")
 {
-	this->init();
+	this->init(isTitle);
 }
 
-LineEditConfirm::LineEditConfirm(const QString &title, QWidget *parent):
+LineEditConfirm::LineEditConfirm(const QString &title, QWidget *parent, bool isTitle):
 	QFrame(parent),
 	layout_(new QHBoxLayout(this)),
 	lineEdit_(new QLineEdit(title, this)),
-	confirmButton_(new QPushButton(/*LineEditConfirm::confirmIcon_, */tr("Apply"), this)),
-	cancelButton_(new QPushButton(/*LineEditConfirm::cancelIcon_, */tr("Cancel"), this)),
+	buttonBox_(new QDialogButtonBox(this)),
 	originalText_(title)
 {
-	this->init();
+	this->init(isTitle);
 }
 
 
@@ -64,15 +59,24 @@ void LineEditConfirm::restoreText()
 }
 
 
-void LineEditConfirm::init()
+void LineEditConfirm::init(bool isTitle)
 {
+	if (isTitle) {
+		auto lineEditFont = this->lineEdit_->font();
+		lineEditFont.setWeight(QFont::Bold);
+		lineEditFont.setPointSize(lineEditFont.pointSize() + 4);
+		this->lineEdit_->setFont(lineEditFont);
+	}
+	
 	this->lineEdit_->setFrame(false);
 	this->setFrameShadow(QFrame::Sunken);
 	
+	this->buttonBox_->setStandardButtons(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
+	this->buttonBox_->button(QDialogButtonBox::Save)->setDefault(true);
+	
 	this->layout_->setContentsMargins(7, 7, 5, 0);
 	this->layout_->addWidget(this->lineEdit_);
-	this->layout_->addWidget(this->confirmButton_);
-	this->layout_->addWidget(this->cancelButton_);
+	this->layout_->addWidget(this->buttonBox_);
 	this->setLayout(this->layout_);
 	this->hideButtons();
 	
@@ -82,37 +86,34 @@ void LineEditConfirm::init()
 	// Connections
 	this->connect(this->lineEdit_, &QLineEdit::textEdited,
 				  this, &LineEditConfirm::onTextEdited);
-	this->connect(this->confirmButton_, &QPushButton::clicked,
-				  this, &LineEditConfirm::onConfirmButtonClicked);
-	this->connect(this->cancelButton_, &QPushButton::clicked,
-				  this, &LineEditConfirm::onCancelButtonClicked);
+	this->connect(this->buttonBox_, &QDialogButtonBox::accepted,
+				  this, &LineEditConfirm::onAccepted);
+	this->connect(this->buttonBox_, &QDialogButtonBox::rejected,
+				  this, &LineEditConfirm::onRejected);
 }
 
 
 void LineEditConfirm::showButtons()
 {
-	this->confirmButton_->show();
-	this->cancelButton_->show();
+	this->buttonBox_->show();
 	this->setFrame(true);
 }
 
 void LineEditConfirm::hideButtons()
 {
-	this->confirmButton_->hide();
-	this->cancelButton_->hide();
+	this->buttonBox_->hide();
 	this->setFrame(false);
 }
 
 
 // Slots
-void LineEditConfirm::onConfirmButtonClicked()
-{
-	emit confirmButtonClicked(this, this->lineEdit_->text());
-}
+void LineEditConfirm::onAccepted()
+{ emit accepted(this->lineEdit_->text()); }
 
-void LineEditConfirm::onCancelButtonClicked()
+void LineEditConfirm::onRejected()
 {
 	this->restoreText();
+	emit rejected();
 }
 
 

@@ -21,7 +21,6 @@
 
 #include "cryptokernel/cryptokernel.h"
 #include "mainwindow.h"
-#include "warningwindow.h"
 
 #include "abstractitem.h"
 #include "groupitem.h"
@@ -47,19 +46,15 @@ public:
 	void GUI_updateRecordContent();
 	
 	// Record content
-	void GUI_onNameClicked();
-	void GUI_onNameChanged(QString newName);
+	void GUI_onRecordNameChanged(QString newName);
+	void GUI_onRecordTypeNameClicked();
+	void GUI_onRecordGroupNameClicked();
 	
-	void GUI_onTypeClicked();
-	void GUI_onTypeChanged(QString newTypeName);
+	void GUI_onRecordFieldClicked(int index);
+	void GUI_onRecordFieldChanged(int index, QString newText);
 	
-	void GUI_onGroupClicked();
-	void GUI_onGroupChanged(QString newGroupName);
-	
-	void GUI_onFieldClicked(int index);
-	void GUI_onFieldChanged(int index, QString newText);
-	
-	void GUI_onMainWindowClosed();
+	// Group list
+	void GUI_onItemDataChanged(QTreeWidgetItem *item, int index);	// Group, record or type name changed
 	
 	// Add group/record/type, remove selected
 	void GUI_addGroup();
@@ -67,19 +62,14 @@ public:
 	void GUI_addType();
 	void GUI_removeSelectedItems();
 	
+	// Show warning with text
 	void GUI_showWarning(const QString &title, const QString &text);
-	void GUI_closeWarning();
+	
+	void GUI_showTypeEditDialog();
   // End of GUI management
 private:
-	QString DATA_typeName(RecordItem *recordItem) const;
-	QString DATA_parentGroupName(RecordItem *recordItem) const;
-	
-	void DATA_showRecordInList(RecordItem *recordItem);
-	void DATA_hideRecordInList(RecordItem *recordItem);
-	
   // GUI management (see cryptokernelagent_gui.cpp)
 	MainWindow *mainWindow_;		// Main window attached to this agent
-	WarningWindow *warningWindow_;	// Window with warning text (new window)
   // End of GUI management
 	
 	
@@ -91,7 +81,14 @@ private:
 	
 	
   // Data management (see cryptokernelagent_data.cpp)
-	cryptokernel kernel_;			// Cryptokernel used by this agent
+	cryptokernel *kernel_;			// Cryptokernel used by this agent
+	
+	
+	QString DATA_typeName(RecordItem *recordItem) const;
+	QString DATA_parentGroupName(RecordItem *recordItem) const;
+	
+	void DATA_showRecordInList(RecordItem *recordItem);
+	void DATA_hideRecordInList(RecordItem *recordItem);
 	
 	
 	struct Groups {	// Groups maps
@@ -126,7 +123,10 @@ private:
 	void DATA_addRootGroup();	// Unsafe! Use loadData()!
 	void DATA_removeRootGroup();	// Unsafe! Use removeSelectedItems() or removeGroup()!
 	
+	bool DATA_loadGroup(group_id_t id);
 	void DATA_loadGroups();	// Unsafe! Use loadData()!
+	
+	bool DATA_groupItemNameChanged(GroupItem *item);
 	
 	
 	struct Records {	// Records maps and set of shown items
@@ -167,6 +167,8 @@ private:
 	bool DATA_loadRecord(record_id_t id);
 	void DATA_loadRecords();	// Unsafe! Use loadData()!
 	
+	bool DATA_recordItemNameChanged(RecordItem *item);
+	
 	
 	struct Types {	// Type maps and root group
 		struct TypeInfo {
@@ -196,7 +198,10 @@ private:
 	};	// struct Types
 	Types types_;
 	
+	bool DATA_loadType(type_id_t id);
 	void DATA_loadTypes();	// Unsafe! Use loadData()!
+	
+	bool DATA_typeItemNameChanged(TypeItem *item);
 	
 	
 	struct RecordContent {	// Shown record content

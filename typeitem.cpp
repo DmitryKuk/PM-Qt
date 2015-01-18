@@ -7,6 +7,7 @@ TypeItem::TypeItem(const QString &typeName,
 	AbstractItem(typeName, parent)
 {
 	setItemType(this, ::ItemType::Type);
+	this->setFlags(this->flags() | Qt::ItemIsEditable);
 }
 
 TypeItem::TypeItem(const QString &typeName,
@@ -14,4 +15,5 @@ TypeItem::TypeItem(const QString &typeName,
 	AbstractItem(typeName, parent)
 {
 	setItemType(this, ::ItemType::Type);
+	this->setFlags(this->flags() | Qt::ItemIsEditable);
 }

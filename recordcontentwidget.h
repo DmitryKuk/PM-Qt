@@ -3,7 +3,12 @@
 #ifndef PASSWORDCONTENTWIDGET_H
 #define PASSWORDCONTENTWIDGET_H
 
-#include <QtWidgets>
+#include <QWidget>
+#include <QFrame>
+#include <QLabel>
+#include <QScrollArea>
+#include <QVBoxLayout>
+#include <QFormLayout>
 
 #include <QString>
 #include <QList>
@@ -25,13 +30,15 @@ public:
 	~RecordContentWidget();
 	
 	QString name() const;
+	QString origanalName() const;
 	void setName(const QString &name);
+	void confirmNameChanges();
 	
-	QString group() const;
-	void setGroup(const QString &groupName);
+	QString groupName() const;
+	void setGroupName(const QString &groupName);
 	
-	QString type() const;
-	void setType(const QString &typeName);
+	QString typeName() const;
+	void setTypeName(const QString &typeName);
 	
 	QString field(int index) const;
 	QString originalField(int index) const;
@@ -42,38 +49,28 @@ public:
 	
 	void clear();
 	
-	void readSettings(QSettings &settings, const QString &prefix = "") override;
-	void writeSettings(QSettings &settings, const QString &prefix = "") const override;
+	virtual void readSettings(QSettings &settings, const QString &prefix = "") override;
+	virtual void writeSettings(QSettings &settings, const QString &prefix = "") const override;
 signals:
-	void nameClicked();
 	void nameChanged(QString newName);
-	
-	void typeClicked();
-	void typeChanged(QString newTypeName);
-	
-	void groupClicked();
-	void groupChanged(QString newGroupName);
+	void typeNameClicked();
+	void groupNameClicked();
 	
 	void fieldClicked(int index);
 	void fieldChanged(int index, QString newText);
 private:
 	// Slots
-	void onNameClicked(LabelButton *button);
 	void onNameChanged(QString newText);
+	void onTypeNameClicked();
+	void onGroupNameClicked();
 	
-	void onTypeClicked(LabelButton *button);
-	void onTypeChanged(QString newText);
-	
-	void onGroupClicked(LabelButton *button);
-	void onGroupChanged(QString newText);
-	
-	void onFieldClicked(LabelButton *button);
-	void onFieldChanged(LineEditConfirm *field, QString newText);
+	void onFieldClicked(int index);
+	void onFieldChanged(int index, QString newText);
 	
 	
 	QVBoxLayout *mainLayout_;
 	
-	LabelButton *nameLabel_;
+	LineEditConfirm *nameLineEdit_;
 	
 	QWidget *headWidget_;
 	QFormLayout *headLayout_;
