@@ -52,7 +52,8 @@ public:
 	// Generates new type id and adds it with name
 	type_id_t add_type(const std::string &type_name);
 	
-	// Removes existing type with its fields
+	// Removes existing type with its fields,
+	// resetting records of this type and their fields to invalid
 	type_id_t remove_type(type_id_t tid);
 	
 	
@@ -75,7 +76,7 @@ public:
 	// Generates new field id and adds it with name
 	tfield_id_t add_type_field(type_id_t tid, const std::string &field_name, const std::string &field_format = "");
 	
-	// Removes existing field
+	// Removes existing type field, resetting all records' fields of this type to invalid
 	tfield_id_t remove_type_field(type_id_t tid, tfield_id_t fid);
 	
 	

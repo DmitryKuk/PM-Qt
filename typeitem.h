@@ -3,8 +3,6 @@
 #ifndef TYPEITEM_H
 #define TYPEITEM_H
 
-#include <QTreeWidget>
-
 #include <QString>
 
 #include "abstractitem.h"

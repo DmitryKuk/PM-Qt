@@ -3,8 +3,6 @@
 #ifndef GROUPITEM_H
 #define GROUPITEM_H
 
-#include <QTreeWidget>
-
 #include <QString>
 
 #include "abstractitem.h"

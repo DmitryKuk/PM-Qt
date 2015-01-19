@@ -48,7 +48,7 @@ RecordContentWidget::RecordContentWidget(QWidget *parent):
 	
 	// Form
 	this->formLayout_->setVerticalSpacing(2);
-	this->formLayout_->setContentsMargins(0, 0, 0, 0);
+	this->formLayout_->setContentsMargins(5, 5, 5, 5);
 	this->formLayout_->setFormAlignment(Qt::AlignLeft | Qt::AlignTop);
 	this->formLayout_->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
 	this->scrollArea_->setLayout(this->formLayout_);
@@ -79,6 +79,20 @@ RecordContentWidget::~RecordContentWidget()
 }
 
 
+record_id_t RecordContentWidget::recordId() const
+{ return this->recordId_; }
+
+void RecordContentWidget::setRecordId(record_id_t id)
+{ this->recordId_ = id; }
+
+
+type_id_t RecordContentWidget::recordTypeId() const
+{ return this->recordTypeId_; }
+
+void RecordContentWidget::setRecordTypeId(type_id_t id)
+{ this->recordTypeId_ = id; }
+
+
 QString RecordContentWidget::name() const
 { return this->nameLineEdit_->text(); }
 
@@ -106,51 +120,65 @@ void RecordContentWidget::setTypeName(const QString &typeName)
 { this->typeContent_->setText(typeName); }
 
 
-QString RecordContentWidget::field(int index) const
-{ return this->fields_[index].second->text(); }
-
-QString RecordContentWidget::originalField(int index) const
-{ return this->fields_[index].second->originalText(); }
-
-void RecordContentWidget::setFields(const QList<QPair<QString, QString>> &fields)
+void RecordContentWidget::addTypeField(tfield_id_t id, const QString &fieldName)
 {
-	for (const auto &fieldPair: fields)	// Adding type labels and fields data
-		this->addField(fieldPair.first, fieldPair.second);
+	this->typeFieldNames_[id] = fieldName;
+	this->typeFieldsOrder_.push_back(id);
+	for (auto &fieldPair: this->fields_)
+		fieldPair.first->addItem(fieldName);
 }
 
-void RecordContentWidget::addField(const QString &fieldTypeName, const QString &fieldData)
+
+QString RecordContentWidget::field(rfield_id_t id) const
+{ return this->fields_[id].second->text(); }
+
+QString RecordContentWidget::originalField(rfield_id_t id) const
+{ return this->fields_[id].second->originalText(); }
+
+
+void RecordContentWidget::addField(rfield_id_t fieldId, tfield_id_t fieldTypeId, const QString &fieldData)
 {
-	// Color for label
-	auto palette = this->palette();
-	palette.setColor(QPalette::Foreground, Qt::gray);
-	
-	auto label = new LabelButton(fieldTypeName, this);
+	auto comboBox = new QComboBox(this->scrollArea_);
 	auto lineEdit = new LineEditConfirm(fieldData, this);
 	
-	label->setPalette(palette);
-	label->setMinimumHeight(lineEdit->height());
+	// Color for comboBox
+	// auto palette = this->palette();
+	// palette.setColor(QPalette::Foreground, Qt::gray);
+	// comboBox->setPalette(palette);
+	// comboBox->setMinimumHeight(lineEdit->height());
 	
-	int i = this->fields_.size();
-	this->connect(label, &LabelButton::clicked,
-				  [this, i]() { this->onFieldClicked(i); });
+	// Filling combo box
+	int i = 0;
+	for (auto typeFieldId: this->typeFieldsOrder_) {
+		comboBox->addItem(this->typeFieldNames_[typeFieldId]);
+		if (typeFieldId == fieldTypeId)
+			comboBox->setCurrentIndex(i);
+		++i;
+	}
+	comboBox->setFrame(false);
+	
+	this->connect(comboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+				  [this, fieldId](int fieldTypeIndex) { this->onFieldTypeChanged(fieldId, fieldTypeIndex); });
 	this->connect(lineEdit, &LineEditConfirm::accepted,
-				  [this, i](QString newText) { this->onFieldChanged(i, newText); });
+				  [this, fieldId](QString newText) { this->onFieldChanged(fieldId, newText); });
 	
-	this->formLayout_->addRow(label, lineEdit);
-	this->fields_.append(qMakePair(label, lineEdit));
+	this->fields_[fieldId] = qMakePair(comboBox, lineEdit);
+	this->formLayout_->addRow(comboBox, lineEdit);
 }
 
 
-void RecordContentWidget::removeField(int index)
+void RecordContentWidget::removeField(rfield_id_t id)
 {
-	auto &p = this->fields_.at(index);
-	delete p.first;
-	delete p.second;
-	this->fields_.removeAt(index);
+	auto it = this->fields_.find(id);
+	if (it != this->fields_.end()) {
+		delete it->first;
+		delete it->second;
+		this->fields_.erase(it);
+	}
 }
 
-void RecordContentWidget::confirmFieldChanges(int index)
-{ this->fields_[index].second->confirmText(); }
+void RecordContentWidget::confirmFieldChanges(rfield_id_t id)
+{ this->fields_[id].second->confirmText(); }
 
 
 void RecordContentWidget::clear()
@@ -161,7 +189,14 @@ void RecordContentWidget::clear()
 	this->groupContent_->setText("");
 	this->typeContent_->setText("");
 	
+	this->recordId_ = invalid_record_id;
+	this->recordTypeId_ = invalid_type_id;
+	
+	this->typeFieldNames_.clear();
+	this->typeFieldsOrder_.clear();
+	
 	for (auto &p: this->fields_) {
+		p.first->clear();
 		delete p.first;
 		delete p.second;
 	}
@@ -197,8 +232,15 @@ void RecordContentWidget::onGroupNameClicked()
 { emit groupNameClicked(); }
 
 
-void RecordContentWidget::onFieldClicked(int index)
-{ emit fieldClicked(index); }
+void RecordContentWidget::onFieldClicked(rfield_id_t id)
+{ emit fieldClicked(id); }
 
-void RecordContentWidget::onFieldChanged(int index, QString newText)
-{ emit fieldChanged(index, newText); }
+void RecordContentWidget::onFieldChanged(rfield_id_t id, QString newText)
+{ emit fieldChanged(id, newText); }
+
+void RecordContentWidget::onFieldTypeChanged(rfield_id_t fieldId, tfield_id_t typeFieldIndex)
+{
+	auto fieldTypeId = this->typeFieldsOrder_.value(typeFieldIndex, invalid_tfield_id);
+	if (fieldTypeId != invalid_tfield_id)
+		emit fieldTypeChanged(fieldId, fieldTypeId);
+}

@@ -1,7 +1,7 @@
 # Author: Dmitry Kukovinets (d1021976@gmail.com)
 
 QT += core gui
-QMAKE_MAC_SDK = macosx10.9
+QMAKE_MAC_SDK = macosx10.10
 QMAKE_CXXFLAGS += -std=c++11 -Wall
 CONFIG += c++11
 
@@ -25,6 +25,7 @@ SOURCES += main.cpp \
 		groupitem.cpp \
 		recorditem.cpp \
 		typeitem.cpp \
+		typefielditem.cpp \
 		labelbutton.cpp \
 		lineeditconfirm.cpp \
 		typeeditdialog.cpp \
@@ -44,6 +45,7 @@ HEADERS += types.h \
 		groupitem.h \
 		recorditem.h \
 		typeitem.h \
+		typefielditem.h \
 		labelbutton.h \
 		lineeditconfirm.h \
 		typeeditdialog.h \

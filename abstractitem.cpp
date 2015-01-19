@@ -10,7 +10,8 @@ const int
 	ItemType::Group			= 20,
 	ItemType::Type			= 30,
 	ItemType::RootGroup		= 40,
-	ItemType::RootTypeGroup	= 50;
+	ItemType::RootTypeGroup	= 50,
+	ItemType::TypeField		= 60;
 
 
 AbstractItem::AbstractItem(const QString &itemName,

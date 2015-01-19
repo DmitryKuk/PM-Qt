@@ -6,16 +6,17 @@
 #include <QWidget>
 #include <QFrame>
 #include <QLabel>
+#include <QComboBox>
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include <QFormLayout>
 
-#include <QString>
+#include <QMap>
 #include <QList>
 #include <QPair>
+#include <QString>
 
-#include <unordered_map>
-
+#include "types.h"
 #include "labelbutton.h"
 #include "lineeditconfirm.h"
 #include "settingssaver.h"
@@ -29,6 +30,12 @@ public:
 	RecordContentWidget(QWidget *parent = nullptr);
 	~RecordContentWidget();
 	
+	record_id_t recordId() const;
+	void setRecordId(record_id_t id);
+	
+	type_id_t recordTypeId() const;
+	void setRecordTypeId(type_id_t id);
+	
 	QString name() const;
 	QString origanalName() const;
 	void setName(const QString &name);
@@ -40,13 +47,14 @@ public:
 	QString typeName() const;
 	void setTypeName(const QString &typeName);
 	
-	QString field(int index) const;
-	QString originalField(int index) const;
-	void setFields(const QList<QPair<QString, QString>> &fields);
-	void addField(const QString &fieldTypeName, const QString &fieldData);
+	void addTypeField(tfield_id_t id, const QString &fieldName);
 	
-	void removeField(int index);
-	void confirmFieldChanges(int index);
+	QString field(rfield_id_t id) const;
+	QString originalField(rfield_id_t id) const;
+	void addField(rfield_id_t fieldId, tfield_id_t fieldTypeId, const QString &fieldData);
+	
+	void removeField(rfield_id_t id);
+	void confirmFieldChanges(rfield_id_t id);
 	
 	void clear();
 	
@@ -57,18 +65,21 @@ signals:
 	void typeNameClicked();
 	void groupNameClicked();
 	
-	void fieldClicked(int index);
-	void fieldChanged(int index, QString newText);
+	void fieldClicked(rfield_id_t id);
+	void fieldChanged(rfield_id_t id, QString newText);
+	void fieldTypeChanged(rfield_id_t fieldId, tfield_id_t fieldTypeId);
 private:
 	// Slots
 	void onNameChanged(QString newText);
 	void onTypeNameClicked();
 	void onGroupNameClicked();
 	
-	void onFieldClicked(int index);
-	void onFieldChanged(int index, QString newText);
+	void onFieldClicked(rfield_id_t id);
+	void onFieldChanged(rfield_id_t id, QString newText);
+	void onFieldTypeChanged(rfield_id_t fieldId, tfield_id_t typeFieldIndex);
 	
 	
+	// Widgets
 	QVBoxLayout *mainLayout_;
 	
 	LineEditConfirm *nameLineEdit_;
@@ -87,8 +98,17 @@ private:
 	QScrollArea *scrollArea_;
 	QFormLayout *formLayout_;
 	
-	// Label button + LineEdit + original content
-	QList<QPair<LabelButton *, LineEditConfirm *>> fields_;
+	
+	// Data
+	record_id_t recordId_;
+	type_id_t recordTypeId_;
+	
+	// Field types for current type
+	QMap<tfield_id_t, QString> typeFieldNames_;
+	QList<tfield_id_t> typeFieldsOrder_;
+	
+	// Field type ComboBox + field data LineEdit
+	QMap<rfield_id_t, QPair<QComboBox *, LineEditConfirm *>> fields_;
 };
 
 #endif // PASSWORDCONTENTWIDGET_H

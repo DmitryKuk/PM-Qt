@@ -15,7 +15,6 @@
 #include <QObject>
 #include <QString>
 
-#include <vector>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -50,10 +49,11 @@ public:
 	void GUI_onRecordTypeNameClicked();
 	void GUI_onRecordGroupNameClicked();
 	
-	void GUI_onRecordFieldClicked(int index);
-	void GUI_onRecordFieldChanged(int index, QString newText);
+	void GUI_onRecordFieldClicked(rfield_id_t fieldId);
+	void GUI_onRecordFieldChanged(rfield_id_t fieldId, QString newText);
 	
 	void GUI_addRecordField();
+	void GUI_setRecordFieldType(rfield_id_t fieldId, tfield_id_t typeFieldId);
 	
 	// Group list
 	void GUI_onItemDataChanged(QTreeWidgetItem *item, int index);	// Group, record or type name changed
@@ -73,13 +73,6 @@ private:
   // GUI management (see cryptokernelagent_gui.cpp)
 	MainWindow *mainWindow_;		// Main window attached to this agent
   // End of GUI management
-	
-	
-  // Other functions
-	void DATA_removeRecord(RecordItem *item);
-	void DATA_removeGroup(GroupItem *item);
-	void DATA_removeType(TypeItem *item);
-  // End of other functions
 	
 	
   // Data management (see cryptokernelagent_data.cpp)
@@ -122,11 +115,12 @@ private:
 	};	// struct Groups
 	Groups groups_;
 	
-	void DATA_addRootGroup();	// Unsafe! Use loadData()!
-	void DATA_removeRootGroup();	// Unsafe! Use removeSelectedItems() or removeGroup()!
-	
 	bool DATA_loadGroup(group_id_t id);
 	void DATA_loadGroups();	// Unsafe! Use loadData()!
+	
+	void DATA_addRootGroup();	// Unsafe! Use loadData()!
+	void DATA_removeRootGroup();	// Unsafe! Use removeSelectedItems() or removeGroup()!
+	void DATA_removeGroup(GroupItem *item);
 	
 	bool DATA_groupItemNameChanged(GroupItem *item);
 	
@@ -169,6 +163,11 @@ private:
 	bool DATA_loadRecord(record_id_t id);
 	void DATA_loadRecords();	// Unsafe! Use loadData()!
 	
+	void DATA_addRecordField();
+	void DATA_setRecordFieldType(rfield_id_t fieldId, tfield_id_t typeFieldId);
+	
+	void DATA_removeRecord(RecordItem *item);
+	
 	bool DATA_recordItemNameChanged(RecordItem *item);
 	
 	
@@ -203,18 +202,10 @@ private:
 	bool DATA_loadType(type_id_t id);
 	void DATA_loadTypes();	// Unsafe! Use loadData()!
 	
+	void DATA_removeType(TypeItem *item);
+	void DATA_removeTypeField(TypeItem *item, tfield_id_t fieldId);
+	
 	bool DATA_typeItemNameChanged(TypeItem *item);
-	
-	
-	struct RecordContent {	// Shown record content
-		record_id_t shownRecordId;
-		std::vector<rfield_id_t> shownFieldIds;
-		
-		void clear();
-	};	// struct RecordContent
-	RecordContent recordContent_;
-	
-	void DATA_addRecordField();
 	
 	
 	void DATA_loadData();	// Safe

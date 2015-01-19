@@ -435,7 +435,8 @@ cryptokernel::add_type(const std::string &type_name)
 	return invalid_type_id;
 }
 
-// Removes existing type with its fields
+// Removes existing type with its fields,
+// resetting records of this type and their fields to invalid
 type_id_t
 cryptokernel::remove_type(type_id_t tid)
 {
@@ -451,6 +452,14 @@ cryptokernel::remove_type(type_id_t tid)
 		if (order_it->first == tid) {
 			this->types_order_.erase(order_it);
 			break;
+		}
+	
+	// Resetting all fields of this type to invalid
+	for (auto &record_data: this->records_)	// Searching records of type tid
+		if (record_data.second.type == tid) {
+			record_data.second.type = invalid_tfield_id;	// Resetting records types to invalid
+			for (auto &field_data: record_data.second.fields)	// And resetting records' fields to invalid
+				field_data.second.type = invalid_tfield_id;
 		}
 	return tid;
 }
@@ -524,7 +533,7 @@ cryptokernel::add_type_field(type_id_t tid, const std::string &field_name, const
 	return invalid_tfield_id;
 }
 
-// Removes existing field
+// Removes existing type field, resetting all records' fields of this type to invalid
 tfield_id_t
 cryptokernel::remove_type_field(type_id_t tid, tfield_id_t fid)
 {
@@ -546,6 +555,13 @@ cryptokernel::remove_type_field(type_id_t tid, tfield_id_t fid)
 				}
 			break;
 		}
+	
+	// Resetting all fields of this type to invalid
+	for (auto &record_data: this->records_)	// Searching records of type tid
+		if (record_data.second.type == tid)
+			for (auto &field_data: record_data.second.fields)	// Searching fields of type fid
+				if (field_data.second.type == fid)
+					field_data.second.type = invalid_tfield_id;	// And resetting them to invalid
 	return fid;
 }
 
@@ -980,9 +996,17 @@ rfield_id_t
 cryptokernel::remove_field(record_id_t rid, rfield_id_t fid)
 {
 	try {
-		auto &fields = this->records_.at(rid).fields;
-		auto it = fields.find(fid);
-		if (it != fields.end()) fields.erase(it);
+		auto &record_data = this->records_.at(rid);
+		auto it = record_data.fields.find(fid);
+		if (it == record_data.fields.end()) throw (int());
+		record_data.fields.erase(it);
+		
+		for (auto it = record_data.fields_order.begin(), end = record_data.fields_order.end(); it != end; ++it)
+			if (*it == fid) {
+				record_data.fields_order.erase(it);
+				break;
+			}
+		return fid;
 	} catch (...) {}
 	return invalid_rfield_id;
 }

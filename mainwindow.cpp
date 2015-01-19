@@ -81,6 +81,8 @@ MainWindow::MainWindow(CryptoKernelAgent *agent,
 	// Record content -> agent
 	this->connect(this->addRecordFieldAction_, &QAction::triggered,
 				  [this]() { this->agent_->GUI_addRecordField(); });
+	this->connect(this->recordContentWidget(), &RecordContentWidget::fieldTypeChanged,
+				  [this](rfield_id_t fieldId, tfield_id_t typeFieldId) { this->agent_->GUI_setRecordFieldType(fieldId, typeFieldId); });
 	this->connect(this->recordContentWidget(), &RecordContentWidget::nameChanged,
 				  [this](QString newName) { this->agent_->GUI_onRecordNameChanged(newName); });
 	this->connect(this->recordContentWidget(), &RecordContentWidget::typeNameClicked,

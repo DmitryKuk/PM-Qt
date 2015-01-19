@@ -3,7 +3,6 @@
 #ifndef ABSTRACTITEM_H
 #define ABSTRACTITEM_H
 
-#include <QTreeWidget>
 #include <QTreeWidgetItem>
 
 #include <QString>
@@ -17,7 +16,8 @@ extern const int
 	Group,			// = 20
 	Type,			// = 30
 	RootGroup,		// = 40
-	RootTypeGroup;	// = 50
+	RootTypeGroup,	// = 50
+	TypeField;		// = 60
 };
 
 extern inline int itemType(const QTreeWidgetItem *item);

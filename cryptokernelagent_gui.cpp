@@ -105,7 +105,6 @@ void CryptoKernelAgent::GUI_updateRecordContent()
 	auto recordListWidget = this->GUI_mainWindow()->recordListWidget();
 	auto recordContentWidget = this->GUI_mainWindow()->recordContentWidget();
 	recordContentWidget->clear();
-	this->recordContent_.clear();
 	
 	auto selectedRecordItems = recordListWidget->selectedItems();
 	if (selectedRecordItems.size() != 1) {	// Selected 0 or >1 items: don't need to show fields
@@ -116,39 +115,38 @@ void CryptoKernelAgent::GUI_updateRecordContent()
 	try {
 		// Record metadata
 		auto recordItem = selectedRecordItems[0];
-		auto recordId = this->records_.recordListItemsMap.at(recordItem)->id;
-		auto recordName = this->records_.idsMap.at(recordId)->name;
+		const auto &recordInfo = *(this->records_.recordListItemsMap.at(recordItem));
 		
-		auto typeId = this->kernel_->record_type(recordId);
-		auto &typeName = this->types_.idsMap.at(typeId)->name;
+		const auto typeId = this->kernel_->record_type(recordInfo.id);
+		const auto &typeName = this->types_.idsMap.at(typeId)->name;
 		
-		auto parentGroupId = this->kernel_->record_parent_group(recordId);
-		auto &parentGroupName = this->groups_.idsMap.at(parentGroupId)->name;
+		const auto parentGroupId = this->kernel_->record_parent_group(recordInfo.id);
+		const auto &parentGroupName = this->groups_.idsMap.at(parentGroupId)->name;
 		
 		// Filling record metadata
-		recordContentWidget->setName(recordName);
+		recordContentWidget->setRecordId(recordInfo.id);
+		recordContentWidget->setName(recordInfo.name);
+		recordContentWidget->setRecordTypeId(typeId);
 		recordContentWidget->setTypeName(typeName);
 		recordContentWidget->setGroupName(parentGroupName);
 		
-		// Update agent's cache
-		this->recordContent_.shownRecordId = recordId;
-		this->recordContent_.shownFieldIds = std::move(this->kernel_->fields(recordId));
-		
-		// Processing record fields
-		QList<QPair<QString, QString>> fieldsToShow;
-		for (auto fieldId: this->recordContent_.shownFieldIds) {
-			auto fieldTypeId = this->kernel_->field_type(recordId, fieldId);
-			auto fieldTypeName = QString::fromStdString(this->kernel_->type_field_name(typeId, fieldTypeId));
-			auto fieldData = QString::fromStdString(this->kernel_->field_data(recordId, fieldId));
-			
-			fieldsToShow.append(qMakePair(fieldTypeName, fieldData));
+		// Adding types to record list widget
+		recordContentWidget->addTypeField(invalid_tfield_id, QObject::tr("<Raw>"));
+		for (auto typeFieldId: this->kernel_->type_fields(typeId)) {
+			auto typeFieldName = QString::fromStdString(this->kernel_->type_field_name(typeId, typeFieldId));
+			recordContentWidget->addTypeField(typeFieldId, typeFieldName);
 		}
-		recordContentWidget->setFields(fieldsToShow);
+		
+		// Adding records to record list widget
+		for (auto fieldId: this->kernel_->fields(recordInfo.id)) {
+			auto fieldTypeId = this->kernel_->field_type(recordInfo.id, fieldId);
+			auto fieldData = QString::fromStdString(this->kernel_->field_data(recordInfo.id, fieldId));
+			recordContentWidget->addField(fieldId, fieldTypeId, fieldData);
+		}
 		
 		recordContentWidget->show();
 	} catch (...) {
 		recordContentWidget->clear();
-		recordContentWidget->hide();
 	}
 }
 
@@ -157,7 +155,7 @@ void CryptoKernelAgent::GUI_updateRecordContent()
 void CryptoKernelAgent::GUI_onRecordNameChanged(QString newName)
 {
 	try {
-		auto shownRecordItem = this->records_.idsMap.at(this->recordContent_.shownRecordId)->item;
+		auto shownRecordItem = this->records_.idsMap.at(this->GUI_mainWindow()->recordContentWidget()->recordId())->item;
 		shownRecordItem->setName(newName);
 		if (this->DATA_recordItemNameChanged(shownRecordItem))
 			this->GUI_mainWindow()->recordContentWidget()->confirmNameChanges();
@@ -176,23 +174,24 @@ void CryptoKernelAgent::GUI_onRecordGroupNameClicked()
 	std::cerr << "Copy group name \"" << groupName.toStdString() << "\"." << std::endl;
 }
 
-void CryptoKernelAgent::GUI_onRecordFieldClicked(int index)
+void CryptoKernelAgent::GUI_onRecordFieldClicked(rfield_id_t fieldId)
 {
-	auto fieldData = this->GUI_mainWindow()->recordContentWidget()->originalField(index);
+	auto fieldData = this->GUI_mainWindow()->recordContentWidget()->originalField(fieldId);
 	std::cerr << "Copy field data \"" << fieldData.toStdString() << "\"." << std::endl;
 }
 
-void CryptoKernelAgent::GUI_onRecordFieldChanged(int index, QString newText)
+void CryptoKernelAgent::GUI_onRecordFieldChanged(rfield_id_t fieldId, QString newText)
 {
 	try {
-		auto fieldId = this->recordContent_.shownFieldIds.at(index);
+		auto recordId = this->GUI_mainWindow()->recordContentWidget()->recordId();
+		if (recordId == invalid_record_id) return;
+		
 		if (newText.size() == 0) {
-			this->kernel_->remove_field(this->recordContent_.shownRecordId, fieldId);
-			this->GUI_mainWindow()->recordContentWidget()->removeField(index);
-			this->recordContent_.shownFieldIds.erase(this->recordContent_.shownFieldIds.begin() + index);
+			this->kernel_->remove_field(recordId, fieldId);
+			this->GUI_mainWindow()->recordContentWidget()->removeField(fieldId);
 		} else {
-			this->kernel_->set_field_data(this->recordContent_.shownRecordId, fieldId, newText.toStdString());
-			this->GUI_mainWindow()->recordContentWidget()->confirmFieldChanges(index);
+			this->kernel_->set_field_data(recordId, fieldId, newText.toStdString());
+			this->GUI_mainWindow()->recordContentWidget()->confirmFieldChanges(fieldId);
 		}
 	} catch (...) {}
 }
@@ -200,6 +199,9 @@ void CryptoKernelAgent::GUI_onRecordFieldChanged(int index, QString newText)
 
 void CryptoKernelAgent::GUI_addRecordField()
 { this->DATA_addRecordField(); }
+
+void CryptoKernelAgent::GUI_setRecordFieldType(rfield_id_t fieldId, tfield_id_t typeFieldId)
+{ this->DATA_setRecordFieldType(fieldId, typeFieldId); }
 
 
 // Group list
@@ -242,8 +244,8 @@ void CryptoKernelAgent::GUI_addGroup()
 		this->DATA_loadGroup(newGroupId);
 	} catch (...) {
 		this->GUI_showWarning(QObject::tr("Error"),
-						  QObject::tr("Please, select parent group in list at the left "
-						  			  "and try again."));
+							  QObject::tr("Please, select parent group in list at the left "
+						  				  "and try again."));
 	}
 }
 
@@ -361,6 +363,12 @@ void CryptoKernelAgent::GUI_showTypeEditDialog()
 		// Lambda helpers
 		auto changeTypeName = [this, item, &dialog](QString newName)
 		{
+			if (newName.isEmpty()) {
+				this->GUI_showWarning(QObject::tr("Error"),
+									  QObject::tr("Can't set empty name to the type."));
+				return;
+			}
+			
 			try {
 				auto oldName = this->types_.itemsMap.at(item)->name;
 				if (newName == oldName) return;
@@ -374,24 +382,32 @@ void CryptoKernelAgent::GUI_showTypeEditDialog()
 			}
 		};
 		
-		auto changeTypeFieldName = [this, item, &info, &dialog, &fieldIds, &fieldNames](int index, QString newName)
+		auto changeTypeFieldName = [this, item, &info, &dialog, &fieldIds, &fieldNames](int id, QString newName)
 		{
 			try {
 				auto typeId = this->types_.itemsMap.at(item)->id;
-				auto oldName = fieldNames.at(index);
+				auto oldName = fieldNames.at(id);
 				if (newName == oldName) return;
 				
-				auto fieldId = fieldIds.at(index);
+				auto fieldId = fieldIds.at(id);
+				if (newName.isEmpty()) {
+					dialog.removeField(id);
+					fieldIds.erase(fieldIds.begin() + id);
+					fieldNames.removeAt(id);
+					this->DATA_removeTypeField(item, fieldId);
+					return;
+				}
+				
 				fieldId = this->kernel_->set_type_field_name(typeId, fieldId, newName.toStdString());
 				if (fieldId == invalid_tfield_id)
 					this->GUI_showWarning(QObject::tr("Error"),
 										  QObject::tr("Can't set name \"%1\" to the type field \"%2\": "
 													  "type field with the same name already exists.").arg(newName, oldName));
 				else {
-					dialog.confirmFieldChanges(index);
+					dialog.confirmFieldChanges(id);
 					
-					if (this->recordContent_.shownRecordId != invalid_record_id
-						&& this->kernel_->record_type(this->recordContent_.shownRecordId) == info.id)
+					if (this->GUI_mainWindow()->recordContentWidget()->recordId() != invalid_record_id
+						&& this->kernel_->record_type(this->GUI_mainWindow()->recordContentWidget()->recordId()) == info.id)
 						this->GUI_updateRecordContent();
 				}
 			} catch (...) {	// It's impossible
@@ -417,8 +433,8 @@ void CryptoKernelAgent::GUI_showTypeEditDialog()
 			// Updating dialog fields
 			dialog.addField(newTypeFieldName);
 			
-			if (this->recordContent_.shownRecordId != invalid_record_id
-				&& this->kernel_->record_type(this->recordContent_.shownRecordId) == info.id)
+			if (this->GUI_mainWindow()->recordContentWidget()->recordId() != invalid_record_id
+				&& this->kernel_->record_type(this->GUI_mainWindow()->recordContentWidget()->recordId()) == info.id)
 				this->GUI_updateRecordContent();
 		};
 		
