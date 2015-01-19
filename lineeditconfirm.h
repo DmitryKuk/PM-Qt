@@ -39,13 +39,12 @@ private:
 	void showButtons();
 	void hideButtons();
 	
-	void onAccepted();
-	void onRejected();
+	void onClicked(QAbstractButton *button);
 	
 	// Slots
 	void onTextEdited(const QString &newText);
 	
-	QHBoxLayout *layout_;
+	QHBoxLayout *mainLayout_;
 	QLineEdit *lineEdit_;
 	QDialogButtonBox *buttonBox_;
 	

@@ -48,10 +48,14 @@ private:
 	
 	
 	// Context menu
+	// Group list
 	QAction
 		*addGroupAction_, *addRecordAction_, *addTypeAction_,
 		*removeAction_,
 		*editTypeAction_;
+	
+	// Record content
+	QAction *addRecordFieldAction_;
 	
 	QSplitter *mainSplit_;
 	LeftPanelWidget *leftPanelWidget_;	// Left panel

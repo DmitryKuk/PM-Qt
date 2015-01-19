@@ -5,7 +5,7 @@
 
 LineEditConfirm::LineEditConfirm(QWidget *parent, bool isTitle):
 	QFrame(parent),
-	layout_(new QHBoxLayout(this)),
+	mainLayout_(new QHBoxLayout(this)),
 	lineEdit_(new QLineEdit(this)),
 	buttonBox_(new QDialogButtonBox(this)),
 	originalText_("")
@@ -15,7 +15,7 @@ LineEditConfirm::LineEditConfirm(QWidget *parent, bool isTitle):
 
 LineEditConfirm::LineEditConfirm(const QString &title, QWidget *parent, bool isTitle):
 	QFrame(parent),
-	layout_(new QHBoxLayout(this)),
+	mainLayout_(new QHBoxLayout(this)),
 	lineEdit_(new QLineEdit(title, this)),
 	buttonBox_(new QDialogButtonBox(this)),
 	originalText_(title)
@@ -71,25 +71,25 @@ void LineEditConfirm::init(bool isTitle)
 	this->lineEdit_->setFrame(false);
 	this->setFrameShadow(QFrame::Sunken);
 	
-	this->buttonBox_->setStandardButtons(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
-	this->buttonBox_->button(QDialogButtonBox::Save)->setDefault(true);
+	this->buttonBox_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	this->buttonBox_->setOrientation(Qt::Horizontal);
+	this->buttonBox_->layout()->setSpacing(5);
+	this->buttonBox_->layout()->setContentsMargins(5, 0, 0, 0);
+	this->buttonBox_->setStandardButtons(QDialogButtonBox::Apply | QDialogButtonBox::Cancel);
+	this->buttonBox_->button(QDialogButtonBox::Apply)->setDefault(true);
 	
-	this->layout_->setContentsMargins(7, 7, 5, 0);
-	this->layout_->addWidget(this->lineEdit_);
-	this->layout_->addWidget(this->buttonBox_);
-	this->setLayout(this->layout_);
+	this->mainLayout_->addWidget(this->lineEdit_);
+	this->mainLayout_->addWidget(this->buttonBox_);
+	this->setLayout(this->mainLayout_);
 	this->hideButtons();
 	
-	//this->setContentsMargins(1, 1, 1, 1);
 	this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	
 	// Connections
 	this->connect(this->lineEdit_, &QLineEdit::textEdited,
 				  this, &LineEditConfirm::onTextEdited);
-	this->connect(this->buttonBox_, &QDialogButtonBox::accepted,
-				  this, &LineEditConfirm::onAccepted);
-	this->connect(this->buttonBox_, &QDialogButtonBox::rejected,
-				  this, &LineEditConfirm::onRejected);
+	this->connect(this->buttonBox_, &QDialogButtonBox::clicked,
+				  this, &LineEditConfirm::onClicked);
 }
 
 
@@ -97,23 +97,26 @@ void LineEditConfirm::showButtons()
 {
 	this->buttonBox_->show();
 	this->setFrame(true);
+	this->mainLayout_->setContentsMargins(6, 6, 4, 0);
 }
 
 void LineEditConfirm::hideButtons()
 {
 	this->buttonBox_->hide();
 	this->setFrame(false);
+	this->mainLayout_->setContentsMargins(7, 7, 5, 0);
 }
 
 
 // Slots
-void LineEditConfirm::onAccepted()
-{ emit accepted(this->lineEdit_->text()); }
-
-void LineEditConfirm::onRejected()
+void LineEditConfirm::onClicked(QAbstractButton *button)
 {
-	this->restoreText();
-	emit rejected();
+	if (this->buttonBox_->buttonRole(button) == QDialogButtonBox::ApplyRole)
+		emit accepted(this->lineEdit_->text());
+	else {
+		this->restoreText();
+		emit rejected();
+	}
 }
 
 

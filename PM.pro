@@ -47,7 +47,7 @@ HEADERS += types.h \
 		labelbutton.h \
 		lineeditconfirm.h \
 		typeeditdialog.h \
-		cryptokernelagent.h cryptokernelagent_data.hpp \
+		cryptokernelagent.h cryptokernelagent_data.hpp  cryptokernelagent_gui.hpp \
 		algorithm.h algorithm.hpp
 
 

@@ -9,6 +9,7 @@
 #include <QLabel>
 #include <QScrollArea>
 #include <QVBoxLayout>
+#include <QAction>
 
 #include "lineeditconfirm.h"
 
@@ -27,6 +28,7 @@ public:
 	QString field(int index) const;
 	QString originalField(int index) const;
 	void setFields(const QList<QString> &fields);
+	void addField(const QString &text);
 	
 	void removeField(int index);
 	void confirmFieldChanges(int index);
@@ -35,10 +37,12 @@ public:
 signals:
 	void nameChanged(QString newName);
 	void fieldChanged(int index, QString newText);
+	void fieldAdded();
 private:
 	// Slots
 	void onNameChanged(QString newText);
 	void onFieldChanged(int index, QString newText);
+	void onAddFieldActionActivated();
 	
 	
 	LineEditConfirm *nameLineEdit_;
@@ -47,6 +51,9 @@ private:
 	QVBoxLayout *mainLayout_, *scrollAreaLayout_;
 	
 	QList<LineEditConfirm *> fields_;
+	
+	// Context menu
+	QAction *addTypeFieldAction_;
 };
 
 #endif // TYPEEDITDIALOG_H

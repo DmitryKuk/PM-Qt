@@ -242,7 +242,8 @@ cryptokernel::read(std::istream &s)
 					io::read(s, field_type_id);
 					io::read(s, field_data);
 					
-					field_type_id = type_pair.second.at(field_type_id);
+					if (field_type_id != invalid_tfield_id)
+						field_type_id = type_pair.second.at(field_type_id);
 					
 					auto new_field_id = this->add_field(record_id, field_type_id, field_data);
 					if (new_field_id == invalid_rfield_id) throw (io::exception());
@@ -553,12 +554,13 @@ cryptokernel::remove_type_field(type_id_t tid, tfield_id_t fid)
 std::string
 cryptokernel::type_field_name(type_id_t tid, tfield_id_t fid) const
 {
-	try {
-		const auto &fields = this->types_.at1(tid).fields;
-		auto it = fields.find1(fid);
-		if (it == fields.end()) return "";
-		return it->second;
-	} catch (...) {}
+	if (tid != invalid_type_id && fid != invalid_tfield_id)
+		try {
+			const auto &fields = this->types_.at1(tid).fields;
+			auto it = fields.find1(fid);
+			if (it == fields.end()) return "";
+			return it->second;
+		} catch (...) {}
 	return "";
 }
 
@@ -566,12 +568,11 @@ cryptokernel::type_field_name(type_id_t tid, tfield_id_t fid) const
 tfield_id_t
 cryptokernel::set_type_field_name(type_id_t tid, tfield_id_t fid, const std::string &field_name)
 {
-	if (field_name.empty()) return invalid_tfield_id;
-	
-	try {
-		auto &fields = this->types_.at1(tid).fields;
-		if (fields.update12(fid, field_name)) return fid;
-	} catch (...) {}
+	if (!field_name.empty() && tid != invalid_type_id && fid != invalid_tfield_id)
+		try {
+			auto &fields = this->types_.at1(tid).fields;
+			if (fields.update12(fid, field_name)) return fid;
+		} catch (...) {}
 	return invalid_tfield_id;
 }
 
@@ -684,7 +685,7 @@ record_id_t
 cryptokernel::add_record(group_id_t gid, const std::string &record_name, type_id_t record_type)
 {
 	if (record_name.empty() || this->root_group_id_ == invalid_group_id
-		|| (!this->types_.test1(record_type) && record_type != invalid_type_id))
+		|| (record_type != invalid_type_id && !this->types_.test1(record_type)))
 		return invalid_record_id;
 	try {
 		auto &records = this->groups_.at(gid).records;
@@ -866,8 +867,12 @@ cryptokernel::set_record_type(record_id_t rid, type_id_t record_type_id)
 {
 	try {
 		auto &record_data = this->records_.at(rid);
-		if (record_data.fields.empty() && this->test_type(record_type_id)) {
-			record_data.type = record_type_id;
+		if (record_type_id == record_data.type) return rid;
+		
+		if (record_type_id == invalid_type_id || this->test_type(record_type_id)) {
+			for (auto fid: record_data.fields_order)	// Reset fields types to invalid
+				this->set_field_type(rid, fid, invalid_tfield_id);
+			record_data.type = record_type_id;			// Change record type
 			return rid;
 		}
 	} catch (...) {}
@@ -956,8 +961,9 @@ cryptokernel::add_field(record_id_t rid, tfield_id_t type, const std::string &da
 {
 	try {
 		auto &record = this->records_.at(rid);
-		if (!this->test_type_field(record.type, type))
+		if (type != invalid_tfield_id && !this->test_type_field(record.type, type))
 			return invalid_rfield_id;	// Incorrect field type
+		
 		auto p = record.fields.insert_random(this->rfield_generator_,
 											 { .type = type,
 											   .data = data });
@@ -989,7 +995,7 @@ cryptokernel::field_type(record_id_t rid, rfield_id_t fid) const
 	try {
 		return this->records_.at(rid).fields.at(fid).type;
 	} catch (...) {}
-	return invalid_rfield_id;
+	return invalid_tfield_id;
 }
 
 // Sets field type or returns invalid_tfield_id, if it is impossible
@@ -997,8 +1003,13 @@ rfield_id_t
 cryptokernel::set_field_type(record_id_t rid, rfield_id_t fid, tfield_id_t type)
 {
 	try {
-		this->records_.at(rid).fields.at(fid).type = type;
-		return fid;
+		auto &record_data = this->records_.at(rid);
+		if (record_data.type != invalid_type_id
+			&& (type == invalid_tfield_id
+				|| test_type_field(record_data.type, type))) {
+			record_data.fields.at(fid).type = type;
+			return fid;
+		}
 	} catch (...) {}
 	return invalid_rfield_id;
 }

@@ -18,6 +18,7 @@ MainWindow::MainWindow(CryptoKernelAgent *agent,
 	addTypeAction_(new QAction(tr("Add type"), this)),
 	removeAction_(new QAction(tr("Remove selected"), this)),
 	editTypeAction_(new QAction(tr("Edit type"), this)),
+	addRecordFieldAction_(new QAction(tr("Add field"), this)),
 	
 	mainSplit_(new QSplitter(this)),
 	leftPanelWidget_(new LeftPanelWidget(mainSplit_)),
@@ -31,12 +32,17 @@ MainWindow::MainWindow(CryptoKernelAgent *agent,
 	}
 	
 	// Context menu
-	this->leftPanelWidget()->groupListWidget()->setContextMenuPolicy(Qt::ActionsContextMenu);
-	this->leftPanelWidget()->groupListWidget()->addAction(this->addRecordAction_);
-	this->leftPanelWidget()->groupListWidget()->addAction(this->addGroupAction_);
-	this->leftPanelWidget()->groupListWidget()->addAction(this->addTypeAction_);
-	this->leftPanelWidget()->groupListWidget()->addAction(this->removeAction_);
-	this->leftPanelWidget()->groupListWidget()->addAction(this->editTypeAction_);
+	// Group list
+	this->groupListWidget()->setContextMenuPolicy(Qt::ActionsContextMenu);
+	this->groupListWidget()->addAction(this->addRecordAction_);
+	this->groupListWidget()->addAction(this->addGroupAction_);
+	this->groupListWidget()->addAction(this->addTypeAction_);
+	this->groupListWidget()->addAction(this->removeAction_);
+	this->groupListWidget()->addAction(this->editTypeAction_);
+	
+	// Record content
+	this->recordContentWidget()->setContextMenuPolicy(Qt::ActionsContextMenu);
+	this->recordContentWidget()->addAction(this->addRecordFieldAction_);
 	
 	// Main splitter setting...
 	this->mainSplit_->setOrientation(Qt::Horizontal);
@@ -65,29 +71,31 @@ MainWindow::MainWindow(CryptoKernelAgent *agent,
 	this->connect(this->editTypeAction_,  &QAction::triggered, [this]() { this->agent_->GUI_showTypeEditDialog();  });
 	
 	// Groups list -> records list
-	this->connect(this->leftPanelWidget()->groupListWidget(), &GroupListWidget::itemSelectionChanged,
+	this->connect(this->groupListWidget(), &GroupListWidget::itemSelectionChanged,
 				  [this]() { this->agent_->GUI_updateRecordListItems(); });
 	
 	// Records list -> record content widget
-	this->connect(this->mainWidget()->recordListWidget(), &RecordListWidget::itemSelectionChanged,
+	this->connect(this->recordListWidget(), &RecordListWidget::itemSelectionChanged,
 				  [this]() { this->agent_->GUI_updateRecordContent(); });
 	
 	// Record content -> agent
-	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::nameChanged,
+	this->connect(this->addRecordFieldAction_, &QAction::triggered,
+				  [this]() { this->agent_->GUI_addRecordField(); });
+	this->connect(this->recordContentWidget(), &RecordContentWidget::nameChanged,
 				  [this](QString newName) { this->agent_->GUI_onRecordNameChanged(newName); });
-	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::typeNameClicked,
+	this->connect(this->recordContentWidget(), &RecordContentWidget::typeNameClicked,
 				  [this]() { this->agent_->GUI_onRecordTypeNameClicked(); });
-	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::groupNameClicked,
+	this->connect(this->recordContentWidget(), &RecordContentWidget::groupNameClicked,
 				  [this]() { this->agent_->GUI_onRecordGroupNameClicked(); });
 	
 	
-	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::fieldClicked,
+	this->connect(this->recordContentWidget(), &RecordContentWidget::fieldClicked,
 				  [this](int index) { this->agent_->GUI_onRecordFieldClicked(index); });
-	this->connect(this->mainWidget()->recordContentWidget(), &RecordContentWidget::fieldChanged,
+	this->connect(this->recordContentWidget(), &RecordContentWidget::fieldChanged,
 				  [this](int index, QString newText) { this->agent_->GUI_onRecordFieldChanged(index, newText); });
 	
 	// Group list: items names
-	this->connect(this->leftPanelWidget()->groupListWidget(), &GroupListWidget::itemChanged,
+	this->connect(this->groupListWidget(), &GroupListWidget::itemChanged,
 				  [this](QTreeWidgetItem *item, int index) { this->agent_->GUI_onItemDataChanged(item, index); });
 }
 

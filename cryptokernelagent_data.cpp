@@ -443,13 +443,6 @@ void CryptoKernelAgent::Types::clear()
 }
 
 
-void CryptoKernelAgent::RecordContent::clear()
-{
-	this->shownRecordId = invalid_record_id;
-	this->shownFieldIds.clear();
-}
-
-
 bool CryptoKernelAgent::DATA_loadType(type_id_t id)
 {
 	Types::TypeInfo info;
@@ -510,9 +503,37 @@ bool CryptoKernelAgent::DATA_typeItemNameChanged(TypeItem *item)
 }
 
 
+void CryptoKernelAgent::RecordContent::clear()
+{
+	this->shownRecordId = invalid_record_id;
+	this->shownFieldIds.clear();
+}
+
+
+void CryptoKernelAgent::DATA_addRecordField()
+{
+	static const QString newRecordName = QObject::tr("New field");
+	
+	if (this->recordContent_.shownRecordId == invalid_record_id) return;
+	
+	auto recordFieldId = this->kernel_->add_field(this->recordContent_.shownRecordId, invalid_tfield_id, newRecordName.toStdString());
+	if (recordFieldId == invalid_rfield_id)
+		this->GUI_showWarning(QObject::tr("Error"),
+							  QObject::tr("Unknown error."));
+	else {
+		auto recordTypeId = this->kernel_->record_type(this->recordContent_.shownRecordId);
+		auto recordFieldTypeId = this->kernel_->field_type(this->recordContent_.shownRecordId, recordFieldId);
+		auto fieldTypeName = QString::fromStdString(this->kernel_->type_field_name(recordTypeId, recordFieldTypeId));
+		auto recordFieldData = QString::fromStdString(this->kernel_->field_data(this->recordContent_.shownRecordId, recordFieldId));
+		this->recordContent_.shownFieldIds.push_back(recordFieldId);
+		this->GUI_mainWindow()->recordContentWidget()->addField(fieldTypeName, recordFieldData);
+	}
+}
+
+
 void CryptoKernelAgent::DATA_loadData()
 {
-	this->DATA_loadGroups();		// Adding groups (must be before loadRecords()!)
+	this->DATA_loadGroups();	// Adding groups (must be before loadRecords()!)
 	this->DATA_loadTypes();		// Adding types (must be before loadRecords()!)
 	this->DATA_loadRecords();	// Adding records
 }

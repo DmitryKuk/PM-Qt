@@ -7,7 +7,7 @@
 // Example: [     GUI      ] <-> [          Agent          ] <-> [    Kernel    ]
 //          (Qt/ncurses/...)     (depends on GUI and Kernel)     (lib/daemon/...)
 // This version of program uses Qt GUI, so Agent has Qt-based API too. Agent may has
-// own cache for some data. Some data caches in PasswordItem or GroupItem objects.
+// own cache for some data.
 
 #ifndef CRYPTOKERNELAGENT_H
 #define CRYPTOKERNELAGENT_H
@@ -39,7 +39,7 @@ public:
   // End of other functions
 	
   // GUI management
-	MainWindow * GUI_mainWindow();
+	inline MainWindow * GUI_mainWindow() const;
 	
 	// Update functions
 	void GUI_updateRecordListItems();
@@ -52,6 +52,8 @@ public:
 	
 	void GUI_onRecordFieldClicked(int index);
 	void GUI_onRecordFieldChanged(int index, QString newText);
+	
+	void GUI_addRecordField();
 	
 	// Group list
 	void GUI_onItemDataChanged(QTreeWidgetItem *item, int index);	// Group, record or type name changed
@@ -212,6 +214,8 @@ private:
 	};	// struct RecordContent
 	RecordContent recordContent_;
 	
+	void DATA_addRecordField();
+	
 	
 	void DATA_loadData();	// Safe
   // End of data management
@@ -227,4 +231,5 @@ private:
 
 
 #include "cryptokernelagent_data.hpp"
+#include "cryptokernelagent_gui.hpp"
 #endif // CRYPTOKERNELAGENT_H

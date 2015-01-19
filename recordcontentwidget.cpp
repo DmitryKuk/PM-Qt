@@ -6,7 +6,7 @@ RecordContentWidget::RecordContentWidget(QWidget *parent):
 	QFrame(parent),
 	mainLayout_(new QVBoxLayout(this)),
 	
-	nameLineEdit_(new LineEditConfirm(this)),
+	nameLineEdit_(new LineEditConfirm(this, true)),
 	
 	headWidget_(new QWidget(this)),
 	headLayout_(new QFormLayout(this->headWidget_)),
@@ -25,13 +25,6 @@ RecordContentWidget::RecordContentWidget(QWidget *parent):
 	auto palette = this->palette();
 	palette.setColor(QPalette::Foreground, Qt::gray);
 	
-	// Head
-	this->nameLineEdit_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	auto nameLabelFont = this->nameLineEdit_->font();
-	nameLabelFont.setWeight(QFont::Bold);
-	nameLabelFont.setPointSize(nameLabelFont.pointSize() + 4);
-	this->nameLineEdit_->setFont(nameLabelFont);
-	
 	this->typeLabel_->setPalette(palette);
 	this->typeLabel_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::MinimumExpanding);
 	this->typeContent_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -40,8 +33,8 @@ RecordContentWidget::RecordContentWidget(QWidget *parent):
 	this->groupLabel_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::MinimumExpanding);
 	this->groupContent_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	
-	this->headLayout_->setContentsMargins(0, 0, 0, 0);
-	//this->headLayout_->setVerticalSpacing(5);
+	this->headLayout_->setContentsMargins(0, 0, 0, 4);
+	this->headLayout_->setVerticalSpacing(4);
 	this->headLayout_->setFormAlignment(Qt::AlignLeft | Qt::AlignTop);
 	this->headLayout_->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
 	this->headLayout_->addRow(this->typeLabel_, this->typeContent_);
@@ -54,19 +47,21 @@ RecordContentWidget::RecordContentWidget(QWidget *parent):
 	this->hLine_->setFrameShadow(QFrame::Sunken);
 	
 	// Form
-	this->formLayout_->setContentsMargins(0, 5, 0, 0);
+	this->formLayout_->setVerticalSpacing(2);
+	this->formLayout_->setContentsMargins(0, 0, 0, 0);
 	this->formLayout_->setFormAlignment(Qt::AlignLeft | Qt::AlignTop);
 	this->formLayout_->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
 	this->scrollArea_->setLayout(this->formLayout_);
 	this->scrollArea_->setFrameShape(QFrame::NoFrame);
 	
 	// Main
+	this->mainLayout_->setSpacing(2);
+	this->mainLayout_->setContentsMargins(10, 0, 10, 0);
 	this->mainLayout_->addWidget(this->nameLineEdit_);
 	this->mainLayout_->addWidget(this->headWidget_);
 	this->mainLayout_->addWidget(this->hLine_);
 	this->mainLayout_->addWidget(this->scrollArea_);
 	this->setLayout(this->mainLayout_);
-	this->setContentsMargins(5, 0, 5, 0);
 	
 	
 	// Connections
@@ -119,28 +114,30 @@ QString RecordContentWidget::originalField(int index) const
 
 void RecordContentWidget::setFields(const QList<QPair<QString, QString>> &fields)
 {
-	// Color for labels
+	for (const auto &fieldPair: fields)	// Adding type labels and fields data
+		this->addField(fieldPair.first, fieldPair.second);
+}
+
+void RecordContentWidget::addField(const QString &fieldTypeName, const QString &fieldData)
+{
+	// Color for label
 	auto palette = this->palette();
 	palette.setColor(QPalette::Foreground, Qt::gray);
 	
-	// Adding type labels and fields data
-	int i = 0;
-	for (const auto &field: fields) {
-		auto label = new LabelButton(field.first, this);	// Label with text of first
-		auto lineEdit = new LineEditConfirm(field.second, this);	// LineEdit with text of the second
-		
-		label->setPalette(palette);
-		label->setMinimumHeight(lineEdit->height());
-		
-		this->connect(label, &LabelButton::clicked,
-					  [this, i]() { this->onFieldClicked(i); });
-		this->connect(lineEdit, &LineEditConfirm::accepted,
-					  [this, i](QString newText) { this->onFieldChanged(i, newText); });
-		++i;
-		
-		this->formLayout_->addRow(label, lineEdit);
-		this->fields_.append(qMakePair(label, lineEdit));
-	}
+	auto label = new LabelButton(fieldTypeName, this);
+	auto lineEdit = new LineEditConfirm(fieldData, this);
+	
+	label->setPalette(palette);
+	label->setMinimumHeight(lineEdit->height());
+	
+	int i = this->fields_.size();
+	this->connect(label, &LabelButton::clicked,
+				  [this, i]() { this->onFieldClicked(i); });
+	this->connect(lineEdit, &LineEditConfirm::accepted,
+				  [this, i](QString newText) { this->onFieldChanged(i, newText); });
+	
+	this->formLayout_->addRow(label, lineEdit);
+	this->fields_.append(qMakePair(label, lineEdit));
 }
 
 

@@ -43,6 +43,7 @@ public:
 	QString field(int index) const;
 	QString originalField(int index) const;
 	void setFields(const QList<QPair<QString, QString>> &fields);
+	void addField(const QString &fieldTypeName, const QString &fieldData);
 	
 	void removeField(int index);
 	void confirmFieldChanges(int index);
