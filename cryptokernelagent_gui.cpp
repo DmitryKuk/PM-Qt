@@ -351,14 +351,14 @@ void CryptoKernelAgent::GUI_showTypeEditDialog()
 	
 	try {
 		auto &info = *(this->types_.itemsMap.at(item));
-		auto fieldIds = this->kernel_->type_fields(info.id);
-		QStringList fieldNames;
-		for (auto fieldId: fieldIds)
-			fieldNames.append(QString::fromStdString(this->kernel_->type_field_name(info.id, fieldId)));
-		
 		TypeEditDialog dialog(this->GUI_mainWindow());
+		
+		// Filling type data
 		dialog.setName(info.name);
-		dialog.setFields(fieldNames);
+		for (auto fieldId: this->kernel_->type_fields(info.id)) {
+			auto fieldName = QString::fromStdString(this->kernel_->type_field_name(info.id, fieldId));
+			dialog.addField(fieldId, fieldName);
+		}
 		
 		// Lambda helpers
 		auto changeTypeName = [this, item, &dialog](QString newName)
@@ -370,8 +370,11 @@ void CryptoKernelAgent::GUI_showTypeEditDialog()
 			}
 			
 			try {
-				auto oldName = this->types_.itemsMap.at(item)->name;
-				if (newName == oldName) return;
+				const auto &oldName = this->types_.itemsMap.at(item)->name;
+				if (newName == oldName) {
+					dialog.confirmNameChanges();
+					return;
+				}
 				
 				item->setName(newName);
 				if (this->DATA_typeItemNameChanged(item))
@@ -382,65 +385,60 @@ void CryptoKernelAgent::GUI_showTypeEditDialog()
 			}
 		};
 		
-		auto changeTypeFieldName = [this, item, &info, &dialog, &fieldIds, &fieldNames](int id, QString newName)
+		auto changeTypeFieldName = [this, item, &info, &dialog](tfield_id_t fieldId, QString newName)
 		{
-			try {
-				auto typeId = this->types_.itemsMap.at(item)->id;
-				auto oldName = fieldNames.at(id);
-				if (newName == oldName) return;
-				
-				auto fieldId = fieldIds.at(id);
-				if (newName.isEmpty()) {
-					dialog.removeField(id);
-					fieldIds.erase(fieldIds.begin() + id);
-					fieldNames.removeAt(id);
-					this->DATA_removeTypeField(item, fieldId);
-					return;
-				}
-				
-				fieldId = this->kernel_->set_type_field_name(typeId, fieldId, newName.toStdString());
-				if (fieldId == invalid_tfield_id)
-					this->GUI_showWarning(QObject::tr("Error"),
-										  QObject::tr("Can't set name \"%1\" to the type field \"%2\": "
-													  "type field with the same name already exists.").arg(newName, oldName));
-				else {
-					dialog.confirmFieldChanges(id);
-					
-					if (this->GUI_mainWindow()->recordContentWidget()->recordId() != invalid_record_id
-						&& this->kernel_->record_type(this->GUI_mainWindow()->recordContentWidget()->recordId()) == info.id)
-						this->GUI_updateRecordContent();
-				}
-			} catch (...) {	// It's impossible
+			auto oldName = QString::fromStdString(this->kernel_->type_field_name(info.id, fieldId));
+			if (newName == oldName) {
+				dialog.confirmFieldChanges(fieldId);
+				return;
+			}
+			
+			if (newName.isEmpty()) {
+				dialog.removeField(fieldId);
+				this->DATA_removeTypeField(item, fieldId);
+				return;
+			}
+			
+			fieldId = this->kernel_->set_type_field_name(info.id, fieldId, newName.toStdString());
+			if (fieldId == invalid_tfield_id)
 				this->GUI_showWarning(QObject::tr("Error"),
-									  QObject::tr("Type field does not exist."));
+									  QObject::tr("Can't set name \"%1\" to the type field \"%2\": "
+												  "type field with the same name already exists.").arg(newName, oldName));
+			else {
+				dialog.confirmFieldChanges(fieldId);
+				
+				auto shownRecordId = this->GUI_mainWindow()->recordContentWidget()->recordId();
+				if (shownRecordId != invalid_record_id
+					&& this->kernel_->record_type(shownRecordId) == info.id)
+					this->GUI_updateRecordContent();
 			}
 		};
 		
-		auto addTypeField = [this, item, &info, &dialog, &fieldIds, &fieldNames]()
+		auto addTypeField = [this, &info, &dialog]()
 		{
-			static const QString newTypeFieldNamePrefix = QObject::tr("New field ");
+			static const QString fieldNamePrefix = QObject::tr("New field ");
 			
-			tfield_id_t newTypeFieldId = invalid_tfield_id;
-			for (size_t i = 1; newTypeFieldId == invalid_tfield_id; ++i) {	// Adding type field like "New field 1"
-				auto newTypeFieldName = (newTypeFieldNamePrefix + QString::number(i)).toStdString();
-				newTypeFieldId = this->kernel_->add_type_field(info.id, newTypeFieldName);
+			tfield_id_t fieldId = invalid_tfield_id;
+			for (size_t i = 1; fieldId == invalid_tfield_id; ++i) {	// Adding type field like "New field 1"
+				auto fieldName = (fieldNamePrefix + QString::number(i)).toStdString();
+				fieldId = this->kernel_->add_type_field(info.id, fieldName);
 			}
-			// Getting inserted name
-			auto newTypeFieldName = QString::fromStdString(this->kernel_->type_field_name(info.id, newTypeFieldId));
-			fieldIds.push_back(newTypeFieldId);
-			fieldNames.append(newTypeFieldName);
 			
 			// Updating dialog fields
-			dialog.addField(newTypeFieldName);
+			auto fieldName = QString::fromStdString(this->kernel_->type_field_name(info.id, fieldId));
+			dialog.addField(fieldId, fieldName);
 			
-			if (this->GUI_mainWindow()->recordContentWidget()->recordId() != invalid_record_id
-				&& this->kernel_->record_type(this->GUI_mainWindow()->recordContentWidget()->recordId()) == info.id)
+			auto shownRecordId = this->GUI_mainWindow()->recordContentWidget()->recordId();
+			if (shownRecordId != invalid_record_id
+				&& this->kernel_->record_type(shownRecordId) == info.id)
 				this->GUI_updateRecordContent();
 		};
 		
+		// Connections
 		QObject::connect(&dialog, &TypeEditDialog::nameChanged,  changeTypeName);
 		QObject::connect(&dialog, &TypeEditDialog::fieldChanged, changeTypeFieldName);
 		QObject::connect(&dialog, &TypeEditDialog::fieldAdded,   addTypeField);
+		
 		dialog.exec();
 	} catch (...) {}
 }

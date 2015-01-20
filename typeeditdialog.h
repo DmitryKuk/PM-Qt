@@ -11,9 +11,10 @@
 #include <QVBoxLayout>
 #include <QAction>
 
-#include "lineeditconfirm.h"
+#include <QMap>
 
-#include <QList>
+#include "lineeditconfirm.h"
+#include "types.h"
 
 class TypeEditDialog: public QDialog
 {
@@ -25,23 +26,21 @@ public:
 	void setName(const QString &name);
 	void confirmNameChanges();
 	
-	QString field(int index) const;
-	QString originalField(int index) const;
-	void setFields(const QList<QString> &fields);
-	void addField(const QString &text);
-	
-	void removeField(int index);
-	void confirmFieldChanges(int index);
+	QString field(tfield_id_t id) const;
+	QString originalField(tfield_id_t id) const;
+	void addField(tfield_id_t id, const QString &text);
+	void removeField(tfield_id_t id);
+	void confirmFieldChanges(tfield_id_t id);
 	
 	void clear();
 signals:
 	void nameChanged(QString newName);
-	void fieldChanged(int index, QString newText);
+	void fieldChanged(tfield_id_t id, QString newText);
 	void fieldAdded();
 private:
 	// Slots
 	void onNameChanged(QString newText);
-	void onFieldChanged(int index, QString newText);
+	void onFieldChanged(tfield_id_t id, QString newText);
 	void onAddFieldActionActivated();
 	
 	
@@ -50,7 +49,7 @@ private:
 	QDialogButtonBox *buttonBox_;
 	QVBoxLayout *mainLayout_, *scrollAreaLayout_;
 	
-	QList<LineEditConfirm *> fields_;
+	QMap<tfield_id_t, LineEditConfirm *> fields_;
 	
 	// Context menu
 	QAction *addTypeFieldAction_;

@@ -53,40 +53,43 @@ void TypeEditDialog::confirmNameChanges()
 { this->nameLineEdit_->confirmText(); }
 
 
-QString TypeEditDialog::field(int index) const
-{ return this->fields_[index]->text(); }
-
-QString TypeEditDialog::originalField(int index) const
-{ return this->fields_[index]->originalText(); }
-
-void TypeEditDialog::setFields(const QList<QString> &fields)
+QString TypeEditDialog::field(tfield_id_t id) const
 {
-	for (const auto &field: fields)	// Adding type labels and fields data
-		this->addField(field);
+	auto it = this->fields_.find(id);
+	if (it == this->fields_.end()) return "";
+	return (*it)->text();
 }
 
-void TypeEditDialog::addField(const QString &text)
+QString TypeEditDialog::originalField(tfield_id_t id) const
+{
+	auto it = this->fields_.find(id);
+	if (it == this->fields_.end()) return "";
+	return (*it)->originalText();
+}
+
+void TypeEditDialog::addField(tfield_id_t id, const QString &text)
 {
 	auto lineEdit = new LineEditConfirm(text, this->scrollArea_);	// LineEdit with text of the second
-	
-	int i = this->fields_.size();
-	this->connect(lineEdit, &LineEditConfirm::accepted,
-				  [this, i](QString newText) { this->onFieldChanged(i, newText); });
-	
 	this->scrollAreaLayout_->addWidget(lineEdit);
-	this->fields_.append(lineEdit);
+	this->fields_[id] = lineEdit;
+	
+	this->connect(lineEdit, &LineEditConfirm::accepted,
+				  [this, id](QString newText) { this->onFieldChanged(id, newText); });
 }
 
-
-void TypeEditDialog::removeField(int index)
+void TypeEditDialog::removeField(tfield_id_t id)
 {
-	delete this->fields_.at(index);
-	this->fields_.removeAt(index);
+	auto it = this->fields_.find(id);
+	if (it == this->fields_.end()) return;
+	delete *it;
+	this->fields_.erase(it);
 }
 
-void TypeEditDialog::confirmFieldChanges(int index)
+void TypeEditDialog::confirmFieldChanges(tfield_id_t id)
 {
-	this->fields_[index]->confirmText();
+	auto it = this->fields_.find(id);
+	if (it == this->fields_.end()) return;
+	(*it)->confirmText();
 }
 
 
@@ -106,8 +109,8 @@ void TypeEditDialog::onNameChanged(QString newText)
 { emit nameChanged(newText); }
 
 
-void TypeEditDialog::onFieldChanged(int index, QString newText)
-{ emit fieldChanged(index, newText); }
+void TypeEditDialog::onFieldChanged(tfield_id_t id, QString newText)
+{ emit fieldChanged(id, newText); }
 
 void TypeEditDialog::onAddFieldActionActivated()
 { emit fieldAdded(); }
