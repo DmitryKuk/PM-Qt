@@ -13,11 +13,12 @@
 namespace generator {
 
 // Generation status
-enum class status {
+namespace status {
+extern const int
 	not_initialized,	// Generator was not be initialized correctly
 	success,			// Operation was successful
 	not_enough_entropy,	// Operation was incorrect because of entropy pool is empty
-	unknown_error		// Another error occured
+	unknown_error;		// Another error occured
 };
 
 
@@ -35,7 +36,7 @@ public:
 	inline generator::base & operator=(generator::base &&other);		// Move
 	
 	// Returns status of last generation
-	inline enum status status() const { return this->status_; }
+	inline int status() const { return this->status_; }
 	
 	// Tells about last operation status
 	inline bool good() const { return this->status() == status::success; }
@@ -43,9 +44,9 @@ public:
 	inline operator bool() const { return this->good(); }
 protected:
 	// Sets new status. Call this function on every generation
-	inline void set_status(enum status new_status) const { this->status_ = new_status; }
+	inline void set_status(int new_status) const { this->status_ = new_status; }
 private:
-	mutable std::atomic<enum status> status_;
+	mutable std::atomic<int> status_;
 };
 
 
