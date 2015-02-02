@@ -47,7 +47,7 @@ RecordContentWidget::RecordContentWidget(QWidget *parent):
 	this->hLine_->setFrameShadow(QFrame::Sunken);
 	
 	// Form
-	this->formLayout_->setVerticalSpacing(2);
+	this->formLayout_->setVerticalSpacing(1);
 	this->formLayout_->setContentsMargins(5, 5, 5, 5);
 	this->formLayout_->setFormAlignment(Qt::AlignLeft | Qt::AlignTop);
 	this->formLayout_->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
@@ -66,11 +66,11 @@ RecordContentWidget::RecordContentWidget(QWidget *parent):
 	
 	// Connections
 	this->connect(this->nameLineEdit_, &LineEditConfirm::accepted,
-				  this, &RecordContentWidget::onNameChanged);
+				  [this](QString newText) { emit nameChanged(newText); });
 	this->connect(this->typeLabel_, &LabelButton::clicked,
-				  this, &RecordContentWidget::onTypeNameClicked);
+				  [this]() { emit typeNameClicked(); });
 	this->connect(this->groupLabel_, &LabelButton::clicked,
-				  this, &RecordContentWidget::onGroupNameClicked);
+				  [this]() { emit groupNameClicked(); });
 }
 
 RecordContentWidget::~RecordContentWidget()
@@ -153,10 +153,13 @@ void RecordContentWidget::addField(rfield_id_t fieldId, tfield_id_t fieldTypeId,
 		comboBox->addItem(this->typeFieldNames_[typeFieldId]);
 		if (typeFieldId == fieldTypeId)
 			comboBox->setCurrentIndex(i);
+		
+		comboBox->setItemData(i, Qt::AlignRight, Qt::TextAlignmentRole);
 		++i;
 	}
 	comboBox->setFrame(false);
 	
+	// Connections
 	this->connect(comboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
 				  [this, fieldId](int fieldTypeIndex) { this->onFieldTypeChanged(fieldId, fieldTypeIndex); });
 	this->connect(lineEdit, &LineEditConfirm::accepted,
@@ -222,15 +225,6 @@ void RecordContentWidget::writeSettings(QSettings &settings, const QString &pref
 
 
 // Slots
-void RecordContentWidget::onNameChanged(QString newText)
-{ emit nameChanged(newText); }
-
-void RecordContentWidget::onTypeNameClicked()
-{ emit typeNameClicked(); }
-
-void RecordContentWidget::onGroupNameClicked()
-{ emit groupNameClicked(); }
-
 
 void RecordContentWidget::onFieldClicked(rfield_id_t id)
 { emit fieldClicked(id); }

@@ -21,9 +21,9 @@ TypeEditDialog::TypeEditDialog(QWidget *parent):
 	palette.setColor(QPalette::Background, Qt::white);
 	this->setPalette(palette);
 	
-	this->setModal(true);
-	
-	this->scrollAreaLayout_->setContentsMargins(0, 5, 0, 0);
+	this->scrollAreaLayout_->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
+	this->scrollAreaLayout_->setSpacing(1);
+	this->scrollAreaLayout_->setContentsMargins(2, 2, 1, 2);
 	this->scrollArea_->setLayout(this->scrollAreaLayout_);
 	this->buttonBox_->setOrientation(Qt::Horizontal);
 	this->buttonBox_->setStandardButtons(QDialogButtonBox::Close);
@@ -32,6 +32,9 @@ TypeEditDialog::TypeEditDialog(QWidget *parent):
 	this->mainLayout_->addWidget(this->nameLineEdit_);
 	this->mainLayout_->addWidget(this->scrollArea_);
 	this->mainLayout_->addWidget(this->buttonBox_);
+	
+	this->setModal(true);
+	this->setMinimumWidth(400);
 	
 	// Connections
 	this->connect(this->addTypeFieldAction_, &QAction::triggered,
@@ -72,6 +75,8 @@ void TypeEditDialog::addField(tfield_id_t id, const QString &text)
 	auto lineEdit = new LineEditConfirm(text, this->scrollArea_);	// LineEdit with text of the second
 	this->scrollAreaLayout_->addWidget(lineEdit);
 	this->fields_[id] = lineEdit;
+	
+	lineEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	
 	this->connect(lineEdit, &LineEditConfirm::accepted,
 				  [this, id](QString newText) { this->onFieldChanged(id, newText); });

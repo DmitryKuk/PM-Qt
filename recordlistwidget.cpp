@@ -13,6 +13,7 @@ RecordListWidget::RecordListWidget(QWidget *parent):
 	QTreeWidget(parent)
 {
 	this->setHeaderLabels({ tr("Name"), tr("Type"), tr("Group") });
+	this->setAlternatingRowColors(true);
 }
 
 

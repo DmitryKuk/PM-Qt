@@ -13,6 +13,7 @@ GroupItem::GroupItem(const QString &groupName,
 		setItemType(this, ::ItemType::Group);
 		this->setFlags(this->flags() | Qt::ItemIsEditable);
 	}
+	this->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
 }
 
 GroupItem::GroupItem(const QString &groupName,
@@ -26,4 +27,5 @@ GroupItem::GroupItem(const QString &groupName,
 		setItemType(this, ::ItemType::Group);
 		this->setFlags(this->flags() | Qt::ItemIsEditable);
 	}
+	this->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
 }

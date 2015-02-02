@@ -343,13 +343,13 @@ bool CryptoKernelAgent::DATA_loadRecord(record_id_t id)
 		
 		// Adding data into recordListWidget
 		info.recordListItem = new QTreeWidgetItem(recordListWidget);
-		info.recordListItem->setText(RecordFieldPos::Name, info.name);
-		
 		auto typeId = this->kernel_->record_type(id);
-		info.recordListItem->setText(RecordFieldPos::TypeName, this->types_.idsMap.at(typeId)->name);
-		
 		auto recordParentGroupId = this->kernel_->record_parent_group(id);
-		info.recordListItem->setText(RecordFieldPos::ParentGroup, this->groups_.idsMap.at(recordParentGroupId)->name);
+		
+		// Filling item's data
+		info.recordListItem->setText(RecordFieldPos::Name,			info.name);
+		info.recordListItem->setText(RecordFieldPos::TypeName,		this->types_.idsMap.at(typeId)->name);
+		info.recordListItem->setText(RecordFieldPos::ParentGroup,	this->groups_.idsMap.at(recordParentGroupId)->name);
 		
 		// Updating agent's cache
 		this->records_.add(info);

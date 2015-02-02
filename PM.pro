@@ -1,7 +1,7 @@
 # Author: Dmitry Kukovinets (d1021976@gmail.com)
 
 QT += core gui
-QMAKE_MAC_SDK = macosx10.10
+QMAKE_MAC_SDK = macosx10.9
 QMAKE_CXXFLAGS += -std=c++11 -Wall
 CONFIG += c++11
 
