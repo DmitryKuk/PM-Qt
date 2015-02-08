@@ -21,7 +21,7 @@ void CryptoKernelAgent::GUI_updateRecordListItems()
 	oldShownRecordListItems.swap(this->records_.shownRecordListItems);
 	
 	// Queue for searching records in groups (BFS)
-	std::queue<group_id_t> groupIdQueue;
+	std::queue<types::group_id> groupIdQueue;
 	
 	
 	// Lambda-helpers
@@ -34,7 +34,7 @@ void CryptoKernelAgent::GUI_updateRecordListItems()
 		} catch (...) {}
 	};
 	
-	auto showRecordListItemById = [this, &showRecordListItem](record_id_t id) {
+	auto showRecordListItemById = [this, &showRecordListItem](types::record_id id) {
 		try {
 			auto item = this->records_.idsMap.at(id)->item;
 			showRecordListItem(item);
@@ -49,7 +49,7 @@ void CryptoKernelAgent::GUI_updateRecordListItems()
 	};
 	
 	
-	auto processGroupId = [this, &groupIdQueue, &showRecordListItemById](group_id_t groupId) {
+	auto processGroupId = [this, &groupIdQueue, &showRecordListItemById](types::group_id groupId) {
 		for (auto childGroupId: this->kernel_->groups(groupId))
 			groupIdQueue.push(childGroupId);
 		for_each(this->kernel_->records(groupId), showRecordListItemById);
@@ -63,7 +63,7 @@ void CryptoKernelAgent::GUI_updateRecordListItems()
 			showRecordListItem(reinterpret_cast<RecordItem *>(selectedItem));
 		} else if (selectedItemType == ItemType::Group) {	// Adding group into the queue for processing
 			auto groupItem = reinterpret_cast<GroupItem *>(selectedItem);
-			group_id_t groupId;
+			types::group_id groupId;
 			try {
 				groupId = this->groups_.itemsMap.at(groupItem)->id;
 			} catch (...) {}
@@ -72,7 +72,7 @@ void CryptoKernelAgent::GUI_updateRecordListItems()
 			showRecordListItemByTypeItem(reinterpret_cast<TypeItem *>(selectedItem));
 		} else if (selectedItemType == ItemType::RootGroup) {	// "Data"
 			auto rootGroupItem = reinterpret_cast<GroupItem *>(selectedItem);
-			group_id_t rootGroupId;
+			types::group_id rootGroupId;
 			try {
 				rootGroupId = this->groups_.itemsMap.at(rootGroupItem)->id;
 			} catch (...) { break; }
@@ -131,7 +131,7 @@ void CryptoKernelAgent::GUI_updateRecordContent()
 		recordContentWidget->setGroupName(parentGroupName);
 		
 		// Adding types to record list widget
-		recordContentWidget->addTypeField(invalid_tfield_id, QObject::tr("<Raw>"));
+		recordContentWidget->addTypeField(types::tfield_id::invalid(), QObject::tr("<Raw>"));
 		for (auto typeFieldId: this->kernel_->type_fields(typeId)) {
 			auto typeFieldName = QString::fromStdString(this->kernel_->type_field_name(typeId, typeFieldId));
 			recordContentWidget->addTypeField(typeFieldId, typeFieldName);
@@ -174,17 +174,17 @@ void CryptoKernelAgent::GUI_onRecordGroupNameClicked()
 	std::cerr << "Copy group name \"" << groupName.toStdString() << "\"." << std::endl;
 }
 
-void CryptoKernelAgent::GUI_onRecordFieldClicked(rfield_id_t fieldId)
+void CryptoKernelAgent::GUI_onRecordFieldClicked(types::rfield_id fieldId)
 {
 	auto fieldData = this->GUI_mainWindow()->recordContentWidget()->originalField(fieldId);
 	std::cerr << "Copy field data \"" << fieldData.toStdString() << "\"." << std::endl;
 }
 
-void CryptoKernelAgent::GUI_onRecordFieldChanged(rfield_id_t fieldId, QString newText)
+void CryptoKernelAgent::GUI_onRecordFieldChanged(types::rfield_id fieldId, QString newText)
 {
 	try {
 		auto recordId = this->GUI_mainWindow()->recordContentWidget()->recordId();
-		if (recordId == invalid_record_id) return;
+		if (recordId.is_invalid()) return;
 		
 		if (newText.size() == 0) {
 			this->kernel_->remove_field(recordId, fieldId);
@@ -200,7 +200,7 @@ void CryptoKernelAgent::GUI_onRecordFieldChanged(rfield_id_t fieldId, QString ne
 void CryptoKernelAgent::GUI_addRecordField()
 { this->DATA_addRecordField(); }
 
-void CryptoKernelAgent::GUI_setRecordFieldType(rfield_id_t fieldId, tfield_id_t typeFieldId)
+void CryptoKernelAgent::GUI_setRecordFieldType(types::rfield_id fieldId, types::tfield_id typeFieldId)
 { this->DATA_setRecordFieldType(fieldId, typeFieldId); }
 
 
@@ -235,8 +235,8 @@ void CryptoKernelAgent::GUI_addGroup()
 		
 		// Inserting group like "New group 1"
 		QString newGroupName, newGroupNamePrefix = QObject::tr("New group ");
-		auto newGroupId = invalid_group_id;
-		for (size_t i = 1; newGroupId == invalid_group_id; ++i) {
+		auto newGroupId = types::group_id::invalid();
+		for (size_t i = 1; newGroupId.is_invalid(); ++i) {
 			newGroupName = newGroupNamePrefix + QString::number(i);
 			newGroupId = this->kernel_->add_group(parentGroupId, newGroupName.toStdString());
 		}
@@ -278,8 +278,8 @@ void CryptoKernelAgent::GUI_addRecord()
 		
 		// Inserting record like "New record 1"
 		QString newRecordName, newRecordNamePrefix = QObject::tr("New record ");
-		auto newRecordId = invalid_record_id;
-		for (size_t i = 1; newRecordId == invalid_record_id; ++i) {
+		auto newRecordId = types::record_id::invalid();
+		for (size_t i = 1; newRecordId.is_invalid(); ++i) {
 			newRecordName = newRecordNamePrefix + QString::number(i);
 			newRecordId = this->kernel_->add_record(groupId, newRecordName.toStdString(), typeId);
 		}
@@ -297,8 +297,8 @@ void CryptoKernelAgent::GUI_addType()
 {
 	// Inserting type like "New type 1"
 	QString newTypeName, newTypeNamePrefix = QObject::tr("New type ");
-	auto newTypeId = invalid_type_id;
-	for (size_t i = 1; newTypeId == invalid_type_id; ++i) {
+	auto newTypeId = types::type_id::invalid();
+	for (size_t i = 1; newTypeId.is_invalid(); ++i) {
 		newTypeName = newTypeNamePrefix + QString::number(i);
 		newTypeId = this->kernel_->add_type(newTypeName.toStdString());
 	}
@@ -385,7 +385,7 @@ void CryptoKernelAgent::GUI_showTypeEditDialog()
 			}
 		};
 		
-		auto changeTypeFieldName = [this, item, &info, &dialog](tfield_id_t fieldId, QString newName)
+		auto changeTypeFieldName = [this, item, &info, &dialog](types::tfield_id fieldId, QString newName)
 		{
 			auto oldName = QString::fromStdString(this->kernel_->type_field_name(info.id, fieldId));
 			if (newName == oldName) {
@@ -400,7 +400,7 @@ void CryptoKernelAgent::GUI_showTypeEditDialog()
 			}
 			
 			fieldId = this->kernel_->set_type_field_name(info.id, fieldId, newName.toStdString());
-			if (fieldId == invalid_tfield_id)
+			if (fieldId.is_invalid())
 				this->GUI_showWarning(QObject::tr("Error"),
 									  QObject::tr("Can't set name \"%1\" to the type field \"%2\": "
 												  "type field with the same name already exists.").arg(newName, oldName));
@@ -408,7 +408,7 @@ void CryptoKernelAgent::GUI_showTypeEditDialog()
 				dialog.confirmFieldChanges(fieldId);
 				
 				auto shownRecordId = this->GUI_mainWindow()->recordContentWidget()->recordId();
-				if (shownRecordId != invalid_record_id
+				if (shownRecordId.is_valid()
 					&& this->kernel_->record_type(shownRecordId) == info.id)
 					this->GUI_updateRecordContent();
 			}
@@ -418,8 +418,8 @@ void CryptoKernelAgent::GUI_showTypeEditDialog()
 		{
 			static const QString fieldNamePrefix = QObject::tr("New field ");
 			
-			tfield_id_t fieldId = invalid_tfield_id;
-			for (size_t i = 1; fieldId == invalid_tfield_id; ++i) {	// Adding type field like "New field 1"
+			types::tfield_id fieldId = types::tfield_id::invalid();
+			for (size_t i = 1; fieldId.is_invalid(); ++i) {	// Adding type field like "New field 1"
 				auto fieldName = (fieldNamePrefix + QString::number(i)).toStdString();
 				fieldId = this->kernel_->add_type_field(info.id, fieldName);
 			}
@@ -429,7 +429,7 @@ void CryptoKernelAgent::GUI_showTypeEditDialog()
 			dialog.addField(fieldId, fieldName);
 			
 			auto shownRecordId = this->GUI_mainWindow()->recordContentWidget()->recordId();
-			if (shownRecordId != invalid_record_id
+			if (shownRecordId.is_valid()
 				&& this->kernel_->record_type(shownRecordId) == info.id)
 				this->GUI_updateRecordContent();
 		};

@@ -1,6 +1,6 @@
 // Author: Dmitry Kukovinets (d1021976@gmail.com)
 
-inline bool CryptoKernelAgent::Groups::cached(group_id_t id)
+inline bool CryptoKernelAgent::Groups::cached(types::group_id id)
 {
 	if (this->idsMap.find(id) == this->idsMap.end())
 		return false;
@@ -15,7 +15,7 @@ inline bool CryptoKernelAgent::Groups::cached(GroupItem *item)
 }
 
 
-inline bool CryptoKernelAgent::Records::cached(record_id_t id)
+inline bool CryptoKernelAgent::Records::cached(types::record_id id)
 {
 	if (this->idsMap.find(id) == this->idsMap.end())
 		return false;
@@ -30,7 +30,7 @@ inline bool CryptoKernelAgent::Records::cached(RecordItem *item)
 }
 
 
-inline bool CryptoKernelAgent::Types::cached(type_id_t id)
+inline bool CryptoKernelAgent::Types::cached(types::type_id id)
 {
 	if (this->idsMap.find(id) == this->idsMap.end())
 		return false;

@@ -108,7 +108,7 @@ bool CryptoKernelAgent::Groups::add(const CryptoKernelAgent::Groups::GroupInfo &
 }
 
 
-void CryptoKernelAgent::Groups::erase(group_id_t id)
+void CryptoKernelAgent::Groups::erase(types::group_id id)
 {
 	auto it1 = this->idsMap.find(id);
 	if (it1 == this->idsMap.end()) return;
@@ -142,7 +142,7 @@ void CryptoKernelAgent::Groups::clear()
 void CryptoKernelAgent::DATA_addRootGroup()
 {
 	auto rootGroupId = this->kernel_->root_group_id();
-	if (rootGroupId == invalid_group_id)	// Creating root group, if it does not exist
+	if (rootGroupId.is_invalid())	// Creating root group, if it does not exist
 		rootGroupId = this->kernel_->add_root_group();
 	
 	QString rootGroupName = QObject::tr("Data");
@@ -177,11 +177,11 @@ void CryptoKernelAgent::DATA_removeRootGroup()
 }
 
 
-bool CryptoKernelAgent::DATA_loadGroup(group_id_t id)	// Do NOT load ROOT group, use DATA_addRootGroup()!
+bool CryptoKernelAgent::DATA_loadGroup(types::group_id id)	// Do NOT load ROOT group, use DATA_addRootGroup()!
 {
 	try {
 		auto parentGroupId = this->kernel_->group_parent_group(id);
-		if (parentGroupId == invalid_group_id) throw (int());
+		if (parentGroupId.is_invalid()) throw (int());
 		auto parentGroupItem = this->groups_.idsMap.at(parentGroupId)->item;
 		
 		Groups::GroupInfo info;
@@ -199,7 +199,7 @@ bool CryptoKernelAgent::DATA_loadGroup(group_id_t id)	// Do NOT load ROOT group,
 
 void CryptoKernelAgent::DATA_loadGroups()
 {
-	std::queue<group_id_t> groupIdQueue;	// Queue for BFS
+	std::queue<types::group_id> groupIdQueue;	// Queue for BFS
 	
 	// Adding root group
 	{
@@ -230,7 +230,7 @@ bool CryptoKernelAgent::DATA_groupItemNameChanged(GroupItem *item)
 		if (newName == info.name) return true;
 		
 		auto id = this->kernel_->set_group_name(info.id, newName.toStdString());
-		if (id == invalid_group_id) {	// Name not changed
+		if (id.is_invalid()) {	// Name not changed
 			this->GUI_showWarning(QObject::tr("Error"),
 								  QObject::tr("Can't set name \"%1\" to the group \"%2\": "
 											  "group with the same name already exists.").arg(newName, info.name));
@@ -276,7 +276,7 @@ bool CryptoKernelAgent::Records::add(const CryptoKernelAgent::Records::RecordInf
 }
 
 
-void CryptoKernelAgent::Records::erase(record_id_t id)
+void CryptoKernelAgent::Records::erase(types::record_id id)
 {
 	auto it1 = this->idsMap.find(id);
 	if (it1 == this->idsMap.end()) return;
@@ -325,13 +325,13 @@ void CryptoKernelAgent::Records::clear()
 }
 
 
-bool CryptoKernelAgent::DATA_loadRecord(record_id_t id)
+bool CryptoKernelAgent::DATA_loadRecord(types::record_id id)
 {
 	try {
 		auto recordListWidget = this->GUI_mainWindow()->mainWidget()->recordListWidget();
 		
 		auto parentGroupId = this->kernel_->record_parent_group(id);
-		if (parentGroupId == invalid_group_id) throw (int());
+		if (parentGroupId.is_invalid()) throw (int());
 		
 		auto parentGroupItem = this->groups_.idsMap.at(parentGroupId)->item;
 		
@@ -372,10 +372,10 @@ void CryptoKernelAgent::DATA_addRecordField()
 	static const QString newRecordName = QObject::tr("New field");
 	
 	auto recordId = this->GUI_mainWindow()->recordContentWidget()->recordId();
-	if (recordId == invalid_record_id) return;
+	if (recordId.is_invalid()) return;
 	
-	auto recordFieldId = this->kernel_->add_field(recordId, invalid_tfield_id, newRecordName.toStdString());
-	if (recordFieldId == invalid_rfield_id)
+	auto recordFieldId = this->kernel_->add_field(recordId, types::tfield_id::invalid(), newRecordName.toStdString());
+	if (recordFieldId.is_invalid())
 		this->GUI_showWarning(QObject::tr("Error"),
 							  QObject::tr("Unknown error."));
 	else {
@@ -386,10 +386,10 @@ void CryptoKernelAgent::DATA_addRecordField()
 }
 
 
-void CryptoKernelAgent::DATA_setRecordFieldType(rfield_id_t fieldId, tfield_id_t typeFieldId)
+void CryptoKernelAgent::DATA_setRecordFieldType(types::rfield_id fieldId, types::tfield_id typeFieldId)
 {
 	auto recordId = this->GUI_mainWindow()->recordContentWidget()->recordId();
-	if (recordId == invalid_record_id) return;
+	if (recordId.is_invalid()) return;
 	this->kernel_->set_field_type(recordId, fieldId, typeFieldId);
 }
 
@@ -403,7 +403,7 @@ bool CryptoKernelAgent::DATA_recordItemNameChanged(RecordItem *item)
 		if (newName == info.name) return true;
 		
 		auto id = this->kernel_->set_record_name(info.id, newName.toStdString());
-		if (id == invalid_record_id) {	// Name not changed
+		if (id.is_invalid()) {	// Name not changed
 			this->GUI_showWarning(QObject::tr("Error"),
 								  QObject::tr("Can't set name \"%1\" to the record \"%2\": "
 											  "record with the same name already exists.").arg(newName, info.name));
@@ -439,7 +439,7 @@ bool CryptoKernelAgent::Types::add(const CryptoKernelAgent::Types::TypeInfo &inf
 }
 
 
-void CryptoKernelAgent::Types::erase(record_id_t id)
+void CryptoKernelAgent::Types::erase(types::type_id id)
 {
 	auto it1 = this->idsMap.find(id);
 	if (it1 == this->idsMap.end()) return;
@@ -470,7 +470,7 @@ void CryptoKernelAgent::Types::clear()
 }
 
 
-bool CryptoKernelAgent::DATA_loadType(type_id_t id)
+bool CryptoKernelAgent::DATA_loadType(types::type_id id)
 {
 	Types::TypeInfo info;
 	info.id = id;
@@ -495,14 +495,14 @@ void CryptoKernelAgent::DATA_loadTypes()
 }
 
 
-void CryptoKernelAgent::DATA_removeTypeField(TypeItem *item, tfield_id_t fieldId)
+void CryptoKernelAgent::DATA_removeTypeField(TypeItem *item, types::tfield_id fieldId)
 {
 	try {
-		auto id = this->types_.itemsMap.at(item)->id;
-		this->kernel_->remove_type_field(id, fieldId);
+		auto typeId = this->types_.itemsMap.at(item)->id;
+		this->kernel_->remove_type_field(typeId, fieldId);
 		
-		if (this->GUI_mainWindow()->recordContentWidget()->recordId() != invalid_record_id
-			&& this->kernel_->record_type(this->GUI_mainWindow()->recordContentWidget()->recordId()) == id)
+		if (this->GUI_mainWindow()->recordContentWidget()->recordId().is_valid()
+			&& this->kernel_->record_type(this->GUI_mainWindow()->recordContentWidget()->recordId()) == typeId)
 			this->GUI_updateRecordContent();
 	} catch (...) {}
 }
@@ -517,7 +517,7 @@ bool CryptoKernelAgent::DATA_typeItemNameChanged(TypeItem *item)
 		if (newName == info.name) return true;
 		
 		auto id = this->kernel_->set_type_name(info.id, newName.toStdString());
-		if (id == invalid_type_id) {	// Name not changed
+		if (id.is_invalid()) {	// Name not changed
 			item->setName(info.name);
 			this->GUI_showWarning(QObject::tr("Error"),
 								  QObject::tr("Can't set name \"%1\" to the type \"%2\": "

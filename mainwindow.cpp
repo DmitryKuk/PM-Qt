@@ -82,7 +82,7 @@ MainWindow::MainWindow(CryptoKernelAgent *agent,
 	this->connect(this->addRecordFieldAction_, &QAction::triggered,
 				  [this]() { this->agent_->GUI_addRecordField(); });
 	this->connect(this->recordContentWidget(), &RecordContentWidget::fieldTypeChanged,
-				  [this](rfield_id_t fieldId, tfield_id_t typeFieldId) { this->agent_->GUI_setRecordFieldType(fieldId, typeFieldId); });
+				  [this](types::rfield_id fieldId, types::tfield_id typeFieldId) { this->agent_->GUI_setRecordFieldType(fieldId, typeFieldId); });
 	this->connect(this->recordContentWidget(), &RecordContentWidget::nameChanged,
 				  [this](QString newName) { this->agent_->GUI_onRecordNameChanged(newName); });
 	this->connect(this->recordContentWidget(), &RecordContentWidget::typeNameClicked,
@@ -92,9 +92,9 @@ MainWindow::MainWindow(CryptoKernelAgent *agent,
 	
 	
 	this->connect(this->recordContentWidget(), &RecordContentWidget::fieldClicked,
-				  [this](int index) { this->agent_->GUI_onRecordFieldClicked(index); });
+				  [this](types::rfield_id id) { this->agent_->GUI_onRecordFieldClicked(id); });
 	this->connect(this->recordContentWidget(), &RecordContentWidget::fieldChanged,
-				  [this](int index, QString newText) { this->agent_->GUI_onRecordFieldChanged(index, newText); });
+				  [this](types::rfield_id id, QString newText) { this->agent_->GUI_onRecordFieldChanged(id, newText); });
 	
 	// Group list: items names
 	this->connect(this->groupListWidget(), &GroupListWidget::itemChanged,

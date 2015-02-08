@@ -56,21 +56,21 @@ void TypeEditDialog::confirmNameChanges()
 { this->nameLineEdit_->confirmText(); }
 
 
-QString TypeEditDialog::field(tfield_id_t id) const
+QString TypeEditDialog::field(types::tfield_id id) const
 {
 	auto it = this->fields_.find(id);
 	if (it == this->fields_.end()) return "";
 	return (*it)->text();
 }
 
-QString TypeEditDialog::originalField(tfield_id_t id) const
+QString TypeEditDialog::originalField(types::tfield_id id) const
 {
 	auto it = this->fields_.find(id);
 	if (it == this->fields_.end()) return "";
 	return (*it)->originalText();
 }
 
-void TypeEditDialog::addField(tfield_id_t id, const QString &text)
+void TypeEditDialog::addField(types::tfield_id id, const QString &text)
 {
 	auto lineEdit = new LineEditConfirm(text, this->scrollArea_);	// LineEdit with text of the second
 	this->scrollAreaLayout_->addWidget(lineEdit);
@@ -82,7 +82,7 @@ void TypeEditDialog::addField(tfield_id_t id, const QString &text)
 				  [this, id](QString newText) { this->onFieldChanged(id, newText); });
 }
 
-void TypeEditDialog::removeField(tfield_id_t id)
+void TypeEditDialog::removeField(types::tfield_id id)
 {
 	auto it = this->fields_.find(id);
 	if (it == this->fields_.end()) return;
@@ -90,7 +90,7 @@ void TypeEditDialog::removeField(tfield_id_t id)
 	this->fields_.erase(it);
 }
 
-void TypeEditDialog::confirmFieldChanges(tfield_id_t id)
+void TypeEditDialog::confirmFieldChanges(types::tfield_id id)
 {
 	auto it = this->fields_.find(id);
 	if (it == this->fields_.end()) return;
@@ -114,7 +114,7 @@ void TypeEditDialog::onNameChanged(QString newText)
 { emit nameChanged(newText); }
 
 
-void TypeEditDialog::onFieldChanged(tfield_id_t id, QString newText)
+void TypeEditDialog::onFieldChanged(types::tfield_id id, QString newText)
 { emit fieldChanged(id, newText); }
 
 void TypeEditDialog::onAddFieldActionActivated()

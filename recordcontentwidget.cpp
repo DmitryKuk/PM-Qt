@@ -79,17 +79,17 @@ RecordContentWidget::~RecordContentWidget()
 }
 
 
-record_id_t RecordContentWidget::recordId() const
+types::record_id RecordContentWidget::recordId() const
 { return this->recordId_; }
 
-void RecordContentWidget::setRecordId(record_id_t id)
+void RecordContentWidget::setRecordId(types::record_id id)
 { this->recordId_ = id; }
 
 
-type_id_t RecordContentWidget::recordTypeId() const
+types::type_id RecordContentWidget::recordTypeId() const
 { return this->recordTypeId_; }
 
-void RecordContentWidget::setRecordTypeId(type_id_t id)
+void RecordContentWidget::setRecordTypeId(types::type_id id)
 { this->recordTypeId_ = id; }
 
 
@@ -120,7 +120,7 @@ void RecordContentWidget::setTypeName(const QString &typeName)
 { this->typeContent_->setText(typeName); }
 
 
-void RecordContentWidget::addTypeField(tfield_id_t id, const QString &fieldName)
+void RecordContentWidget::addTypeField(types::tfield_id id, const QString &fieldName)
 {
 	this->typeFieldNames_[id] = fieldName;
 	this->typeFieldsOrder_.push_back(id);
@@ -129,14 +129,14 @@ void RecordContentWidget::addTypeField(tfield_id_t id, const QString &fieldName)
 }
 
 
-QString RecordContentWidget::field(rfield_id_t id) const
+QString RecordContentWidget::field(types::rfield_id id) const
 { return this->fields_[id].second->text(); }
 
-QString RecordContentWidget::originalField(rfield_id_t id) const
+QString RecordContentWidget::originalField(types::rfield_id id) const
 { return this->fields_[id].second->originalText(); }
 
 
-void RecordContentWidget::addField(rfield_id_t fieldId, tfield_id_t fieldTypeId, const QString &fieldData)
+void RecordContentWidget::addField(types::rfield_id fieldId, types::tfield_id fieldTypeId, const QString &fieldData)
 {
 	auto comboBox = new QComboBox(this->scrollArea_);
 	auto lineEdit = new LineEditConfirm(fieldData, this);
@@ -161,7 +161,7 @@ void RecordContentWidget::addField(rfield_id_t fieldId, tfield_id_t fieldTypeId,
 	
 	// Connections
 	this->connect(comboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-				  [this, fieldId](int fieldTypeIndex) { this->onFieldTypeChanged(fieldId, fieldTypeIndex); });
+				  [this, fieldId](int typeFieldIndex) { this->onFieldTypeChanged(fieldId, typeFieldIndex); });
 	this->connect(lineEdit, &LineEditConfirm::accepted,
 				  [this, fieldId](QString newText) { this->onFieldChanged(fieldId, newText); });
 	
@@ -170,7 +170,7 @@ void RecordContentWidget::addField(rfield_id_t fieldId, tfield_id_t fieldTypeId,
 }
 
 
-void RecordContentWidget::removeField(rfield_id_t id)
+void RecordContentWidget::removeField(types::rfield_id id)
 {
 	auto it = this->fields_.find(id);
 	if (it != this->fields_.end()) {
@@ -180,7 +180,7 @@ void RecordContentWidget::removeField(rfield_id_t id)
 	}
 }
 
-void RecordContentWidget::confirmFieldChanges(rfield_id_t id)
+void RecordContentWidget::confirmFieldChanges(types::rfield_id id)
 { this->fields_[id].second->confirmText(); }
 
 
@@ -192,8 +192,8 @@ void RecordContentWidget::clear()
 	this->groupContent_->setText("");
 	this->typeContent_->setText("");
 	
-	this->recordId_ = invalid_record_id;
-	this->recordTypeId_ = invalid_type_id;
+	this->recordId_ = types::record_id::invalid();
+	this->recordTypeId_ = types::type_id::invalid();
 	
 	this->typeFieldNames_.clear();
 	this->typeFieldsOrder_.clear();
@@ -226,15 +226,15 @@ void RecordContentWidget::writeSettings(QSettings &settings, const QString &pref
 
 // Slots
 
-void RecordContentWidget::onFieldClicked(rfield_id_t id)
+void RecordContentWidget::onFieldClicked(types::rfield_id id)
 { emit fieldClicked(id); }
 
-void RecordContentWidget::onFieldChanged(rfield_id_t id, QString newText)
+void RecordContentWidget::onFieldChanged(types::rfield_id id, QString newText)
 { emit fieldChanged(id, newText); }
 
-void RecordContentWidget::onFieldTypeChanged(rfield_id_t fieldId, tfield_id_t typeFieldIndex)
+void RecordContentWidget::onFieldTypeChanged(types::rfield_id fieldId, int typeFieldIndex)
 {
-	auto fieldTypeId = this->typeFieldsOrder_.value(typeFieldIndex, invalid_tfield_id);
-	if (fieldTypeId != invalid_tfield_id)
-		emit fieldTypeChanged(fieldId, fieldTypeId);
+	auto typeFieldId = this->typeFieldsOrder_.value(typeFieldIndex, types::tfield_id::invalid());
+	if (typeFieldId.is_valid())
+		emit fieldTypeChanged(fieldId, typeFieldId);
 }

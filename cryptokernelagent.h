@@ -49,11 +49,11 @@ public:
 	void GUI_onRecordTypeNameClicked();
 	void GUI_onRecordGroupNameClicked();
 	
-	void GUI_onRecordFieldClicked(rfield_id_t fieldId);
-	void GUI_onRecordFieldChanged(rfield_id_t fieldId, QString newText);
+	void GUI_onRecordFieldClicked(types::rfield_id fieldId);
+	void GUI_onRecordFieldChanged(types::rfield_id fieldId, QString newText);
 	
 	void GUI_addRecordField();
-	void GUI_setRecordFieldType(rfield_id_t fieldId, tfield_id_t typeFieldId);
+	void GUI_setRecordFieldType(types::rfield_id fieldId, types::tfield_id typeFieldId);
 	
 	// Group list
 	void GUI_onItemDataChanged(QTreeWidgetItem *item, int index);	// Group, record or type name changed
@@ -88,7 +88,7 @@ private:
 	
 	struct Groups {	// Groups maps
 		struct GroupInfo {
-			group_id_t id;
+			types::group_id id;
 			GroupItem *item;
 			
 			QString name;
@@ -98,24 +98,24 @@ private:
 		
 		
 		Container list;
-		std::unordered_map<group_id_t, iterator> idsMap;
+		std::unordered_map<types::group_id, iterator> idsMap;
 		std::unordered_map<GroupItem *, iterator> itemsMap;
 		// The root group in mainWindow->leftPanel->groupListWidget availible as
 		// groupIdsMap[kernel_.root_group_id()]
 		
 		
 		bool add(const GroupInfo &info);
-		void erase(group_id_t id);
+		void erase(types::group_id id);
 		void erase(GroupItem *item);
 		
-		inline bool cached(group_id_t id);
+		inline bool cached(types::group_id id);
 		inline bool cached(GroupItem *item);
 		
 		void clear();
 	};	// struct Groups
 	Groups groups_;
 	
-	bool DATA_loadGroup(group_id_t id);
+	bool DATA_loadGroup(types::group_id id);
 	void DATA_loadGroups();	// Unsafe! Use loadData()!
 	
 	void DATA_addRootGroup();	// Unsafe! Use loadData()!
@@ -127,7 +127,7 @@ private:
 	
 	struct Records {	// Records maps and set of shown items
 		struct RecordInfo {
-			record_id_t id;
+			types::record_id id;
 			RecordItem *item;
 			QTreeWidgetItem *recordListItem;
 			
@@ -138,7 +138,7 @@ private:
 		
 		
 		Container list;
-		std::unordered_map<record_id_t, iterator> idsMap;
+		std::unordered_map<types::record_id, iterator> idsMap;
 		std::unordered_map<RecordItem *, iterator> itemsMap;
 		std::unordered_map<QTreeWidgetItem *, iterator> recordListItemsMap;
 		
@@ -149,22 +149,22 @@ private:
 		
 		
 		bool add(const RecordInfo &info);
-		void erase(record_id_t id);
+		void erase(types::record_id id);
 		void erase(RecordItem *item);
 		void erase(QTreeWidgetItem *recordListItem);
 		
-		inline bool cached(record_id_t id);
+		inline bool cached(types::record_id id);
 		inline bool cached(RecordItem *item);
 		
 		void clear();
 	};	// struct Records
 	Records records_;
 	
-	bool DATA_loadRecord(record_id_t id);
+	bool DATA_loadRecord(types::record_id id);
 	void DATA_loadRecords();	// Unsafe! Use loadData()!
 	
 	void DATA_addRecordField();
-	void DATA_setRecordFieldType(rfield_id_t fieldId, tfield_id_t typeFieldId);
+	void DATA_setRecordFieldType(types::rfield_id fieldId, types::tfield_id typeFieldId);
 	
 	void DATA_removeRecord(RecordItem *item);
 	
@@ -173,7 +173,7 @@ private:
 	
 	struct Types {	// Type maps and root group
 		struct TypeInfo {
-			type_id_t id;
+			types::type_id id;
 			TypeItem *item;
 			
 			QString name;
@@ -183,27 +183,27 @@ private:
 		
 		
 		Container list;
-		std::unordered_map<type_id_t, iterator> idsMap;
+		std::unordered_map<types::type_id, iterator> idsMap;
 		std::unordered_map<TypeItem *, iterator> itemsMap;
 		GroupItem *rootGroup = nullptr;	// Root group of types in mainWindow->leftPanel->groupListWidget
 		
 		
 		bool add(const TypeInfo &info);
-		void erase(type_id_t id);
+		void erase(types::type_id id);
 		void erase(TypeItem *item);
 		
-		inline bool cached(type_id_t id);
+		inline bool cached(types::type_id id);
 		inline bool cached(TypeItem *item);
 		
 		void clear();
 	};	// struct Types
 	Types types_;
 	
-	bool DATA_loadType(type_id_t id);
+	bool DATA_loadType(types::type_id id);
 	void DATA_loadTypes();	// Unsafe! Use loadData()!
 	
 	void DATA_removeType(TypeItem *item);
-	void DATA_removeTypeField(TypeItem *item, tfield_id_t fieldId);
+	void DATA_removeTypeField(TypeItem *item, types::tfield_id fieldId);
 	
 	bool DATA_typeItemNameChanged(TypeItem *item);
 	

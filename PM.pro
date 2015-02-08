@@ -31,7 +31,7 @@ SOURCES += main.cpp \
 		typeeditdialog.cpp \
 		cryptokernelagent.cpp cryptokernelagent_data.cpp cryptokernelagent_gui.cpp
 
-HEADERS += types.h \
+HEADERS += types.h types.hpp \
 		mainwindow.h mainwindow.hpp \
 		taskwidget.h \
 		tasklistwidget.h \

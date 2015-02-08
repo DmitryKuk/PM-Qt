@@ -26,21 +26,21 @@ public:
 	void setName(const QString &name);
 	void confirmNameChanges();
 	
-	QString field(tfield_id_t id) const;
-	QString originalField(tfield_id_t id) const;
-	void addField(tfield_id_t id, const QString &text);
-	void removeField(tfield_id_t id);
-	void confirmFieldChanges(tfield_id_t id);
+	QString field(types::tfield_id id) const;
+	QString originalField(types::tfield_id id) const;
+	void addField(types::tfield_id id, const QString &text);
+	void removeField(types::tfield_id id);
+	void confirmFieldChanges(types::tfield_id id);
 	
 	void clear();
 signals:
 	void nameChanged(QString newName);
-	void fieldChanged(tfield_id_t id, QString newText);
+	void fieldChanged(types::tfield_id id, QString newText);
 	void fieldAdded();
 private:
 	// Slots
 	void onNameChanged(QString newText);
-	void onFieldChanged(tfield_id_t id, QString newText);
+	void onFieldChanged(types::tfield_id id, QString newText);
 	void onAddFieldActionActivated();
 	
 	
@@ -49,7 +49,7 @@ private:
 	QDialogButtonBox *buttonBox_;
 	QVBoxLayout *mainLayout_, *scrollAreaLayout_;
 	
-	QMap<tfield_id_t, LineEditConfirm *> fields_;
+	QMap<types::tfield_id, LineEditConfirm *> fields_;
 	
 	// Context menu
 	QAction *addTypeFieldAction_;
