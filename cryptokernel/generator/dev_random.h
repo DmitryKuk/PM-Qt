@@ -53,13 +53,19 @@ public:
 	inline universal_dev_random & operator=(universal_dev_random &&other);		// Move
 	
 	template<class Num>
-	Num generate() const;	// override final
+	inline Num generate() const;	// Generates any number (if id, it may be incorrect, remebmer to check!)
+	
+	template<class Num, class MappingType = double>
+	Num generate(const Num &min, const Num &max) const;	// Generates number in [min, max] diapasone
+	
+	template<class Num>
+	inline const universal_dev_random & operator>>(Num &n) const;	// Same as generate<Num>()
 private:
 	using raw_dev_random::operator();
 };
 
 
-template<class Num>
+template<class Num, class MappingType = double>
 class dev_random:
 	public raw_dev_random,
 	public simple<Num>
@@ -67,22 +73,19 @@ class dev_random:
 public:
 	// Constructors and operator=()
 	inline dev_random();									// Default
-	inline dev_random(const dev_random<Num> &other);		// Copy
-	inline dev_random(dev_random<Num> &&other);				// Move
+	inline dev_random(const dev_random<Num, MappingType> &other);		// Copy
+	inline dev_random(dev_random<Num, MappingType> &&other);				// Move
 	
 	inline dev_random & operator=(const dev_random &other);	// Copy
 	inline dev_random & operator=(dev_random &&other);		// Move
 	
-	virtual Num operator()() const override final;
+	virtual Num operator()() const override final;	// Generates any number (if id, it may be incorrect, use id_generator!)
+	virtual Num operator()(const Num &min, const Num &max) const override final;	// Generates number in [min, max] diapasone
 private:
 	using raw_dev_random::operator();
 };
 
 }; // namespace generator
-
-
-template<class Num>
-inline const generator::universal_dev_random & operator>>(const generator::universal_dev_random &g, Num &n);
 
 
 #include "dev_random.hpp"

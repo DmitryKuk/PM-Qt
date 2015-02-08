@@ -5,7 +5,6 @@
 # Sources
 SOURCES_CPP = \
 	cryptokernel.cpp \
-	types.cpp \
 	generator/generator.cpp \
 	generator/dev_random.cpp
 
@@ -22,7 +21,7 @@ TEST_SOURCES_CPP = \
 
 
 # Compiler and library archiever
-GPP = g++ -Wall -std=c++11
+GPP = g++ -Wall -std=c++11 $(EXTRA_FLAGS)
 AR = ar cr
 
 # Objects and target files

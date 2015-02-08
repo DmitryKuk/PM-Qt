@@ -1,6 +1,6 @@
 // Author: Dmitry Kukovinets (d1021976@gmail.com)
 
-// Id (number)
+// Number
 template<class Id>
 inline void io::read(std::istream &stream, Id &id)
 {
@@ -13,6 +13,20 @@ inline void io::write(std::ostream &stream, const Id &id)
 {
 	if (!(stream << id << ' ')) throw (io::exception());
 }
+
+
+// Id
+template<class ReprType, class RawId, class ...Args>
+inline void io::read(std::istream &stream, types::universal_id<ReprType, RawId, Args...> &id)
+{
+	typename types::universal_id<ReprType, RawId, Args...>::raw_id_type raw_id;
+	io::read(stream, raw_id);
+	id = raw_id;
+}
+
+template<class ReprType, class RawId, class ...Args>
+inline void io::write(std::ostream &stream, const types::universal_id<ReprType, RawId, Args...> &id)
+{ io::write(stream, id.value()); }
 
 
 // String

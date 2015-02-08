@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 
+#include "types.h"
 #include "double_map.h"
 
 namespace io {
@@ -17,12 +18,20 @@ typedef std::exception exception;
 // manually check function parameters.
 
 
-// Id (number)
+// Number
 template<class Id>
 inline void read(std::istream &stream, Id &id);
 
 template<class Id>
 inline void write(std::ostream &stream, const Id &id);
+
+
+// Id
+template<class ReprType, class RawId, class ...Args>
+inline void read(std::istream &stream, types::universal_id<ReprType, RawId, Args...> &id);
+
+template<class ReprType, class RawId, class ...Args>
+inline void write(std::ostream &stream, const types::universal_id<ReprType, RawId, Args...> &id);
 
 
 // String

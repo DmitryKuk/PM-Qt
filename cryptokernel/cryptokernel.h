@@ -43,55 +43,55 @@ public:
   // Metadata management
   // Types management (every type has own set of fields)
 	// Returns all types ids (ids are ordered by user)
-	std::vector<type_id_t> types() const;
+	std::vector<types::type_id> types() const;
 	
 	
 	// Return true if type exists, false otherwise
-	bool test_type(type_id_t tid) const;
+	bool test_type(types::type_id tid) const;
 	
 	// Generates new type id and adds it with name
-	type_id_t add_type(const std::string &type_name);
+	types::type_id add_type(const std::string &type_name);
 	
 	// Removes existing type with its fields,
 	// resetting records of this type and their fields to invalid
-	type_id_t remove_type(type_id_t tid);
+	types::type_id remove_type(types::type_id tid);
 	
 	
 	// Returns type id if it exists or empty string
-	std::string type_name(type_id_t tid) const;
+	std::string type_name(types::type_id tid) const;
 	
 	// Sets new name for existing type or returns invalid_type_id
-	type_id_t set_type_name(type_id_t tid, const std::string &type_name);
+	types::type_id set_type_name(types::type_id tid, const std::string &type_name);
   // End of types management
 	
 	
   // Fields management (field ids are unique for same type)
 	// Returns all fields ids for type (ids are ordered by user) or empty vector
-	std::vector<tfield_id_t> type_fields(type_id_t tid) const;
+	std::vector<types::tfield_id> type_fields(types::type_id tid) const;
 	
 	
 	// Returns true if type and field exist, false otherwise
-	bool test_type_field(type_id_t tid, tfield_id_t fid) const;
+	bool test_type_field(types::type_id tid, types::tfield_id fid) const;
 	
 	// Generates new field id and adds it with name
-	tfield_id_t add_type_field(type_id_t tid, const std::string &field_name, const std::string &field_format = "");
+	types::tfield_id add_type_field(types::type_id tid, const std::string &field_name, const std::string &field_format = "");
 	
 	// Removes existing type field, resetting all records' fields of this type to invalid
-	tfield_id_t remove_type_field(type_id_t tid, tfield_id_t fid);
+	types::tfield_id remove_type_field(types::type_id tid, types::tfield_id fid);
 	
 	
 	// Returns type field name if it exists or "", if not
-	std::string type_field_name(type_id_t tid, tfield_id_t fid) const;
+	std::string type_field_name(types::type_id tid, types::tfield_id fid) const;
 	
 	// Sets new name for existing field of existing type or returns invalid_tfield_id
-	tfield_id_t set_type_field_name(type_id_t tid, tfield_id_t fid, const std::string &field_name);
+	types::tfield_id set_type_field_name(types::type_id tid, types::tfield_id fid, const std::string &field_name);
 	
 	
 	// Returns field format, if field fid exists in type tid or ""
-	std::string type_field_format(type_id_t tid, tfield_id_t fid) const;
+	std::string type_field_format(types::type_id tid, types::tfield_id fid) const;
 	
 	// Sets field format, if field fid exists in type tid or returns invalid_tfield_id
-	tfield_id_t set_type_field_format(type_id_t tid, tfield_id_t fid, const std::string &format);
+	types::tfield_id set_type_field_format(types::type_id tid, types::tfield_id fid, const std::string &format);
   // End of fields management
   // End of metadata management
 	
@@ -99,114 +99,114 @@ public:
   // Data management
   // Records and groups management
 	// Returns root group id
-	group_id_t root_group_id() const;
+	types::group_id root_group_id() const;
 	
 	
 	// Returns all records ids
-	std::vector<record_id_t> records() const;
+	std::vector<types::record_id> records() const;
 	
 	// Returns all records ids in group gid
-	std::vector<record_id_t> records(group_id_t gid) const;
+	std::vector<types::record_id> records(types::group_id gid) const;
 	
 	// Returns all records of type tid
-	std::vector<record_id_t> records_of_type(type_id_t tid) const;
+	std::vector<types::record_id> records_of_type(types::type_id tid) const;
 	
 	
 	// Returns all groups ids
-	std::vector<group_id_t> groups() const;
+	std::vector<types::group_id> groups() const;
 	
 	// Returns all groups ids in group gid
-	std::vector<record_id_t> groups(group_id_t gid) const;
+	std::vector<types::group_id> groups(types::group_id gid) const;
 	
 	
 	// Return true if record exists, false otherwise
-	bool test_record(record_id_t rid) const;
+	bool test_record(types::record_id rid) const;
 	
 	// Return true if group exists, false otherwise
-	bool test_group(group_id_t gid) const;
+	bool test_group(types::group_id gid) const;
 	
 	
 	// Generates new record id and adds it with name into existing group
 	// or returns invalid_record_id
-	record_id_t add_record(group_id_t gid, const std::string &record_name, type_id_t record_type);
+	types::record_id add_record(types::group_id gid, const std::string &record_name, types::type_id record_type);
 	
 	// Generates new group id and adds it with name into existing group
 	// or returns invalid_group_id
-	group_id_t add_group(group_id_t gid, const std::string &group_name);
+	types::group_id add_group(types::group_id gid, const std::string &group_name);
 	
 	// Generates new root group id and adds it or returns invalid_group_id
-	group_id_t add_root_group();
+	types::group_id add_root_group();
 	
 	
 	// Removes existing record or returns invalid_record_id
-	record_id_t remove_record(record_id_t rid);
+	types::record_id remove_record(types::record_id rid);
 	
 	// Removes existing group or returns invalid_group_id
-	group_id_t remove_group(group_id_t gid);
+	types::group_id remove_group(types::group_id gid);
 	
 	
 	// Returns record id if it exists or empty string
-	std::string record_name(record_id_t rid) const;
+	std::string record_name(types::record_id rid) const;
 	
 	// Returns group id if it exists or empty string
-	std::string group_name(group_id_t gid) const;
+	std::string group_name(types::group_id gid) const;
 	
 	
 	// Sets new name for existing record or returns invalid_record_id
-	record_id_t set_record_name(record_id_t rid, const std::string &record_name);
+	types::record_id set_record_name(types::record_id rid, const std::string &record_name);
 	
 	// Sets new name for existing group or returns invalid_group_id
-	group_id_t set_group_name(group_id_t gid, const std::string &group_name);
+	types::group_id set_group_name(types::group_id gid, const std::string &group_name);
 	
 	
 	// Returns record type id if record exists or invalid_type_id
-	type_id_t record_type(record_id_t rid) const;
+	types::type_id record_type(types::record_id rid) const;
 	
 	// Sets new type for existing record if if does not contain fields
 	// or returns invalid_record_id
-	record_id_t set_record_type(record_id_t rid, type_id_t record_type_id);
+	types::record_id set_record_type(types::record_id rid, types::type_id record_type_id);
 	
 	
 	// Returns records parent group id if record exists or invalid_group_id
-	group_id_t record_parent_group(record_id_t rid) const;
+	types::group_id record_parent_group(types::record_id rid) const;
 	
 	// Returns groups parent group id if group exists or invalid_group_id
-	group_id_t group_parent_group(group_id_t gid) const;
+	types::group_id group_parent_group(types::group_id gid) const;
 	
 	
 	// Sets new parent group for existing record or returns invalid_record_id
-	record_id_t set_record_parent_group(record_id_t rid, group_id_t parent_group_id);
+	types::record_id set_record_parent_group(types::record_id rid, types::group_id parent_group_id);
 	
 	// Sets new parent group for existing group or returns invalid_group_id
-	group_id_t set_group_parent_group(group_id_t gid, group_id_t parent_group_id);
+	types::group_id set_group_parent_group(types::group_id gid, types::group_id parent_group_id);
   // End of records and groups management
 	
   // Fields management (field ids are unique for same record)
 	// Returns all fields ids for record (ids are ordered by user) or empty vector
-	std::vector<rfield_id_t> fields(record_id_t rid) const;
+	std::vector<types::rfield_id> fields(types::record_id rid) const;
 	
 	
 	// Returns true if record and field exist, false otherwise
-	bool test_field(record_id_t rid, rfield_id_t fid) const;
+	bool test_field(types::record_id rid, types::rfield_id fid) const;
 	
 	// Generates new field id and adds it with name
-	rfield_id_t add_field(record_id_t rid, tfield_id_t type, const std::string &data = "");
+	types::rfield_id add_field(types::record_id rid, types::tfield_id type, const std::string &data = "");
 	
 	// Removes existing field
-	rfield_id_t remove_field(record_id_t rid, rfield_id_t fid);
+	types::rfield_id remove_field(types::record_id rid, types::rfield_id fid);
 	
 	// Returns field type, if field fid exists in record rid, or invalid_type_id
-	tfield_id_t field_type(record_id_t rid, rfield_id_t fid) const;
+	types::tfield_id field_type(types::record_id rid, types::rfield_id fid) const;
 	
 	// Sets field type or returns invalid_tfield_id, if it is impossible
-	rfield_id_t set_field_type(record_id_t rid, rfield_id_t fid, tfield_id_t type);
+	types::rfield_id set_field_type(types::record_id rid, types::rfield_id fid, types::tfield_id type);
 	
 	
 	// Returns field data, if field fid exists in record rid, or ""
-	std::string field_data(record_id_t rid, rfield_id_t fid) const;
+	std::string field_data(types::record_id rid, types::rfield_id fid) const;
 	
 	// Sets field data, if field fid exists in record rid, or returns invalid_tfield_id
-	rfield_id_t set_field_data(record_id_t rid, rfield_id_t fid, const std::string &data);
+	types::rfield_id set_field_data(types::record_id rid, types::rfield_id fid, const std::string &data);
   // End of fields management
   // End of data management
 	
@@ -220,86 +220,86 @@ private:
 	
   // Generators
 	// Default generators types
-	typedef generator::dev_random<type_id_t> type_generator_t;
-	typedef generator::dev_random<tfield_id_t> tfield_genertor_t;
-	typedef generator::dev_random<record_id_t> record_generator_t;
-	typedef generator::dev_random<rfield_id_t> rfield_generator_t;
-	typedef generator::dev_random<group_id_t> group_generator_t;
+	typedef generator::id_generator<generator::dev_random, types::type_id	> type_generator;
+	typedef generator::id_generator<generator::dev_random, types::tfield_id	> tfield_generator_t;
+	typedef generator::id_generator<generator::dev_random, types::record_id	> record_generator;
+	typedef generator::id_generator<generator::dev_random, types::rfield_id	> rfield_generator;
+	typedef generator::id_generator<generator::dev_random, types::group_id	> group_generator;
 	
-	type_generator_t type_generator_;		// Default type ids generator
-	tfield_genertor_t tfield_generator_;	// Default type field ids generator
-	record_generator_t record_generator_;	// Default record ids generator
-	rfield_generator_t rfield_generator_;	// Default record field ids generator
-	group_generator_t group_generator_;		// Default group ids generator
+	type_generator type_generator_;			// Default type ids generator
+	tfield_generator_t tfield_generator_;	// Default type field ids generator
+	record_generator record_generator_;		// Default record ids generator
+	rfield_generator rfield_generator_;		// Default record field ids generator
+	group_generator group_generator_;		// Default group ids generator
   // End of generators
 	
   // Types and fields containers
-	struct tfield_t	// Type field
+	struct tfield	// Type field
 	{
 		std::string format;
 	};
 	
-	struct type_t	// Type
+	struct type	// Type
 	{
-		// Fields double map: field id, field name: tfield_t
-		typedef double_map<tfield_id_t, std::string, tfield_t> tfields_dmap_t;
+		// Fields double map: field id, field name: tfield
+		typedef double_map<types::tfield_id, std::string, tfield> tfields_dmap_t;
 		
 		tfields_dmap_t fields;
 	};
 	
-	// Types double map: type id, type name: type_t
-	typedef double_map<type_id_t, std::string, type_t> types_dmap_t;
+	// Types double map: type id, type name: type
+	typedef double_map<types::type_id, std::string, type> types_dmap_t;
 	
 	types_dmap_t types_;	// Types map
   // End of types and fields containers
 	
   // Types and fields orders containers
-	typedef std::vector<tfield_id_t> tfields_order_t;
-	typedef std::vector<std::pair<type_id_t, tfields_order_t>> types_order_t;
+	typedef std::vector<types::tfield_id> tfields_order_t;
+	typedef std::vector<std::pair<types::type_id, tfields_order_t>> types_order_t;
 	
 	types_order_t types_order_;
   // End of types and fields orders containers
 	
 	
   // Data containers
-	struct rfield_t	// Record field
+	struct rfield	// Record field
 	{
-		tfield_id_t type;	// This fields type
+		types::tfield_id type;	// This fields type
 		std::string data;	// Data this field contains
 	};
 	
-	struct record_t	// Record
+	struct record	// Record
 	{
-		// Fields map: field id: rfield_t
-		typedef random_map<rfield_id_t, rfield_t> rfields_rmap_t;
+		// Fields map: field id: rfield
+		typedef random_map<types::rfield_id, rfield> rfields_rmap;
 		
-		type_id_t type;							// Type this record is of
-		group_id_t parent_group;				// Group containing this record
-		rfields_rmap_t fields;					// This records fields
-		std::vector<rfield_id_t> fields_order;	// This records fields order container
+		types::type_id type;						// Type this record is of
+		types::group_id parent_group;				// Group containing this record
+		rfields_rmap fields;						// This records fields
+		std::vector<types::rfield_id> fields_order;	// This records fields order container
 	};
 	
 	// Groups and records hierarchy
-	struct group_t	// Group
+	struct group	// Group
 	{
 		// Records double map: record id, record name: record data
-		typedef double_map<record_id_t, std::string, record_id_t> records_dmap_t;
+		typedef double_map<types::record_id, std::string, types::record_id> records_dmap;
 		
 		// Groups double map: group id, group name: group data
-		typedef double_map<group_id_t, std::string, group_id_t> groups_dmap_t;
+		typedef double_map<types::group_id, std::string, types::group_id> groups_dmap;
 		
-		group_id_t parent_group;	// Group containing this record
-		groups_dmap_t groups;		// Groups this group contain
-		records_dmap_t records;		// Records this group contain
+		types::group_id parent_group;	// Group containing this record
+		groups_dmap groups;				// Groups this group contain
+		records_dmap records;			// Records this group contain
 	};
 	
 	// Global records and groups containers
-	typedef random_map<record_id_t, record_t> records_rmap_t;
-	typedef random_map<group_id_t, group_t> groups_rmap_t;
+	typedef random_map<types::record_id, record> records_rmap;
+	typedef random_map<types::group_id, group> groups_rmap;
 	
-	records_rmap_t records_;
-	groups_rmap_t groups_;
-	group_id_t root_group_id_;
+	records_rmap records_;
+	groups_rmap groups_;
+	types::group_id root_group_id_;
   // End of data containers
 	
 	

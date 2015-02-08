@@ -64,73 +64,101 @@ generator::universal_dev_random::operator=(generator::universal_dev_random &&oth
 
 
 template<class Num>
+inline
 Num
 generator::universal_dev_random::generate() const
+{ return this->generate<Num>(std::numeric_limits<Num>::min(), std::numeric_limits<Num>::max()); }
+
+template<class Num, class MappingType>
+Num generator::universal_dev_random::generate(const Num &min, const Num &max) const	// Generates number in [min, max] diapasone
 {
-	Num n(0);
-	if (this->status() == status::not_initialized) return n;
+	if (min >= max) return min;
 	
-	(*this)(static_cast<void *>(&n), sizeof(Num));
-	return n;
-}
-
-
-// Simple
-// Constructors and operator=()
-template<class Num>
-inline
-generator::dev_random<Num>::dev_random():
-	generator::raw_dev_random()
-{}
-
-template<class Num>
-inline
-generator::dev_random<Num>::dev_random(const generator::dev_random<Num> &other):	// Copy
-	generator::raw_dev_random(other)
-{}
-
-template<class Num>
-inline
-generator::dev_random<Num>::dev_random(generator::dev_random<Num> &&other):			// Move
-	generator::raw_dev_random(std::move(other))
-{}
-
-template<class Num>
-inline
-generator::dev_random<Num> &
-generator::dev_random<Num>::operator=(const generator::dev_random<Num> &other)		// Copy
-{
-	this->generator::raw_dev_random::operator=(other);
-	return *this;
-}
-
-template<class Num>
-inline
-generator::dev_random<Num> &
-generator::dev_random<Num>::operator=(generator::dev_random<Num> &&other)			// Move
-{
-	this->generator::raw_dev_random::operator=(std::move(other));
-	return *this;
-}
-
-
-template<class Num>
-Num
-generator::dev_random<Num>::operator()() const
-{
-	Num n(0);
-	if (this->status() == status::not_initialized) return n;
+	Num res(min);
+	(*this)(static_cast<void *>(&res), sizeof(Num));	// Generating using the raw form
+	if (this->bad()) return min;
 	
-	(*this)(static_cast<void *>(&n), sizeof(Num));
-	return n;
+	// Mapping [global_min, global_max] (for example: [0, 4E+9]) into local [min, max] diapasone:
+	// min + (res - global_min) * local_len / global_len
+	constexpr Num global_min = std::numeric_limits<Num>::min(),
+				  global_max = std::numeric_limits<Num>::max();
+	MappingType global_len = static_cast<MappingType>(global_max - global_min),
+				local_len  = static_cast<MappingType>(max - min);
+	
+	return static_cast<Num>(min + ((res - global_min) * local_len) / global_len);
 }
 
 
 template<class Num>
 inline
 const generator::universal_dev_random &
-operator>>(const generator::universal_dev_random &g, Num &n)
+generator::universal_dev_random::operator>>(Num &n) const
 {
-	n = g.generate<Num>();
-	return g;
+	n = this->generate<Num>();
+	return *this;
+}
+
+
+// Simple
+// Constructors and operator=()
+template<class Num, class MappingType>
+inline
+generator::dev_random<Num, MappingType>::dev_random():
+	generator::raw_dev_random()
+{}
+
+template<class Num, class MappingType>
+inline
+generator::dev_random<Num, MappingType>::dev_random(const generator::dev_random<Num, MappingType> &other):	// Copy
+	generator::raw_dev_random(other)
+{}
+
+template<class Num, class MappingType>
+inline
+generator::dev_random<Num, MappingType>::dev_random(generator::dev_random<Num, MappingType> &&other):		// Move
+	generator::raw_dev_random(std::move(other))
+{}
+
+template<class Num, class MappingType>
+inline
+generator::dev_random<Num, MappingType> &
+generator::dev_random<Num, MappingType>::operator=(const generator::dev_random<Num, MappingType> &other)	// Copy
+{
+	this->generator::raw_dev_random::operator=(other);
+	return *this;
+}
+
+template<class Num, class MappingType>
+inline
+generator::dev_random<Num, MappingType> &
+generator::dev_random<Num, MappingType>::operator=(generator::dev_random<Num, MappingType> &&other)			// Move
+{
+	this->generator::raw_dev_random::operator=(std::move(other));
+	return *this;
+}
+
+
+template<class Num, class MappingType>
+Num
+generator::dev_random<Num, MappingType>::operator()() const	// Generates any number (if id, it may be incorrect, remebmer to check!)
+{ return (*this)(std::numeric_limits<Num>::min(), std::numeric_limits<Num>::max()); }
+
+template<class Num, class MappingType>
+Num
+generator::dev_random<Num, MappingType>::operator()(const Num &min, const Num &max) const	// Generates number in [min, max] diapasone
+{
+	if (min >= max) return min;
+	
+	Num res(min);
+	(*this)(static_cast<void *>(&res), sizeof(Num));	// Generating using the raw form
+	if (this->bad()) return min;
+	
+	// Mapping [global_min, global_max] (for example: [0, 4E+9]) into local [min, max] diapasone:
+	// min + (res - global_min) * local_len / global_len
+	constexpr Num global_min = std::numeric_limits<Num>::min(),
+				  global_max = std::numeric_limits<Num>::max();
+	MappingType global_len = static_cast<MappingType>(global_max - global_min),
+				local_len  = static_cast<MappingType>(max - min);
+	
+	return static_cast<Num>(min + ((res - global_min) * local_len) / global_len);
 }

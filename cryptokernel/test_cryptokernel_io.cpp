@@ -44,7 +44,7 @@ int main()
 	auto g1r1 = k1.add_record(g1, "record_1", t1);
 	auto g1r1f1 = k1.add_field(g1r1, t1f1, "record_1_field_1");
 	
-	if (g1r1f1 == invalid_rfield_id) std::cerr << "ERROR: Field not inserted!" << std::endl;
+	if (g1r1f1.is_invalid()) std::cerr << "ERROR: Field not inserted!" << std::endl;
 	
 	std::stringstream s1, s2;
 	if (!k1.write(s1)) std::cout << "Types not wrote by k1!" << std::endl;

@@ -30,7 +30,7 @@ std::ostream & operator<<(std::ostream &f, const std::pair<T, T> &p)
 
 int main()
 {
-	std::vector<type_id_t> types;
+	std::vector<types::type_id> types;
 	cryptokernel k;
 	
 	// Adding types
@@ -50,44 +50,44 @@ int main()
 	// Type changing
 	
 	std::cerr << "Setting \"new hello\"..." << std::endl
-			  << ((k.set_type_name(types[0], "new hello") != invalid_type_id)?
+			  << ((k.set_type_name(types[0], "new hello").is_valid())?
 				 "OK: Correct type changed":
 				 "ERROR: Can't set correct type") << std::endl;
 	
 	std::cerr << "Setting \"new hello 1\"..." << std::endl
-			  << ((k.set_type_name(types[0], "new hello 1") != invalid_type_id)?
+			  << ((k.set_type_name(types[0], "new hello 1").is_valid())?
 				 "OK: Correct type changed":
 				 "ERROR: Can't set correct type") << std::endl;
 	
 	std::cerr << "Setting \"new hello\" again..." << std::endl
-			  << ((k.set_type_name(types[0], "new hello") != invalid_type_id)?
+			  << ((k.set_type_name(types[0], "new hello").is_valid())?
 				 "OK: Correct type changed":
 				 "ERROR: Can't set correct type") << std::endl;
 	
 	
-	std::cerr << ((k.set_type_name(0, "new incorrect type") == invalid_type_id)?
+	std::cerr << ((k.set_type_name(types::type_id(0), "new incorrect type").is_invalid())?
 				 "OK: Incorrect type not changed":
 				 "ERROR: Invalid type changed") << std::endl;
 	
 	// Field changing
-	std::cerr << ((k.set_type_field_name(types[0], k.type_fields(types[0])[0], "hello new field 1") != invalid_type_id)?
+	std::cerr << ((k.set_type_field_name(types[0], k.type_fields(types[0])[0], "hello new field 1").is_valid())?
 				 "OK: Correct type, correct field changed":
 				 "ERROR: Can't set correct type, correct field") << std::endl;
 	
-	std::cerr << ((k.set_type_field_name(types[0], 0, "hello new incorrect field") == invalid_tfield_id)?
+	std::cerr << ((k.set_type_field_name(types[0], types::tfield_id(0), "hello new incorrect field").is_invalid())?
 				 "OK: Correct type, incorrect field not changed":
 				 "ERROR: Changed correct type, incorrect field") << std::endl;
 	
-	std::cerr << ((k.set_type_field_name(0, 0, "incorrect type new incorrect field") == invalid_tfield_id)?
+	std::cerr << ((k.set_type_field_name(types::type_id(0), types::tfield_id(0), "incorrect type new incorrect field").is_invalid())?
 				 "OK: Incorrect type, incorrect field not changed":
 				 "ERROR: Changed incorrect type, incorrect field") << std::endl;
 	
 	// Removing types
-	std::cerr << ((k.remove_type(types[1]) != invalid_type_id)?
+	std::cerr << ((k.remove_type(types[1]).is_valid())?
 				 "OK: Correct type removed":
 				 "ERROR: Correct type not removed") << std::endl;
 	
-	std::cerr << ((k.remove_type(0) == invalid_type_id)?
+	std::cerr << ((k.remove_type(types::type_id(0)).is_invalid())?
 				 "OK: Incorrect type not removed":
 				 "ERROR: Incorrect type removed") << std::endl;
 	
