@@ -2,26 +2,36 @@
 
 # This is simple makefile for build cryptokernel
 
-# Sources
-SOURCES_CPP = \
-	cryptokernel.cpp \
-	generator/generator.cpp \
+# Sources and headers
+HEADERS =											\
+	cryptokernel.h									\
+	types.h types.hpp								\
+	io.h io.hpp										\
+	triple.h triple.hpp								\
+	random_map.h random_map.hpp						\
+	double_map.h double_map.hpp						\
+	generator/generator.h generator/generator.hpp	\
+	generator/dev_random.h generator/dev_random.hpp
+
+SOURCES_CPP =					\
+	cryptokernel.cpp			\
+	generator/generator.cpp		\
 	generator/dev_random.cpp
 
 # Static library
 TARGET_LIB = libcryptokernel.a
 
 # Tests
-TEST_SOURCES_CPP = \
-	test_dev_random.cpp \
-	test_random_map.cpp \
-	test_double_map.cpp \
-	test_cryptokernel.cpp \
+TEST_SOURCES_CPP =				\
+	test_dev_random.cpp			\
+	test_random_map.cpp			\
+	test_double_map.cpp			\
+	test_cryptokernel.cpp		\
 	test_cryptokernel_io.cpp
 
 
 # Compiler and library archiever
-GPP = g++ -Wall -std=c++11 $(EXTRA_FLAGS)
+GPP = g++ -Wall -std=c++11 $(EXTRA_CFLAGS)
 AR = ar cr
 
 # Objects and target files
@@ -44,7 +54,7 @@ $(TARGET_LIB)(%.o): %.o
 	$(AR) "$@" "$<"
 
 # Objects compilation
-%.o: %.cpp
+%.o: %.cpp $(HEADERS)
 	$(GPP) -c -o "$@" "$<"
 
 
