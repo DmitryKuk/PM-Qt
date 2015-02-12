@@ -56,6 +56,7 @@ HEADERS += types.h types.hpp \
 # Cryptokernel
 libcryptokernel.target = cryptokernel/libcryptokernel.a
 libcryptokernel.commands = make --directory='cryptokernel'
-QMAKE_EXTRA_TARGETS += libcryptokernel
+libcryptokernel.depends = FORCE
 PRE_TARGETDEPS += cryptokernel/libcryptokernel.a
 LIBS += cryptokernel/libcryptokernel.a
+QMAKE_EXTRA_TARGETS += libcryptokernel
