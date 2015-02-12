@@ -306,10 +306,10 @@ private:
   // Deprecated members
 	// Deprecated constructor and operator=()
 	[[deprecated("Don't copy crypto_kernel!")]]
-	cryptokernel(const cryptokernel &other);				// Copy
+	cryptokernel(const cryptokernel &other) = delete;				// Copy
 	
 	[[deprecated("Don't copy crypto_kernel!")]]
-	cryptokernel & operator=(const cryptokernel &other);	// Copy
+	cryptokernel & operator=(const cryptokernel &other) = delete;	// Copy
   // End of deprecated members
 };
 
