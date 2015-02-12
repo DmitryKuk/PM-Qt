@@ -17,12 +17,9 @@ CryptoKernelAgent::CryptoKernelAgent():
 
 CryptoKernelAgent::~CryptoKernelAgent()
 {
-	delete this->mainWindow_;
-	
 	std::ofstream f("test_input.txt");
 	if (!this->kernel_->write(f))
 		std::cerr << "ERROR: CryptoKernelAgent destructor: Kernel can't write data!" << std::endl;
-	delete this->kernel_;
 }
 
 

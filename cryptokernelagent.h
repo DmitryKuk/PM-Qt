@@ -17,6 +17,7 @@
 
 #include <unordered_map>
 #include <unordered_set>
+#include <memory>
 
 #include "cryptokernel/cryptokernel.h"
 #include "mainwindow.h"
@@ -38,7 +39,7 @@ public:
   // End of other functions
 	
   // GUI management
-	inline MainWindow * GUI_mainWindow() const;
+	inline MainWindow * GUI_mainWindow();
 	
 	// Update functions
 	void GUI_updateRecordListItems();
@@ -71,12 +72,12 @@ public:
   // End of GUI management
 private:
   // GUI management (see cryptokernelagent_gui.cpp)
-	MainWindow *mainWindow_;		// Main window attached to this agent
+	std::unique_ptr<MainWindow> mainWindow_;		// Main window attached to this agent
   // End of GUI management
 	
 	
   // Data management (see cryptokernelagent_data.cpp)
-	cryptokernel *kernel_;			// Cryptokernel used by this agent
+	std::unique_ptr<cryptokernel> kernel_;			// Cryptokernel used by this agent
 	
 	
 	QString DATA_typeName(RecordItem *recordItem) const;
@@ -214,10 +215,10 @@ private:
 	
 	// Deprecated constructor and operator=()
 	[[deprecated("Don't copy the agent!")]]
-	CryptoKernelAgent(const CryptoKernelAgent &other);
+	CryptoKernelAgent(const CryptoKernelAgent &other) = delete;
 	
 	[[deprecated("Don't copy the agent!")]]
-	CryptoKernelAgent & operator=(const CryptoKernelAgent &other);
+	CryptoKernelAgent & operator=(const CryptoKernelAgent &other) = delete;
 };
 
 
