@@ -131,7 +131,7 @@ void CryptoKernelAgent::GUI_updateRecordContent()
 		recordContentWidget->setGroupName(parentGroupName);
 		
 		// Adding types to record list widget
-		recordContentWidget->addTypeField(types::tfield_id::invalid(), QObject::tr("<Raw>"));
+		recordContentWidget->addTypeField(types::tfield_id::invalid(), this->tr("<Raw>"));
 		for (const auto typeFieldId: this->kernel_->type_fields(typeId)) {
 			auto typeFieldName = QString::fromStdString(this->kernel_->type_field_name(typeId, typeFieldId));
 			recordContentWidget->addTypeField(typeFieldId, typeFieldName);
@@ -234,7 +234,7 @@ void CryptoKernelAgent::GUI_addGroup()
 		types::group_id parentGroupId = this->groups_.itemsMap.at(selectedItem)->id;
 		
 		// Inserting group like "New group 1"
-		QString newGroupName, newGroupNamePrefix = QObject::tr("New group ");
+		QString newGroupName, newGroupNamePrefix = this->tr("New group ");
 		types::group_id newGroupId;
 		for (size_t i = 1; newGroupId.is_invalid(); ++i) {
 			newGroupName = newGroupNamePrefix + QString::number(i);
@@ -243,9 +243,9 @@ void CryptoKernelAgent::GUI_addGroup()
 		
 		this->DATA_loadGroup(newGroupId);
 	} catch (...) {
-		this->GUI_showWarning(QObject::tr("Error"),
-							  QObject::tr("Please, select parent group in list at the left "
-						  				  "and try again."));
+		this->GUI_showWarning(this->tr("Error"),
+							  this->tr("Please, select parent group in list at the left "
+						  			   "and try again."));
 	}
 }
 
@@ -277,7 +277,7 @@ void CryptoKernelAgent::GUI_addRecord()
 		types::type_id	typeId	= this->types_.itemsMap.at(typeItem)->id;
 		
 		// Inserting record like "New record 1"
-		QString newRecordName, newRecordNamePrefix = QObject::tr("New record ");
+		QString newRecordName, newRecordNamePrefix = this->tr("New record ");
 		types::record_id newRecordId;
 		for (size_t i = 1; newRecordId.is_invalid(); ++i) {
 			newRecordName = newRecordNamePrefix + QString::number(i);
@@ -286,17 +286,17 @@ void CryptoKernelAgent::GUI_addRecord()
 		
 		this->DATA_loadRecord(newRecordId);
 	} catch (...) {
-		this->GUI_showWarning(QObject::tr("Error"),
-							  QObject::tr("Please, select parent group in list at the left, "
-						  				  "then press Ctrl and select record type in the list "
-						  				  "and try again."));
+		this->GUI_showWarning(this->tr("Error"),
+							  this->tr("Please, select parent group in list at the left, "
+						  			   "then press Ctrl and select record type in the list "
+						  			   "and try again."));
 	}
 }
 
 void CryptoKernelAgent::GUI_addType()
 {
 	// Inserting type like "New type 1"
-	QString newTypeName, newTypeNamePrefix = QObject::tr("New type ");
+	QString newTypeName, newTypeNamePrefix = this->tr("New type ");
 	types::type_id newTypeId;
 	for (size_t i = 1; newTypeId.is_invalid(); ++i) {
 		newTypeName = newTypeNamePrefix + QString::number(i);
@@ -342,9 +342,9 @@ void CryptoKernelAgent::GUI_showTypeEditDialog()
 	auto groupListWidget = this->GUI_mainWindow()->groupListWidget();
 	auto selectedItems = groupListWidget->selectedItems();
 	if (selectedItems.size() != 1 || itemType(selectedItems[0]) != ItemType::Type) {
-		this->GUI_showWarning(QObject::tr("Error"),
-							  QObject::tr("Please, select a type in the list at the left "
-										  "and try again."));
+		this->GUI_showWarning(this->tr("Error"),
+							  this->tr("Please, select a type in the list at the left "
+									   "and try again."));
 		return;
 	}
 	auto item = reinterpret_cast<TypeItem *>(selectedItems[0]);
@@ -364,8 +364,8 @@ void CryptoKernelAgent::GUI_showTypeEditDialog()
 		auto changeTypeName = [this, item, &dialog](QString newName)
 		{
 			if (newName.isEmpty()) {
-				this->GUI_showWarning(QObject::tr("Error"),
-									  QObject::tr("Can't set empty name to the type."));
+				this->GUI_showWarning(this->tr("Error"),
+									  this->tr("Can't set empty name to the type."));
 				return;
 			}
 			
@@ -380,8 +380,8 @@ void CryptoKernelAgent::GUI_showTypeEditDialog()
 				if (this->DATA_typeItemNameChanged(item))
 					dialog.confirmNameChanges();
 			} catch (...) {
-				this->GUI_showWarning(QObject::tr("Error"),
-									  QObject::tr("Type does not exist."));
+				this->GUI_showWarning(this->tr("Error"),
+									  this->tr("Type does not exist."));
 			}
 		};
 		
@@ -401,9 +401,9 @@ void CryptoKernelAgent::GUI_showTypeEditDialog()
 			
 			typeFieldId = this->kernel_->set_type_field_name(info.id, typeFieldId, newName.toStdString());
 			if (typeFieldId.is_invalid())
-				this->GUI_showWarning(QObject::tr("Error"),
-									  QObject::tr("Can't set name \"%1\" to the type field \"%2\": "
-												  "type field with the same name already exists.").arg(newName, oldName));
+				this->GUI_showWarning(this->tr("Error"),
+									  this->tr("Can't set name \"%1\" to the type field \"%2\": "
+											   "type field with the same name already exists.").arg(newName, oldName));
 			else {
 				dialog.confirmFieldChanges(typeFieldId);
 				
@@ -416,7 +416,7 @@ void CryptoKernelAgent::GUI_showTypeEditDialog()
 		
 		auto addTypeField = [this, &info, &dialog]()
 		{
-			static const QString fieldNamePrefix = QObject::tr("New field ");
+			static const QString fieldNamePrefix = this->tr("New field ");
 			
 			types::tfield_id fieldId = types::tfield_id::invalid();
 			for (size_t i = 1; fieldId.is_invalid(); ++i) {	// Adding type field like "New field 1"
@@ -435,9 +435,9 @@ void CryptoKernelAgent::GUI_showTypeEditDialog()
 		};
 		
 		// Connections
-		QObject::connect(&dialog, &TypeEditDialog::nameChanged,  changeTypeName);
-		QObject::connect(&dialog, &TypeEditDialog::fieldChanged, changeTypeFieldName);
-		QObject::connect(&dialog, &TypeEditDialog::fieldAdded,   addTypeField);
+		this->connect(&dialog, &TypeEditDialog::nameChanged,  changeTypeName);
+		this->connect(&dialog, &TypeEditDialog::fieldChanged, changeTypeFieldName);
+		this->connect(&dialog, &TypeEditDialog::fieldAdded,   addTypeField);
 		
 		dialog.exec();
 	} catch (...) {}

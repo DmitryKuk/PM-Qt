@@ -28,8 +28,9 @@
 #include "typeitem.h"
 
 
-class CryptoKernelAgent
+class CryptoKernelAgent: public QObject
 {
+	Q_OBJECT
 public:
 	CryptoKernelAgent();
 	~CryptoKernelAgent();

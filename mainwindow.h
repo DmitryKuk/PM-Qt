@@ -31,15 +31,15 @@ public:
 	inline bool needSaveSettings() const;
 	inline void setSaveSettings(bool enable);
 	
-	inline LeftPanelWidget * leftPanelWidget() const;
-	inline GroupListWidget * groupListWidget() const;
-	inline TaskListWidget * taskListWidget() const;
+	inline LeftPanelWidget * leftPanelWidget();
+	inline GroupListWidget * groupListWidget();
+	inline TaskListWidget * taskListWidget();
 	
-	inline MainWidget * mainWidget() const;
-	inline RecordListWidget * recordListWidget() const;
-	inline RecordContentWidget * recordContentWidget() const;
+	inline MainWidget * mainWidget();
+	inline RecordListWidget * recordListWidget();
+	inline RecordContentWidget * recordContentWidget();
 	
-	inline CryptoKernelAgent * agent() const;
+	inline CryptoKernelAgent * agent();
 protected:
 	void closeEvent(QCloseEvent *event);
 private:

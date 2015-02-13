@@ -145,7 +145,7 @@ void CryptoKernelAgent::DATA_addRootGroup()
 	if (rootGroupId.is_invalid())	// Creating root group, if it does not exist
 		rootGroupId = this->kernel_->add_root_group();
 	
-	QString rootGroupName = QObject::tr("Data");
+	QString rootGroupName = this->tr("Data");
 	auto rootGroupItem = new GroupItem(rootGroupName, static_cast<GroupListWidget *>(nullptr), true);
 	
 	auto groupListWidget = this->GUI_mainWindow()->leftPanelWidget()->groupListWidget();
@@ -231,9 +231,9 @@ bool CryptoKernelAgent::DATA_groupItemNameChanged(GroupItem *item)
 		
 		auto id = this->kernel_->set_group_name(info.id, newName.toStdString());
 		if (id.is_invalid()) {	// Name not changed
-			this->GUI_showWarning(QObject::tr("Error"),
-								  QObject::tr("Can't set name \"%1\" to the group \"%2\": "
-											  "group with the same name already exists.").arg(newName, info.name));
+			this->GUI_showWarning(this->tr("Error"),
+								  this->tr("Can't set name \"%1\" to the group \"%2\": "
+										   "group with the same name already exists.").arg(newName, info.name));
 			item->setName(info.name);
 			return false;
 		} else {	// Name changed
@@ -369,15 +369,15 @@ void CryptoKernelAgent::DATA_loadRecords()
 
 void CryptoKernelAgent::DATA_addRecordField()
 {
-	static const QString newRecordName = QObject::tr("New field");
+	static const QString newRecordName = this->tr("New field");
 	
 	auto recordId = this->GUI_mainWindow()->recordContentWidget()->recordId();
 	if (recordId.is_invalid()) return;
 	
 	auto recordFieldId = this->kernel_->add_field(recordId, types::tfield_id::invalid(), newRecordName.toStdString());
 	if (recordFieldId.is_invalid())
-		this->GUI_showWarning(QObject::tr("Error"),
-							  QObject::tr("Unknown error."));
+		this->GUI_showWarning(this->tr("Error"),
+							  this->tr("Unknown error."));
 	else {
 		auto recordFieldData = QString::fromStdString(this->kernel_->field_data(recordId, recordFieldId));
 		auto recordFieldTypeId = this->kernel_->field_type(recordId, recordFieldId);
@@ -404,9 +404,9 @@ bool CryptoKernelAgent::DATA_recordItemNameChanged(RecordItem *item)
 		
 		auto id = this->kernel_->set_record_name(info.id, newName.toStdString());
 		if (id.is_invalid()) {	// Name not changed
-			this->GUI_showWarning(QObject::tr("Error"),
-								  QObject::tr("Can't set name \"%1\" to the record \"%2\": "
-											  "record with the same name already exists.").arg(newName, info.name));
+			this->GUI_showWarning(this->tr("Error"),
+								  this->tr("Can't set name \"%1\" to the record \"%2\": "
+										   "record with the same name already exists.").arg(newName, info.name));
 			item->setName(info.name);
 			return false;
 		} else {	// Name changed
@@ -485,7 +485,7 @@ void CryptoKernelAgent::DATA_loadTypes()
 {
 	// Creating root type group
 	auto rootGroupWidget = this->GUI_mainWindow()->leftPanelWidget()->groupListWidget();
-	this->types_.rootGroup = new GroupItem(QObject::tr("Types"), rootGroupWidget, true);
+	this->types_.rootGroup = new GroupItem(this->tr("Types"), rootGroupWidget, true);
 	setItemType(this->types_.rootGroup, ItemType::RootTypeGroup);
 	this->types_.rootGroup->setExpanded(true);
 	
@@ -519,9 +519,9 @@ bool CryptoKernelAgent::DATA_typeItemNameChanged(TypeItem *item)
 		auto id = this->kernel_->set_type_name(info.id, newName.toStdString());
 		if (id.is_invalid()) {	// Name not changed
 			item->setName(info.name);
-			this->GUI_showWarning(QObject::tr("Error"),
-								  QObject::tr("Can't set name \"%1\" to the type \"%2\": "
-											  "type with the same name already exists.").arg(newName, info.name));
+			this->GUI_showWarning(this->tr("Error"),
+								  this->tr("Can't set name \"%1\" to the type \"%2\": "
+										   "type with the same name already exists.").arg(newName, info.name));
 			return false;
 		} else {						// Name changed successfully
 			info.name = newName;

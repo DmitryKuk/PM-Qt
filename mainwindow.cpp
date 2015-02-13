@@ -64,41 +64,31 @@ MainWindow::MainWindow(CryptoKernelAgent *agent,
 	
 	// Connections
 	// Add group/record/type, remove selected, edit type
-	this->connect(this->addGroupAction_,  &QAction::triggered, [this]() { this->agent_->GUI_addGroup();            });
-	this->connect(this->addRecordAction_, &QAction::triggered, [this]() { this->agent_->GUI_addRecord();           });
-	this->connect(this->addTypeAction_,   &QAction::triggered, [this]() { this->agent_->GUI_addType();             });
-	this->connect(this->removeAction_,    &QAction::triggered, [this]() { this->agent_->GUI_removeSelectedItems(); });
-	this->connect(this->editTypeAction_,  &QAction::triggered, [this]() { this->agent_->GUI_showTypeEditDialog();  });
+	this->connect(this->addGroupAction_,  &QAction::triggered, this->agent_, &CryptoKernelAgent::GUI_addGroup);
+	this->connect(this->addRecordAction_, &QAction::triggered, this->agent_, &CryptoKernelAgent::GUI_addRecord);
+	this->connect(this->addTypeAction_,   &QAction::triggered, this->agent_, &CryptoKernelAgent::GUI_addType);
+	this->connect(this->removeAction_,    &QAction::triggered, this->agent_, &CryptoKernelAgent::GUI_removeSelectedItems);
+	this->connect(this->editTypeAction_,  &QAction::triggered, this->agent_, &CryptoKernelAgent::GUI_showTypeEditDialog);
 	
 	// Groups list -> records list
-	this->connect(this->groupListWidget(), &GroupListWidget::itemSelectionChanged,
-				  [this]() { this->agent_->GUI_updateRecordListItems(); });
+	this->connect(this->groupListWidget(), &GroupListWidget::itemSelectionChanged,		this->agent_, &CryptoKernelAgent::GUI_updateRecordListItems);
 	
 	// Records list -> record content widget
-	this->connect(this->recordListWidget(), &RecordListWidget::itemSelectionChanged,
-				  [this]() { this->agent_->GUI_updateRecordContent(); });
+	this->connect(this->recordListWidget(), &RecordListWidget::itemSelectionChanged,	this->agent_, &CryptoKernelAgent::GUI_updateRecordContent);
 	
 	// Record content -> agent
-	this->connect(this->addRecordFieldAction_, &QAction::triggered,
-				  [this]() { this->agent_->GUI_addRecordField(); });
-	this->connect(this->recordContentWidget(), &RecordContentWidget::fieldTypeChanged,
-				  [this](types::rfield_id fieldId, types::tfield_id typeFieldId) { this->agent_->GUI_setRecordFieldType(fieldId, typeFieldId); });
-	this->connect(this->recordContentWidget(), &RecordContentWidget::nameChanged,
-				  [this](QString newName) { this->agent_->GUI_onRecordNameChanged(newName); });
-	this->connect(this->recordContentWidget(), &RecordContentWidget::typeNameClicked,
-				  [this]() { this->agent_->GUI_onRecordTypeNameClicked(); });
-	this->connect(this->recordContentWidget(), &RecordContentWidget::groupNameClicked,
-				  [this]() { this->agent_->GUI_onRecordGroupNameClicked(); });
+	this->connect(this->addRecordFieldAction_, &QAction::triggered,						this->agent_, &CryptoKernelAgent::GUI_addRecordField);
 	
+	this->connect(this->recordContentWidget(), &RecordContentWidget::nameChanged,		this->agent_, &CryptoKernelAgent::GUI_onRecordNameChanged);
+	this->connect(this->recordContentWidget(), &RecordContentWidget::typeNameClicked,	this->agent_, &CryptoKernelAgent::GUI_onRecordTypeNameClicked);
+	this->connect(this->recordContentWidget(), &RecordContentWidget::groupNameClicked,	this->agent_, &CryptoKernelAgent::GUI_onRecordGroupNameClicked);
 	
-	this->connect(this->recordContentWidget(), &RecordContentWidget::fieldClicked,
-				  [this](types::rfield_id id) { this->agent_->GUI_onRecordFieldClicked(id); });
-	this->connect(this->recordContentWidget(), &RecordContentWidget::fieldChanged,
-				  [this](types::rfield_id id, QString newText) { this->agent_->GUI_onRecordFieldChanged(id, newText); });
+	this->connect(this->recordContentWidget(), &RecordContentWidget::fieldTypeChanged,	this->agent_, &CryptoKernelAgent::GUI_setRecordFieldType);
+	this->connect(this->recordContentWidget(), &RecordContentWidget::fieldClicked,		this->agent_, &CryptoKernelAgent::GUI_onRecordFieldClicked);
+	this->connect(this->recordContentWidget(), &RecordContentWidget::fieldChanged,		this->agent_, &CryptoKernelAgent::GUI_onRecordFieldChanged);
 	
 	// Group list: items names
-	this->connect(this->groupListWidget(), &GroupListWidget::itemChanged,
-				  [this](QTreeWidgetItem *item, int index) { this->agent_->GUI_onItemDataChanged(item, index); });
+	this->connect(this->groupListWidget(), &GroupListWidget::itemChanged,				this->agent_, &CryptoKernelAgent::GUI_onItemDataChanged);
 }
 
 
